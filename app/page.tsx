@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -18,21 +18,28 @@ export default function LoginPage() {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password: password.trim()
       })
 
       if (error) {
+        console.error('Login error:', error)
         setError(error.message)
         setLoading(false)
         return
       }
 
-      if (data.session) {
-        window.location.href = '/dashboard'
+      if (data?.session) {
+        // Use router.push for Next.js navigation
+        router.push('/dashboard')
+        router.refresh()
+      } else {
+        setError('No session returned. Please try again.')
+        setLoading(false)
       }
     } catch (err: any) {
-      setError(err.message || 'Unknown error occurred')
+      console.error('Unexpected error:', err)
+      setError('Connection error. Please try again.')
       setLoading(false)
     }
   }

@@ -7,17 +7,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: false,
-    flowType: 'pkce'
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'aisca-admin'
-    }
+    detectSessionInUrl: true,
+    flowType: 'implicit'
   }
 })
 
 export const supabaseAdmin = createClient(
   supabaseUrl,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
