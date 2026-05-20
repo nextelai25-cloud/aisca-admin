@@ -1,0 +1,562 @@
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer 
+} from 'recharts'
+import { 
+  Download, 
+  CircleDollarSign, 
+  TrendingUp, 
+  TrendingDown, 
+  PlusCircle, 
+  MinusCircle,
+  Calendar,
+  X
+} from 'lucide-react'
+
+// Custom tooltip styling
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-[#121212] border border-white/10 p-3 rounded-lg shadow-xl text-xs">
+        <p className="font-semibold text-gray-400 mb-1">{label}</p>
+        {payload.map((p: any) => (
+          <p key={p.name} className="font-bold" style={{ color: p.color }}>
+            {p.name}: LKR {Number(p.value).toLocaleString()}
+          </p>
+        ))}
+      </div>
+    )
+  }
+  return null
+}
+
+const categories = [
+  'Event Income', 
+  'Membership Fees', 
+  'Product Sales', 
+  'Sponsorship', 
+  'Food', 
+  'Transportation', 
+  'Venue', 
+  'Printing', 
+  'Other'
+]
+
+export default function FinancePage() {
+  const [loading, setLoading] = useState(true)
+  const [entries, setEntries] = useState<any[]>([])
+  
+  // Quick Entry Form
+  const [formOpen, setFormOpen] = useState(false)
+  const [formType, setFormType] = useState<'income' | 'expense'>('income')
+  const [formCategory, setFormCategory] = useState('Membership Fees')
+  const [formDescription, setFormDescription] = useState('')
+  const [formAmount, setFormAmount] = useState('')
+  const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0])
+  const [formSubmitting, setFormSubmitting] = useState(false)
+
+  // Filters
+  const [typeFilter, setTypeFilter] = useState('all')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+
+  useEffect(() => {
+    fetchLedger()
+  }, [])
+
+  async function fetchLedger() {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('finance_ledger')
+        .select('*')
+        .order('date', { ascending: true }) // Fetch ascending first to compute running balance chronologically
+
+      if (error) {
+        console.error("Error fetching ledger:", error.message)
+        return
+      }
+
+      setEntries(data || [])
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Handle Form Submit
+  const handleAddTransaction = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formAmount || isNaN(Number(formAmount))) {
+      alert("Please enter a valid amount")
+      return
+    }
+
+    try {
+      setFormSubmitting(true)
+      const newEntry = {
+        type: formType,
+        category: formCategory,
+        description: formDescription,
+        amount: Number(formAmount),
+        date: formDate
+      }
+
+      const { data, error } = await supabase
+        .from('finance_ledger')
+        .insert([newEntry])
+        .select()
+        .single()
+
+      if (error) {
+        alert(`Error adding entry: ${error.message}`)
+        return
+      }
+
+      // Add to entries list and trigger refetch to maintain chronological order
+      setEntries(prev => [...prev, data])
+      setFormOpen(false)
+      
+      // Reset form
+      setFormDescription('')
+      setFormAmount('')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setFormSubmitting(false)
+    }
+  }
+
+  // 1. Calculate running balances chronologically
+  let cumulativeBalance = 0
+  const computedEntries = entries.map(item => {
+    if (item.type === 'income') {
+      cumulativeBalance += Number(item.amount)
+    } else {
+      cumulativeBalance -= Number(item.amount)
+    }
+    return { ...item, runningBalance: cumulativeBalance }
+  })
+
+  // 2. Filter computed entries
+  const filteredEntries = computedEntries.filter(item => {
+    const matchesType = typeFilter === 'all' || item.type === typeFilter
+    const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter
+    
+    const matchesStart = !startDate || new Date(item.date) >= new Date(startDate)
+    const matchesEnd = !endDate || new Date(item.date) <= new Date(endDate)
+
+    return matchesType && matchesCategory && matchesStart && matchesEnd
+  })
+
+  // 3. Display newest transactions first
+  const displayItems = [...filteredEntries].reverse()
+
+  // Calculate aggregates
+  const totalIncome = filteredEntries
+    .filter(e => e.type === 'income')
+    .reduce((sum, e) => sum + Number(e.amount), 0)
+
+  const totalExpenses = filteredEntries
+    .filter(e => e.type === 'expense')
+    .reduce((sum, e) => sum + Number(e.amount), 0)
+
+  const netBalance = totalIncome - totalExpenses
+
+  // Recharts Chart Math: Group chronologically by Month/Year
+  const monthlyMap: Record<string, { income: number; expense: number }> = {}
+  computedEntries.forEach(item => {
+    const [year, month] = item.date.split('-')
+    const monthKey = `${year}-${month}`
+    if (!monthlyMap[monthKey]) {
+      monthlyMap[monthKey] = { income: 0, expense: 0 }
+    }
+    if (item.type === 'income') {
+      monthlyMap[monthKey].income += Number(item.amount)
+    } else {
+      monthlyMap[monthKey].expense += Number(item.amount)
+    }
+  })
+
+  const chartData = Object.keys(monthlyMap)
+    .sort()
+    .map(key => {
+      const [year, month] = key.split('-')
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      const label = `${monthNames[parseInt(month, 10) - 1]} '${year.slice(2)}`
+      return {
+        month: label,
+        "Income": monthlyMap[key].income,
+        "Expenses": monthlyMap[key].expense
+      }
+    })
+
+  // CSV Export
+  const handleExportCSV = () => {
+    if (filteredEntries.length === 0) return
+
+    const headers = ['Date', 'Type', 'Category', 'Description', 'Amount (LKR)', 'Running Balance (LKR)']
+    const csvRows = [
+      headers.join(','),
+      ...filteredEntries.map(item => [
+        item.date,
+        item.type.toUpperCase(),
+        `"${item.category}"`,
+        `"${item.description || ''}"`,
+        item.amount,
+        item.runningBalance
+      ].join(','))
+    ]
+
+    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n")
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement("a")
+    link.setAttribute("href", encodedUri)
+    link.setAttribute("download", `aisca_finance_ledger_${Date.now()}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-t-2 border-r-2 border-[#d4af37] rounded-full animate-spin"></div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-wider uppercase text-white">Finance Ledger</h1>
+          <p className="text-xs text-gray-500 tracking-wide uppercase mt-1">CFO Abstraction Layer & Bookkeeping Ledger</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setFormOpen(!formOpen)}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#d4af37] rounded-xl text-xs font-semibold uppercase tracking-wider text-black hover:bg-[#eac44e] transition-all"
+          >
+            {formOpen ? <X size={14} /> : <PlusCircle size={14} />}
+            <span>{formOpen ? 'Close Form' : 'New Transaction'}</span>
+          </button>
+          <button
+            onClick={handleExportCSV}
+            disabled={filteredEntries.length === 0}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          >
+            <Download size={14} />
+            <span>Export Ledger ({filteredEntries.length})</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Quick Entry Form Section */}
+      {formOpen && (
+        <div className="bg-[#0b0b0b] border border-white/10 p-6 rounded-2xl shadow-2xl animate-slide-down">
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Record New Ledger Entry</h3>
+          <form onSubmit={handleAddTransaction} className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {/* Type */}
+            <div>
+              <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Type</label>
+              <select
+                value={formType}
+                onChange={e => setFormType(e.target.value as 'income' | 'expense')}
+                className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none cursor-pointer"
+              >
+                <option value="income">Income (+)</option>
+                <option value="expense">Expense (-)</option>
+              </select>
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Category</label>
+              <select
+                value={formCategory}
+                onChange={e => setFormCategory(e.target.value)}
+                className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none cursor-pointer"
+              >
+                {categories.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Description</label>
+              <input
+                type="text"
+                placeholder="e.g. sponsorship payout"
+                value={formDescription}
+                onChange={e => setFormDescription(e.target.value)}
+                required
+                className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white placeholder-gray-600 focus:outline-none"
+              />
+            </div>
+
+            {/* Amount */}
+            <div>
+              <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Amount (LKR)</label>
+              <input
+                type="text"
+                placeholder="e.g. 50000"
+                value={formAmount}
+                onChange={e => setFormAmount(e.target.value)}
+                required
+                className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white placeholder-gray-600 focus:outline-none"
+              />
+            </div>
+
+            {/* Date & Button */}
+            <div className="flex flex-col md:flex-row items-end gap-3">
+              <div className="flex-1 w-full">
+                <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Transaction Date</label>
+                <input
+                  type="date"
+                  value={formDate}
+                  onChange={e => setFormDate(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={formSubmitting}
+                className="w-full md:w-auto px-6 py-2.5 bg-white text-black font-semibold rounded-xl text-xs uppercase tracking-wider hover:bg-gray-200 transition-all disabled:opacity-50"
+              >
+                {formSubmitting ? 'Posting...' : 'Post'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {/* Income Card */}
+        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-xl">
+          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-green-400">
+            <TrendingUp size={20} />
+          </div>
+          <div>
+            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Filtered Income</span>
+            <h3 className="text-xl font-bold text-white mt-1">LKR {totalIncome.toLocaleString()}</h3>
+          </div>
+        </div>
+
+        {/* Expense Card */}
+        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-xl">
+          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-red-400">
+            <TrendingDown size={20} />
+          </div>
+          <div>
+            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Filtered Expenses</span>
+            <h3 className="text-xl font-bold text-white mt-1">LKR {totalExpenses.toLocaleString()}</h3>
+          </div>
+        </div>
+
+        {/* Net balance Card */}
+        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-xl">
+          <div className={`w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center ${netBalance >= 0 ? 'text-[#d4af37]' : 'text-red-500'}`}>
+            <CircleDollarSign size={20} />
+          </div>
+          <div>
+            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Net Balance</span>
+            <h3 className={`text-xl font-bold mt-1 ${netBalance >= 0 ? 'text-white' : 'text-red-400'}`}>
+              LKR {netBalance.toLocaleString()}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts & Filter Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Advanced Filters */}
+        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-xl flex flex-col justify-between gap-4">
+          <div>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Ledger Filters</h4>
+            <div className="space-y-4">
+              {/* Type Filter */}
+              <div>
+                <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Transaction Type</label>
+                <select
+                  value={typeFilter}
+                  onChange={e => setTypeFilter(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none cursor-pointer"
+                >
+                  <option value="all">All Types</option>
+                  <option value="income">Incomes Only</option>
+                  <option value="expense">Expenses Only</option>
+                </select>
+              </div>
+
+              {/* Category Filter */}
+              <div>
+                <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Category</label>
+                <select
+                  value={categoryFilter}
+                  onChange={e => setCategoryFilter(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none cursor-pointer"
+                >
+                  <option value="all">All Categories</option>
+                  {categories.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Date Ranges */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Start Date</label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={e => setStartDate(e.target.value)}
+                    className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">End Date</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={e => setEndDate(e.target.value)}
+                    className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => { setTypeFilter('all'); setCategoryFilter('all'); setStartDate(''); setEndDate(''); }}
+            className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition-all text-center"
+          >
+            Clear Active Filters
+          </button>
+        </div>
+
+        {/* Monthly Performance Chart */}
+        <div className="lg:col-span-2 bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-xl">
+          <div className="mb-4">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Bookkeeping Timeline</h4>
+            <span className="text-[10px] text-gray-500 uppercase tracking-wide">Monthly Cash Flow Comparison</span>
+          </div>
+          <div className="h-[230px] w-full">
+            {chartData.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-xs text-gray-500 uppercase tracking-wider">
+                Insufficient data to render chart.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+                  <XAxis dataKey="month" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
+                  <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend verticalAlign="top" height={36} iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10, textTransform: 'uppercase' }} />
+                  <Bar dataKey="Income" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={28} />
+                  <Bar dataKey="Expenses" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={28} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Running Ledger Grid Table */}
+      <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden shadow-xl">
+        <div className="px-6 py-4 border-b border-white/5 bg-white/[0.01]">
+          <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <Calendar size={14} className="text-[#d4af37]" />
+            <span>Audit Ledger</span>
+          </h4>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left text-xs text-white">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/[0.005] text-gray-500 uppercase tracking-widest text-[9px]">
+                <th className="p-4 font-semibold">Transaction Date</th>
+                <th className="p-4 font-semibold">Type</th>
+                <th className="p-4 font-semibold">Category</th>
+                <th className="p-4 font-semibold">Description</th>
+                <th className="p-4 font-semibold text-right">Amount</th>
+                <th className="p-4 font-semibold text-right">Running Balance</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {displayItems.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-gray-500 uppercase tracking-widest text-[10px]">
+                    No bookkeeping entries found matching filter conditions.
+                  </td>
+                </tr>
+              ) : (
+                displayItems.map((item) => (
+                  <tr key={item.id} className="hover:bg-white/[0.01] transition-all">
+                    {/* Date */}
+                    <td className="p-4 font-semibold text-gray-300">
+                      {new Date(item.date).toLocaleDateString('en-LK', { year: 'numeric', month: 'short', day: '2-digit' })}
+                    </td>
+
+                    {/* Type Badge */}
+                    <td className="p-4">
+                      {item.type === 'income' ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-400 text-[9px] font-bold uppercase">
+                          <PlusCircle size={10} />
+                          <span>Income</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-[9px] font-bold uppercase">
+                          <MinusCircle size={10} />
+                          <span>Expense</span>
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Category */}
+                    <td className="p-4 font-semibold text-white">
+                      {item.category}
+                    </td>
+
+                    {/* Description */}
+                    <td className="p-4 text-gray-400 font-normal">
+                      {item.description}
+                    </td>
+
+                    {/* Amount */}
+                    <td className={`p-4 text-right font-mono font-bold ${item.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
+                      {item.type === 'income' ? '+' : '-'} LKR {Number(item.amount).toLocaleString()}
+                    </td>
+
+                    {/* Running Balance */}
+                    <td className="p-4 text-right font-mono font-bold text-gray-300">
+                      LKR {Number(item.runningBalance).toLocaleString()}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
