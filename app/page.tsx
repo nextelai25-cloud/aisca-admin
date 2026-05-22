@@ -1,15 +1,26 @@
 'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const router = useRouter()
+  const [checking, setChecking] = useState(true)
+
+  // Check if already logged in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        window.location.href = '/dashboard'
+      } else {
+        setChecking(false)
+      }
+    })
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,25 +34,30 @@ export default function LoginPage() {
       })
 
       if (error) {
-        console.error('Login error:', error)
         setError(error.message)
         setLoading(false)
         return
       }
 
       if (data?.session) {
-        // Use router.push for Next.js navigation
-        router.push('/dashboard')
-        router.refresh()
+        // Hard redirect — bypasses any Next.js routing issues
+        window.location.href = '/dashboard'
       } else {
-        setError('No session returned. Please try again.')
+        setError('Login succeeded but no session was created. Please try again.')
         setLoading(false)
       }
     } catch (err: any) {
-      console.error('Unexpected error:', err)
-      setError('Connection error. Please try again.')
+      setError('Unexpected error: ' + (err?.message || 'Unknown'))
       setLoading(false)
     }
+  }
+
+  if (checking) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px' }}>Checking session...</p>
+      </div>
+    )
   }
 
   return (
@@ -51,45 +67,43 @@ export default function LoginPage() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontFamily: "'Inter', sans-serif"
+      padding: '20px'
     }}>
       <div style={{
         width: '100%',
         maxWidth: '400px',
-        padding: '48px',
-        background: 'rgba(255,255,255,0.03)',
+        background: '#0d0d0d',
         border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '24px',
-        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-        backdropFilter: 'blur(4px)'
+        borderRadius: '20px',
+        padding: '48px 40px'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h1 style={{ color: '#fff', fontSize: '28px', fontWeight: '700', marginBottom: '8px', letterSpacing: '0.05em' }}>
+          <h1 style={{ color: '#ffffff', fontSize: '28px', fontWeight: '800', letterSpacing: '0.05em', margin: '0 0 8px' }}>
             AI$CA
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', letterSpacing: '0.15em' }}>
-            BOARD ADMINISTRATION
+          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: 0 }}>
+            Admin Dashboard
           </p>
         </div>
 
         <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.1em', marginBottom: '8px' }}>
-              EMAIL
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>
+              Email
             </label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="chairman@aisca.lk"
               required
+              placeholder="chairman@aisca.lk"
               style={{
                 width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(255,255,255,0.05)',
+                padding: '12px 16px',
+                background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '10px',
-                color: '#fff',
+                color: '#ffffff',
                 fontSize: '14px',
                 outline: 'none',
                 boxSizing: 'border-box'
@@ -97,23 +111,23 @@ export default function LoginPage() {
             />
           </div>
 
-          <div style={{ marginBottom: '28px' }}>
-            <label style={{ display: 'block', color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.1em', marginBottom: '8px' }}>
-              PASSWORD
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>
+              Password
             </label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
               required
+              placeholder="••••••••"
               style={{
                 width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(255,255,255,0.05)',
+                padding: '12px 16px',
+                background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '10px',
-                color: '#fff',
+                color: '#ffffff',
                 fontSize: '14px',
                 outline: 'none',
                 boxSizing: 'border-box'
@@ -122,9 +136,15 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p style={{ color: '#ff4444', fontSize: '13px', marginBottom: '16px', textAlign: 'center' }}>
-              ⚠️ {error}
-            </p>
+            <div style={{
+              padding: '12px 16px',
+              background: 'rgba(255,50,50,0.08)',
+              border: '1px solid rgba(255,50,50,0.2)',
+              borderRadius: '8px',
+              marginBottom: '20px'
+            }}>
+              <p style={{ color: '#ff6b6b', fontSize: '13px', margin: 0 }}>{error}</p>
+            </div>
           )}
 
           <button
@@ -133,16 +153,15 @@ export default function LoginPage() {
             style={{
               width: '100%',
               padding: '14px',
-              background: '#fff',
-              color: '#000',
+              background: loading ? 'rgba(255,255,255,0.1)' : '#ffffff',
+              color: loading ? 'rgba(255,255,255,0.4)' : '#000000',
               border: 'none',
               borderRadius: '10px',
               fontSize: '14px',
-              fontWeight: '600',
+              fontWeight: '700',
               cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1,
-              transition: 'opacity 0.2s ease',
-              minHeight: '44px'
+              letterSpacing: '0.05em',
+              transition: 'all 0.2s ease'
             }}
           >
             {loading ? 'Signing in...' : 'Sign In'}
