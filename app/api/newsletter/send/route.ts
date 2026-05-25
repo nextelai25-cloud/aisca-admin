@@ -22,12 +22,13 @@ export async function POST(req: NextRequest) {
     }
     
     // Send in batches of 50
-    const emails = subscribers.map(sub => ({
-      from: 'AISCA <onboarding@resend.dev>',
+    const emails = subscribers.map((sub: any) => ({
+      from: process.env.RESEND_FROM_EMAIL || 'AISCA <noreply@aisca.lk>',
       to: sub.email,
       subject,
       html
     }))
+
     
     const { data, error } = await resend.batch.send(emails)
     
