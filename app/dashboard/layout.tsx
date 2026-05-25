@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [authorized, setAuthorized] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -11,21 +10,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         window.location.href = '/'
-        return
+      } else {
+        setLoading(false)
       }
-      setAuthorized(true)
-      setLoading(false)
     }
-
     checkSession()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
-        window.location.href = '/'
-      }
-    })
-
-    return () => subscription.unsubscribe()
   }, [])
 
   if (loading) {
@@ -45,8 +34,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     )
   }
-
-  if (!authorized) return null
 
   return <>{children}</>
 }

@@ -27,29 +27,24 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password: password.trim()
-      })
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password: password.trim()
+    })
 
-      if (error) {
-        setError(error.message)
-        setLoading(false)
-        return
-      }
-
-      if (data?.session) {
-        // Hard redirect — bypasses any Next.js routing issues
-        window.location.href = '/dashboard'
-      } else {
-        setError('Login succeeded but no session was created. Please try again.')
-        setLoading(false)
-      }
-    } catch (err: any) {
-      setError('Unexpected error: ' + (err?.message || 'Unknown'))
+    if (error) {
+      setError(error.message)
       setLoading(false)
+      return
     }
+
+    if (data?.session) {
+      window.location.href = '/dashboard'
+      return
+    }
+
+    setError('Login failed. Please try again.')
+    setLoading(false)
   }
 
   if (checking) {
