@@ -18,6 +18,7 @@ import {
   X 
 } from 'lucide-react'
 import { getUnreadContactMessagesCount } from './contact/actions'
+import { canAccess, AdminRole } from '@/lib/roles'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
@@ -27,6 +28,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname()
   const router = useRouter()
 
+  const navItems = [
+    { name: 'Overview', path: '/dashboard', icon: LayoutDashboard, section: 'dashboard' },
+    { name: 'Associates Registry', path: '/dashboard/associates', icon: Users, section: 'associates' },
+    { name: 'Schools Registry', path: '/dashboard/schools', icon: GraduationCap, section: 'schools' },
+    { name: 'Product Orders', path: '/dashboard/orders', icon: ShoppingBag, section: 'orders' },
+    { name: 'Finance Ledger', path: '/dashboard/finance', icon: CircleDollarSign, section: 'finance' },
+    { name: 'Newsletter Hub', path: '/dashboard/newsletter', icon: Mail, section: 'newsletter' },
+    { name: 'Contact Messages', path: '/dashboard/contact', icon: MessageSquare, badge: unreadCount, section: 'contact' },
+    { name: 'Site Analytics', path: '/dashboard/analytics', icon: BarChart3, section: 'analytics' },
+    { name: 'Settings', path: '/dashboard/settings', icon: Settings, section: 'dashboard' }
+  ]
+
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -34,11 +47,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         window.location.href = '/'
       } else {
         const userMetadata = session.user.user_metadata
+        const userRole = userMetadata?.role || 'board_member'
         setProfile({
           name: userMetadata?.name || 'Admin Board',
-          role: userMetadata?.role || 'board_member',
+          role: userRole,
           email: session.user.email || ''
         })
+
+        // Enforce route permission checks dynamically
+        const currentPath = window.location.pathname
+        const matchedItem = navItems.find(item => currentPath === item.path || currentPath.startsWith(item.path + '/'))
+        if (matchedItem && !canAccess(userRole as AdminRole, matchedItem.section)) {
+          if (canAccess(userRole as AdminRole, 'dashboard')) {
+            router.push('/dashboard')
+          } else {
+            const allowedItem = navItems.find(item => canAccess(userRole as AdminRole, item.section))
+            if (allowedItem) {
+              router.push(allowedItem.path)
+            } else {
+              await supabase.auth.signOut()
+              window.location.href = '/'
+            }
+          }
+        }
+
         setLoading(false)
         
         // Fetch unread count
@@ -47,7 +79,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     }
     checkSession()
-  }, [])
+  }, [pathname])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -71,18 +103,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     )
   }
-
-  const navItems = [
-    { name: 'Overview', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Associates Registry', path: '/dashboard/associates', icon: Users },
-    { name: 'Schools Registry', path: '/dashboard/schools', icon: GraduationCap },
-    { name: 'Product Orders', path: '/dashboard/orders', icon: ShoppingBag },
-    { name: 'Finance Ledger', path: '/dashboard/finance', icon: CircleDollarSign },
-    { name: 'Newsletter Hub', path: '/dashboard/newsletter', icon: Mail },
-    { name: 'Contact Messages', path: '/dashboard/contact', icon: MessageSquare, badge: unreadCount },
-    { name: 'Site Analytics', path: '/dashboard/analytics', icon: BarChart3 },
-    { name: 'Settings', path: '/dashboard/settings', icon: Settings }
-  ]
 
   const formatRole = (role: string) => {
     return role
@@ -170,7 +190,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         flexDirection: 'column',
         gap: '6px'
       }}>
-        {navItems.map(item => {
+        {navItems.filter(item => profile && canAccess(profile.role as AdminRole, item.section)).map(item => {
           const isActive = pathname === item.path
           const Icon = item.icon
           return (

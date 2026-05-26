@@ -1,4 +1,4 @@
-export type AdminRole = 'chairman' | 'deputy_chairman' | 'cfo' | 'marketing_manager' | 'co_secretary'
+export type AdminRole = 'chairman' | 'deputy_chairman' | 'cfo' | 'marketing_manager' | 'co_secretary' | 'administration_manager'
 
 export const ROLE_PERMISSIONS = {
   chairman: {
@@ -46,6 +46,17 @@ export const ROLE_PERMISSIONS = {
     contact: false
   },
   co_secretary: {
+    dashboard: true,
+    associates: true,
+    schools: true,
+    orders: false,
+    finance: false,
+    analytics: false,
+    members: false,
+    newsletter: false,
+    contact: false
+  },
+  administration_manager: {
     dashboard: true,
     associates: true,
     schools: true,
