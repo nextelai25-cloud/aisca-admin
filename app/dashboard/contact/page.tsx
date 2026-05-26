@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { MessageSquare, Calendar, User, Mail, FileText, Search, X } from 'lucide-react'
+import { markContactMessageRead } from './actions'
 
 export default function ContactMessagesPage() {
   const [messages, setMessages] = useState<any[]>([])
@@ -40,6 +41,19 @@ export default function ContactMessagesPage() {
       msg.message.toLowerCase().includes(q)
     )
   })
+
+  const handleSelectMessage = async (msg: any) => {
+    setSelectedMessage(msg)
+    if (!msg.read) {
+      // Mark as read in DB
+      await markContactMessageRead(msg.id)
+      // Update local state
+      setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, read: true } : m))
+      
+      // Update the badge in layout by triggering a custom event or reloading window if needed,
+      // but standard React state will handle the row itself.
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -92,12 +106,12 @@ export default function ContactMessagesPage() {
                 {filteredMessages.map((msg) => (
                   <tr
                     key={msg.id}
-                    onClick={() => setSelectedMessage(msg)}
-                    className="hover:bg-white/[0.01] cursor-pointer transition-all duration-200"
+                    onClick={() => handleSelectMessage(msg)}
+                    className={`cursor-pointer transition-all duration-200 ${msg.read ? 'hover:bg-white/[0.01]' : 'bg-[#1a1a1a] hover:bg-[#222222] border-l-2 border-l-[#d4af37]'}`}
                   >
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-bold text-white truncate max-w-[180px]">{msg.name}</span>
+                        <span className={`text-xs truncate max-w-[180px] ${msg.read ? 'font-bold text-white' : 'font-extrabold text-[#d4af37]'}`}>{msg.name}</span>
                         <span className="text-[10px] text-gray-500 truncate max-w-[180px]">{msg.email}</span>
                       </div>
                     </td>

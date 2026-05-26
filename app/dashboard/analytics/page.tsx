@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getAnalytics } from './actions'
 import { 
   LineChart, 
   Line, 
@@ -46,7 +46,6 @@ const PIE_COLORS = ['#d4af37', '#71717a', '#27272a']
 export default function AnalyticsPage() {
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [analyticsData, setAnalyticsData] = useState<any[]>([])
 
   // Dashboard Aggregates
   const [metrics, setMetrics] = useState({
@@ -59,7 +58,7 @@ export default function AnalyticsPage() {
   // Recharts states
   const [timelineData, setTimelineData] = useState<any[]>([])
   const [topPagesData, setTopPagesData] = useState<any[]>([])
-  const [deviceData, setDeviceData] = useState<any[]>([])
+  const [deviceDataChart, setDeviceDataChart] = useState<any[]>([])
   
   // Lists
   const [referrersList, setReferrersList] = useState<any[]>([])
@@ -75,31 +74,20 @@ export default function AnalyticsPage() {
     async function fetchAnalytics() {
       try {
         setLoading(true)
-        const { data, error } = await supabase
-          .from('site_analytics')
-          .select('*')
-          .order('created_at', { ascending: true })
+        const { totalViews, sessions, pageData, deviceData, allData } = await getAnalytics()
 
-        if (error) {
-          console.error("Error fetching analytics:", error.message)
-          return
-        }
+        const safeData = allData || []
 
-        const safeData = data || []
-        setAnalyticsData(safeData)
-
-        // Calculate aggregates
-        const pageViews = safeData.length
-        const uniqueSessions = new Set(safeData.map(d => d.session_id)).size
+        const uniqueSessions = new Set(sessions?.map((s: any) => s.session_id)).size
         
-        const countriesSet = new Set(safeData.map(d => d.country).filter(Boolean))
+        const countriesSet = new Set(safeData.map((d: any) => d.country).filter(Boolean))
         const countriesCount = countriesSet.size
 
-        const citiesSet = new Set(safeData.map(d => d.city).filter(Boolean))
+        const citiesSet = new Set(safeData.map((d: any) => d.city).filter(Boolean))
         const citiesCount = citiesSet.size
 
         setMetrics({
-          pageViews,
+          pageViews: totalViews,
           uniqueSessions,
           countriesCount,
           citiesCount
@@ -115,7 +103,8 @@ export default function AnalyticsPage() {
           dayMap[dateString] = 0
         }
 
-        safeData.forEach(item => {
+        safeData.forEach((item: any) => {
+          if (!item.created_at) return
           const day = new Date(item.created_at).toISOString().split('T')[0]
           if (dayMap[day] !== undefined) {
             dayMap[day] += 1
@@ -132,38 +121,33 @@ export default function AnalyticsPage() {
         setTimelineData(timeline)
 
         // Chart 2: Top Pages Visited (sorted Bar chart)
-        const pageMap: Record<string, number> = {}
-        safeData.forEach(item => {
-          const page = item.page || 'Unknown'
-          pageMap[page] = (pageMap[page] || 0) + 1
+        const pageCounts: Record<string, number> = {}
+        pageData?.forEach((row: any) => {
+          const p = row.page || 'Unknown'
+          pageCounts[p] = (pageCounts[p] || 0) + 1
         })
-
-        const topPages = Object.keys(pageMap)
-          .map(key => ({
-            page: key,
-            "Views": pageMap[key]
-          }))
-          .sort((a, b) => b.Views - a.Views)
-          .slice(0, 8) // Limit to top 8 pages
+        const topPages = Object.entries(pageCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([page, count]) => ({ page, Views: count }))
 
         setTopPagesData(topPages)
 
         // Chart 3: Device breakdown
-        const deviceMap: Record<string, number> = {}
-        safeData.forEach(item => {
-          const dev = item.device || 'desktop'
-          deviceMap[dev] = (deviceMap[dev] || 0) + 1
+        const deviceCounts: Record<string, number> = {}
+        deviceData?.forEach((row: any) => {
+          if (row.device) deviceCounts[row.device] = (deviceCounts[row.device] || 0) + 1
         })
 
-        const deviceChart = Object.keys(deviceMap).map(key => ({
+        const deviceChart = Object.keys(deviceCounts).map(key => ({
           name: key.toUpperCase(),
-          value: deviceMap[key]
+          value: deviceCounts[key]
         }))
-        setDeviceData(deviceChart)
+        setDeviceDataChart(deviceChart)
 
         // Table 1: Referrers distribution
         const referrerMap: Record<string, number> = {}
-        safeData.forEach(item => {
+        safeData.forEach((item: any) => {
           const ref = item.referrer || 'Direct'
           referrerMap[ref] = (referrerMap[ref] || 0) + 1
         })
@@ -172,7 +156,7 @@ export default function AnalyticsPage() {
           .map(key => ({
             name: key,
             count: referrerMap[key],
-            percent: pageViews > 0 ? ((referrerMap[key] / pageViews) * 100).toFixed(1) : '0'
+            percent: totalViews > 0 ? ((referrerMap[key] / totalViews) * 100).toFixed(1) : '0'
           }))
           .sort((a, b) => b.count - a.count)
 
@@ -180,7 +164,7 @@ export default function AnalyticsPage() {
 
         // Table 2: Geography breakdown
         const geoMap: Record<string, number> = {}
-        safeData.forEach(item => {
+        safeData.forEach((item: any) => {
           if (item.country) {
             const label = item.city ? `${item.city}, ${item.country}` : item.country
             geoMap[label] = (geoMap[label] || 0) + 1
@@ -309,7 +293,7 @@ export default function AnalyticsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={deviceData}
+                  data={deviceDataChart}
                   cx="50%"
                   cy="50%"
                   innerRadius={50}
@@ -317,7 +301,7 @@ export default function AnalyticsPage() {
                   paddingAngle={4}
                   dataKey="value"
                 >
-                  {deviceData.map((entry, index) => (
+                  {deviceDataChart.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} stroke="rgba(0,0,0,0.5)" />
                   ))}
                 </Pie>
@@ -328,7 +312,7 @@ export default function AnalyticsPage() {
 
           {/* Legend */}
           <div className="mt-4 pt-4 border-t border-white/5 flex justify-center gap-6">
-            {deviceData.map((d, index) => (
+            {deviceDataChart.map((d, index) => (
               <div key={d.name} className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }}></div>
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">

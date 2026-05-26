@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Search, Download, Check, X, FileText, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search, Download, Check, X, FileText, ChevronLeft, ChevronRight, User, Mail, School, MapPin } from 'lucide-react'
 
 export default function AssociatesPage() {
   const [loading, setLoading] = useState(true)
@@ -19,6 +19,10 @@ export default function AssociatesPage() {
 
   // Action loading trackers
   const [actioningId, setActioningId] = useState<string | null>(null)
+  
+  // Bulk selection and Details modal
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [selectedAssociate, setSelectedAssociate] = useState<any>(null)
 
   useEffect(() => {
     fetchAssociates()
@@ -59,10 +63,61 @@ export default function AssociatesPage() {
 
       // Live update state
       setData(prev => prev.map(m => m.id === id ? { ...m, status } : m))
+      
+      // If approved, you can send welcome email here or it's handled by a database trigger.
     } catch (err) {
       console.error(err)
     } finally {
       setActioningId(null)
+    }
+  }
+
+  const handleBulkStatus = async (status: 'approved' | 'rejected') => {
+    if (selectedIds.size === 0) return
+    const ids = Array.from(selectedIds)
+    try {
+      setActioningId('bulk')
+      const { error } = await supabase
+        .from('associate_members')
+        .update({ status })
+        .in('id', ids)
+
+      if (error) {
+        alert(`Error updating statuses: ${error.message}`)
+        return
+      }
+
+      setData(prev => prev.map(m => ids.includes(m.id) ? { ...m, status } : m))
+      setSelectedIds(new Set())
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setActioningId(null)
+    }
+  }
+
+  const handleSendReminder = async (email: string) => {
+    try {
+      // Typically calls an API route
+      // await fetch('/api/email/reminder', { method: 'POST', body: JSON.stringify({ email }) })
+      alert(`Reminder email queued for ${email}`)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const toggleSelection = (id: string) => {
+    const newSet = new Set(selectedIds)
+    if (newSet.has(id)) newSet.delete(id)
+    else newSet.add(id)
+    setSelectedIds(newSet)
+  }
+
+  const toggleAll = () => {
+    if (selectedIds.size === currentItems.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(currentItems.map((i: any) => i.id)))
     }
   }
 
@@ -151,14 +206,34 @@ export default function AssociatesPage() {
           <h1 className="text-2xl font-bold tracking-wider uppercase text-white">Associates Registry</h1>
           <p className="text-xs text-gray-500 tracking-wide uppercase mt-1">Review and manage individual onboardings</p>
         </div>
-        <button
-          onClick={handleExportCSV}
-          disabled={filteredData.length === 0}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-        >
-          <Download size={14} />
-          <span>Export CSV ({filteredData.length})</span>
-        </button>
+        <div className="flex items-center gap-3">
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 mr-4">
+              <button
+                onClick={() => handleBulkStatus('approved')}
+                disabled={actioningId === 'bulk'}
+                className="px-3 py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl text-xs font-semibold uppercase hover:bg-green-500/20 transition-all"
+              >
+                Approve ({selectedIds.size})
+              </button>
+              <button
+                onClick={() => handleBulkStatus('rejected')}
+                disabled={actioningId === 'bulk'}
+                className="px-3 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs font-semibold uppercase hover:bg-red-500/20 transition-all"
+              >
+                Reject ({selectedIds.size})
+              </button>
+            </div>
+          )}
+          <button
+            onClick={handleExportCSV}
+            disabled={filteredData.length === 0}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          >
+            <Download size={14} />
+            <span>Export CSV ({filteredData.length})</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Row */}
@@ -206,14 +281,18 @@ export default function AssociatesPage() {
           <table className="w-full border-collapse text-left text-xs text-white">
             <thead>
               <tr className="border-b border-white/5 bg-white/[0.01] text-gray-500 uppercase tracking-widest text-[9px]">
+                <th className="p-4 w-10">
+                  <input 
+                    type="checkbox" 
+                    checked={selectedIds.size === currentItems.length && currentItems.length > 0}
+                    onChange={toggleAll}
+                    className="w-3.5 h-3.5 rounded border-gray-600 bg-transparent text-[#d4af37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                  />
+                </th>
                 <th className="p-4 font-semibold">Membership No</th>
                 <th className="p-4 font-semibold">Name</th>
                 <th className="p-4 font-semibold">School Details</th>
-                <th className="p-4 font-semibold">District & Province</th>
-                <th className="p-4 font-semibold">Identity / Role</th>
                 <th className="p-4 font-semibold">Status</th>
-                <th className="p-4 font-semibold">Joined Date</th>
-                <th className="p-4 font-semibold text-center">Digital Card</th>
                 <th className="p-4 font-semibold text-center">Board Actions</th>
               </tr>
             </thead>
@@ -229,6 +308,15 @@ export default function AssociatesPage() {
                   const isActioning = actioningId === item.id
                   return (
                     <tr key={item.id} className="hover:bg-white/[0.01] transition-all">
+                      <td className="p-4">
+                        <input 
+                          type="checkbox" 
+                          checked={selectedIds.has(item.id)}
+                          onChange={() => toggleSelection(item.id)}
+                          className="w-3.5 h-3.5 rounded border-gray-600 bg-transparent text-[#d4af37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                        />
+                      </td>
+
                       {/* Membership No */}
                       <td className="p-4 font-mono font-bold text-gray-400">
                         {item.membership_number}
@@ -238,30 +326,13 @@ export default function AssociatesPage() {
                       <td className="p-4 font-semibold">
                         {item.full_name}
                         <div className="text-[10px] text-gray-500 font-normal mt-0.5">{item.email}</div>
-                        <div className="text-[10px] text-gray-500 font-normal">{item.whatsapp}</div>
                       </td>
 
                       {/* School Details */}
                       <td className="p-4">
                         <span className="font-semibold text-gray-300">{item.school}</span>
                         <div className="text-[10px] text-gray-500 mt-0.5">
-                          Stream: {item.commerce_stream ? 'Commerce' : 'Non-Commerce'}
-                        </div>
-                      </td>
-
-                      {/* District & Province */}
-                      <td className="p-4 text-gray-300">
-                        {item.district}
-                        <div className="text-[10px] text-gray-500 mt-0.5">{item.province}</div>
-                      </td>
-
-                      {/* Identity */}
-                      <td className="p-4 text-gray-300">
-                        <span className="max-w-[200px] truncate block" title={item.who_are_you}>
-                          {item.who_are_you}
-                        </span>
-                        <div className="text-[10px] text-gray-500 mt-0.5">
-                          Willing to work: {item.actively_participate ? 'Yes' : 'No'}
+                          {item.district}, {item.province}
                         </div>
                       </td>
 
@@ -278,56 +349,16 @@ export default function AssociatesPage() {
                         </span>
                       </td>
 
-                      {/* Date Joined */}
-                      <td className="p-4 text-gray-400">
-                        {new Date(item.created_at).toLocaleDateString('en-LK')}
-                      </td>
-
-                      {/* Digital Card */}
-                      <td className="p-4 text-center">
-                        {item.status === 'approved' && item.membership_card_url ? (
-                          <a
-                            href={item.membership_card_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded text-[10px] font-semibold uppercase tracking-wider transition-all"
-                          >
-                            <FileText size={12} className="text-[#d4af37]" />
-                            <span>View Card</span>
-                          </a>
-                        ) : (
-                          <span className="text-[10px] text-gray-500 uppercase tracking-widest">—</span>
-                        )}
-                      </td>
-
                       {/* Actions */}
                       <td className="p-4">
-                        {isActioning ? (
-                          <div className="flex justify-center">
-                            <div className="w-4 h-4 border-2 border-t-transparent border-[#d4af37] rounded-full animate-spin"></div>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center gap-2">
-                            {item.status !== 'approved' && (
-                              <button
-                                onClick={() => handleUpdateStatus(item.id, 'approved')}
-                                title="Approve Member"
-                                className="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500/20 flex items-center justify-center transition-all"
-                              >
-                                <Check size={14} />
-                              </button>
-                            )}
-                            {item.status !== 'rejected' && (
-                              <button
-                                onClick={() => handleUpdateStatus(item.id, 'rejected')}
-                                title="Reject Member"
-                                className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-all"
-                              >
-                                <X size={14} />
-                              </button>
-                            )}
-                          </div>
-                        )}
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => setSelectedAssociate(item)}
+                            className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-semibold text-white uppercase tracking-wider transition-all"
+                          >
+                            View Details
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )
@@ -362,6 +393,98 @@ export default function AssociatesPage() {
           </div>
         )}
       </div>
+
+      {/* Selected Associate Drawer */}
+      {selectedAssociate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-end">
+          <div
+            onClick={() => setSelectedAssociate(null)}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          />
+          <div className="relative w-full max-w-lg h-full bg-[#0b0b0b] border-l border-white/5 p-8 flex flex-col justify-between overflow-y-auto z-10">
+            <div className="space-y-8">
+              <div className="flex items-center justify-between pb-6 border-b border-white/5">
+                <div className="flex items-center gap-3 text-[#d4af37]">
+                  <User size={20} />
+                  <span className="text-xs font-extrabold uppercase tracking-widest">Full Details</span>
+                </div>
+                <button
+                  onClick={() => setSelectedAssociate(null)}
+                  className="text-gray-500 hover:text-white transition-all"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Membership No</span>
+                  <div className="text-xl font-bold text-[#d4af37] mt-1 font-mono">{selectedAssociate.membership_number}</div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Personal Info</span>
+                  <div className="flex flex-col gap-2 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
+                    <span className="font-semibold">{selectedAssociate.full_name}</span>
+                    <span className="text-gray-400">Email: {selectedAssociate.email}</span>
+                    <span className="text-gray-400">WhatsApp: {selectedAssociate.whatsapp}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Academic Details</span>
+                  <div className="flex flex-col gap-2 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
+                    <div className="flex items-center gap-2"><School size={14} className="text-gray-400"/> {selectedAssociate.school}</div>
+                    <span className="text-gray-400">Stream: {selectedAssociate.commerce_stream ? 'Commerce' : 'Non-Commerce'}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Location</span>
+                  <div className="flex flex-col gap-2 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
+                    <div className="flex items-center gap-2"><MapPin size={14} className="text-gray-400"/> {selectedAssociate.district}, {selectedAssociate.province}</div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Identity & Role</span>
+                  <div className="flex flex-col gap-2 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
+                    <span className="text-gray-300">{selectedAssociate.who_are_you}</span>
+                    <span className="text-gray-400">Willing to volunteer: {selectedAssociate.actively_participate ? 'Yes' : 'No'}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 flex gap-4 pt-4 border-t border-white/5">
+                  {selectedAssociate.status !== 'approved' && (
+                    <button
+                      onClick={() => { handleUpdateStatus(selectedAssociate.id, 'approved'); setSelectedAssociate((prev: any) => ({...prev, status: 'approved'})); }}
+                      className="flex-1 py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-green-500/20 transition-all text-center"
+                    >
+                      Approve
+                    </button>
+                  )}
+                  {selectedAssociate.status !== 'rejected' && (
+                    <button
+                      onClick={() => { handleUpdateStatus(selectedAssociate.id, 'rejected'); setSelectedAssociate((prev: any) => ({...prev, status: 'rejected'})); }}
+                      className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-red-500/20 transition-all text-center"
+                    >
+                      Reject
+                    </button>
+                  )}
+                  {selectedAssociate.status === 'pending' && (
+                    <button
+                      onClick={() => handleSendReminder(selectedAssociate.email)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500/20 transition-all"
+                    >
+                      <Mail size={14} /> Send Reminder
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -265,85 +265,102 @@ export default function FinancePage() {
         </div>
       </div>
 
-      {/* Quick Entry Form Section */}
+      {/* Quick Entry Form Drawer */}
       {formOpen && (
-        <div className="bg-[#0b0b0b] border border-white/10 p-6 rounded-2xl shadow-2xl animate-slide-down">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Record New Ledger Entry</h3>
-          <form onSubmit={handleAddTransaction} className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {/* Type */}
-            <div>
-              <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Type</label>
-              <select
-                value={formType}
-                onChange={e => setFormType(e.target.value as 'income' | 'expense')}
-                className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none cursor-pointer"
+        <div className="fixed inset-0 z-50 flex items-center justify-end">
+          <div
+            onClick={() => setFormOpen(false)}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          />
+          <div className="relative w-full max-w-md h-full bg-[#0b0b0b] border-l border-white/5 p-8 flex flex-col overflow-y-auto z-10 shadow-2xl animate-slide-in-right">
+            <div className="flex items-center justify-between pb-6 border-b border-white/5 mb-6">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Record Ledger Entry</h3>
+              <button
+                onClick={() => setFormOpen(false)}
+                className="text-gray-500 hover:text-white transition-all"
               >
-                <option value="income">Income (+)</option>
-                <option value="expense">Expense (-)</option>
-              </select>
+                <X size={18} />
+              </button>
             </div>
+            
+            <form onSubmit={handleAddTransaction} className="space-y-5 flex-1">
+              {/* Type */}
+              <div>
+                <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Type</label>
+                <select
+                  value={formType}
+                  onChange={e => setFormType(e.target.value as 'income' | 'expense')}
+                  className="w-full px-3 py-2.5 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none cursor-pointer focus:border-[#d4af37]/50"
+                >
+                  <option value="income">Income (+)</option>
+                  <option value="expense">Expense (-)</option>
+                </select>
+              </div>
 
-            {/* Category */}
-            <div>
-              <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Category</label>
-              <select
-                value={formCategory}
-                onChange={e => setFormCategory(e.target.value)}
-                className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none cursor-pointer"
-              >
-                {categories.map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
+              {/* Category */}
+              <div>
+                <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Category</label>
+                <select
+                  value={formCategory}
+                  onChange={e => setFormCategory(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none cursor-pointer focus:border-[#d4af37]/50"
+                >
+                  {categories.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Description</label>
-              <input
-                type="text"
-                placeholder="e.g. sponsorship payout"
-                value={formDescription}
-                onChange={e => setFormDescription(e.target.value)}
-                required
-                className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white placeholder-gray-600 focus:outline-none"
-              />
-            </div>
+              {/* Description */}
+              <div>
+                <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Description</label>
+                <input
+                  type="text"
+                  placeholder="e.g. sponsorship payout"
+                  value={formDescription}
+                  onChange={e => setFormDescription(e.target.value)}
+                  required
+                  className="w-full px-3 py-2.5 bg-[#121212] border border-white/5 rounded-xl text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#d4af37]/50"
+                />
+              </div>
 
-            {/* Amount */}
-            <div>
-              <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Amount (LKR)</label>
-              <input
-                type="text"
-                placeholder="e.g. 50000"
-                value={formAmount}
-                onChange={e => setFormAmount(e.target.value)}
-                required
-                className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white placeholder-gray-600 focus:outline-none"
-              />
-            </div>
+              {/* Amount */}
+              <div>
+                <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Amount (LKR)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 50000"
+                  value={formAmount}
+                  onChange={e => setFormAmount(e.target.value)}
+                  required
+                  className="w-full px-3 py-2.5 bg-[#121212] border border-white/5 rounded-xl text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#d4af37]/50"
+                />
+              </div>
 
-            {/* Date & Button */}
-            <div className="flex flex-col md:flex-row items-end gap-3">
-              <div className="flex-1 w-full">
+              {/* Date */}
+              <div>
                 <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Transaction Date</label>
                 <input
                   type="date"
                   value={formDate}
                   onChange={e => setFormDate(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none"
+                  className="w-full px-3 py-2.5 bg-[#121212] border border-white/5 rounded-xl text-xs text-white focus:outline-none focus:border-[#d4af37]/50"
                 />
               </div>
-              <button
-                type="submit"
-                disabled={formSubmitting}
-                className="w-full md:w-auto px-6 py-2.5 bg-white text-black font-semibold rounded-xl text-xs uppercase tracking-wider hover:bg-gray-200 transition-all disabled:opacity-50"
-              >
-                {formSubmitting ? 'Posting...' : 'Post'}
-              </button>
-            </div>
-          </form>
+
+              {/* Button */}
+              <div className="pt-4 mt-auto border-t border-white/5">
+                <button
+                  type="submit"
+                  disabled={formSubmitting}
+                  className="w-full px-6 py-3 bg-[#d4af37] text-black font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-[#eac44e] transition-all disabled:opacity-50"
+                >
+                  {formSubmitting ? 'Posting...' : 'Post Transaction'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 

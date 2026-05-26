@@ -73,11 +73,13 @@ export default function LoginPage() {
         padding: '48px 40px'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h1 style={{ color: '#ffffff', fontSize: '28px', fontWeight: '800', letterSpacing: '0.05em', margin: '0 0 8px' }}>
-            AI$CA
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', margin: 0 }}>
-            Admin Dashboard
+          <img
+            src="https://aisca.lk/aisca-logo.webp"
+            alt="AISCA"
+            style={{ width: '72px', height: '72px', objectFit: 'contain', margin: '0 auto 16px', display: 'block' }}
+          />
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', letterSpacing: '0.15em', margin: 0 }}>
+            BOARD ADMINISTRATION
           </p>
         </div>
 

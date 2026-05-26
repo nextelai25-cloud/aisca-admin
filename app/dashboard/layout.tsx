@@ -11,16 +11,19 @@ import {
   CircleDollarSign, 
   Mail, 
   MessageSquare, 
-  BarChart3, 
+  BarChart3,
+  Settings,
   LogOut, 
   Menu, 
   X 
 } from 'lucide-react'
+import { getUnreadContactMessagesCount } from './contact/actions'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [profile, setProfile] = useState<{ name: string; role: string; email: string } | null>(null)
+  const [unreadCount, setUnreadCount] = useState(0)
   const pathname = usePathname()
   const router = useRouter()
 
@@ -37,6 +40,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           email: session.user.email || ''
         })
         setLoading(false)
+        
+        // Fetch unread count
+        const count = await getUnreadContactMessagesCount()
+        setUnreadCount(count)
       }
     }
     checkSession()
@@ -72,8 +79,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Product Orders', path: '/dashboard/orders', icon: ShoppingBag },
     { name: 'Finance Ledger', path: '/dashboard/finance', icon: CircleDollarSign },
     { name: 'Newsletter Hub', path: '/dashboard/newsletter', icon: Mail },
-    { name: 'Contact Messages', path: '/dashboard/contact', icon: MessageSquare },
-    { name: 'Site Analytics', path: '/dashboard/analytics', icon: BarChart3 }
+    { name: 'Contact Messages', path: '/dashboard/contact', icon: MessageSquare, badge: unreadCount },
+    { name: 'Site Analytics', path: '/dashboard/analytics', icon: BarChart3 },
+    { name: 'Settings', path: '/dashboard/settings', icon: Settings }
   ]
 
   const formatRole = (role: string) => {
@@ -100,12 +108,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         justifyContent: 'space-between'
       }}>
         <div>
-          <h2 style={{ color: '#ffffff', fontSize: '20px', fontWeight: '800', letterSpacing: '0.05em', margin: 0 }}>
-            AI$CA
-          </h2>
-          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '9px', letterSpacing: '0.15em', textTransform: 'uppercase', display: 'block', marginTop: '2px' }}>
+          <img
+            src="https://aisca.lk/aisca-logo.webp"
+            alt="AISCA"
+            style={{ width: '52px', height: '52px', objectFit: 'contain', marginBottom: '8px', display: 'block' }}
+          />
+          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '9px', letterSpacing: '0.15em', margin: 0, textTransform: 'uppercase' }}>
             Operations Panel
-          </span>
+          </p>
         </div>
         {/* Mobile Close Button */}
         <button 
@@ -185,7 +195,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               className="nav-link"
             >
               <Icon size={16} style={{ color: isActive ? '#d4af37' : 'inherit' }} />
-              <span>{item.name}</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <span>{item.name}</span>
+                {item.badge ? (
+                  <span style={{
+                    background: '#ff4d4d',
+                    color: '#ffffff',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    padding: '2px 6px',
+                    borderRadius: '10px',
+                    marginLeft: '8px'
+                  }}>
+                    {item.badge}
+                  </span>
+                ) : null}
+              </div>
             </Link>
           )
         })}

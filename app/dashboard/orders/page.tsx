@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Search, Download, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react'
+import { Search, Download, ChevronLeft, ChevronRight, ShoppingBag, FileText, User, MapPin, X } from 'lucide-react'
+import { sendPaymentVerifiedTelegram } from './actions'
 
 export default function OrdersPage() {
   const [loading, setLoading] = useState(true)
@@ -21,6 +22,9 @@ export default function OrdersPage() {
 
   // Action status trackers
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  
+  // Selected order for drawer
+  const [selectedOrder, setSelectedOrder] = useState<any>(null)
 
   useEffect(() => {
     fetchOrders()
@@ -59,7 +63,19 @@ export default function OrdersPage() {
         return
       }
 
+      // Live update
       setData(prev => prev.map(o => o.id === id ? { ...o, payment_status } : o))
+      if (selectedOrder?.id === id) {
+        setSelectedOrder((prev: any) => ({ ...prev, payment_status }))
+      }
+
+      // Send telegram notification if verified
+      if (payment_status === 'verified') {
+        const order = data.find(o => o.id === id)
+        if (order) {
+          await sendPaymentVerifiedTelegram(order.order_number, order.product_name, order.customer_name, order.total_amount)
+        }
+      }
     } catch (err) {
       console.error(err)
     } finally {
@@ -81,6 +97,9 @@ export default function OrdersPage() {
       }
 
       setData(prev => prev.map(o => o.id === id ? { ...o, order_status } : o))
+      if (selectedOrder?.id === id) {
+        setSelectedOrder((prev: any) => ({ ...prev, order_status }))
+      }
     } catch (err) {
       console.error(err)
     } finally {
@@ -276,7 +295,11 @@ export default function OrdersPage() {
                 currentItems.map((item) => {
                   const isUpdating = updatingId === item.id
                   return (
-                    <tr key={item.id} className="hover:bg-white/[0.01] transition-all">
+                    <tr 
+                      key={item.id} 
+                      onClick={() => setSelectedOrder(item)}
+                      className="hover:bg-white/[0.01] transition-all cursor-pointer"
+                    >
                       {/* Order Number */}
                       <td className="p-4 font-mono font-bold text-[#d4af37]">
                         {item.order_number}
@@ -311,7 +334,7 @@ export default function OrdersPage() {
                       </td>
 
                       {/* Payment Status Dropdown */}
-                      <td className="p-4 text-center">
+                      <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
                         {isUpdating ? (
                           <div className="w-4 h-4 border-2 border-t-transparent border-[#d4af37] rounded-full animate-spin mx-auto"></div>
                         ) : (
@@ -334,7 +357,7 @@ export default function OrdersPage() {
                       </td>
 
                       {/* Fulfillment Status Dropdown */}
-                      <td className="p-4 text-center">
+                      <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
                         {isUpdating ? (
                           <div className="w-4 h-4 border-2 border-t-transparent border-[#d4af37] rounded-full animate-spin mx-auto"></div>
                         ) : (
@@ -397,6 +420,83 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
+
+      {/* Selected Order Drawer */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-end">
+          <div
+            onClick={() => setSelectedOrder(null)}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          />
+          <div className="relative w-full max-w-lg h-full bg-[#0b0b0b] border-l border-white/5 p-8 flex flex-col justify-between overflow-y-auto z-10">
+            <div className="space-y-8">
+              <div className="flex items-center justify-between pb-6 border-b border-white/5">
+                <div className="flex items-center gap-3 text-[#d4af37]">
+                  <ShoppingBag size={20} />
+                  <span className="text-xs font-extrabold uppercase tracking-widest">Order Details</span>
+                </div>
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="text-gray-500 hover:text-white transition-all"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Order Number</span>
+                  <div className="text-xl font-bold text-[#d4af37] mt-1">{selectedOrder.order_number}</div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Product Information</span>
+                  <div className="flex flex-col gap-1 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
+                    <span className="font-semibold">{selectedOrder.product_name}</span>
+                    <span className="text-gray-400">Size: {selectedOrder.size || 'N/A'} | Qty: {selectedOrder.quantity || 1}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Customer Details</span>
+                  <div className="flex flex-col gap-2 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
+                    <div className="flex items-center gap-2"><User size={14} className="text-gray-400"/> {selectedOrder.customer_name}</div>
+                    <div className="flex items-center gap-2 text-gray-400 font-mono">WhatsApp: {selectedOrder.customer_phone}</div>
+                    <div className="flex gap-2 text-gray-400"><MapPin size={14} className="mt-0.5 shrink-0"/> {selectedOrder.customer_address}</div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Financials</span>
+                  <div className="flex flex-col gap-1 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
+                    <div className="flex justify-between border-b border-white/10 pb-2 mb-2">
+                      <span className="text-gray-400">Unit Price</span>
+                      <span>LKR {Number(selectedOrder.unit_price).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-white/10 pb-2 mb-2">
+                      <span className="text-gray-400">Delivery Fee</span>
+                      <span>LKR {Number(selectedOrder.delivery_fee).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-[#d4af37]">
+                      <span>Total Amount</span>
+                      <span>LKR {Number(selectedOrder.total_amount).toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase flex items-center gap-2">
+                    <FileText size={12}/> Notes
+                  </span>
+                  <div className="text-xs text-white/80 bg-white/[0.02] border border-white/5 px-4 py-4 rounded-xl leading-relaxed whitespace-pre-wrap font-light">
+                    {selectedOrder.notes || 'No special notes provided for this order.'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
