@@ -109,9 +109,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }}>
         <div>
           <img
-            src="https://aisca.lk/aisca-logo.webp"
+            src="/original-logo.png"
             alt="AISCA"
-            style={{ width: '52px', height: '52px', objectFit: 'contain', marginBottom: '8px', display: 'block' }}
+            style={{ width: '100%', maxWidth: '140px', height: 'auto', objectFit: 'contain', marginBottom: '8px', display: 'block' }}
           />
           <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '9px', letterSpacing: '0.15em', margin: 0, textTransform: 'uppercase' }}>
             Operations Panel

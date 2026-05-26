@@ -74,9 +74,9 @@ export default function LoginPage() {
       }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <img
-            src="https://aisca.lk/aisca-logo.webp"
+            src="/original-logo.png"
             alt="AISCA"
-            style={{ width: '72px', height: '72px', objectFit: 'contain', margin: '0 auto 16px', display: 'block' }}
+            style={{ width: '100%', maxWidth: '220px', height: 'auto', objectFit: 'contain', margin: '0 auto 16px', display: 'block' }}
           />
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', letterSpacing: '0.15em', margin: 0 }}>
             BOARD ADMINISTRATION
