@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { getAnalytics } from './actions'
+import { supabase } from '@/lib/supabase'
 import { 
   LineChart, 
   Line, 
@@ -70,124 +70,135 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     if (!mounted) return
-
+ 
     async function fetchAnalytics() {
       try {
         setLoading(true)
-        const { totalViews, sessions, pageData, deviceData, allData } = await getAnalytics()
-
-        const safeData = allData || []
-
-        const uniqueSessions = new Set(sessions?.map((s: any) => s.session_id)).size
-        
-        const countriesSet = new Set(safeData.map((d: any) => d.country).filter(Boolean))
-        const countriesCount = countriesSet.size
-
-        const citiesSet = new Set(safeData.map((d: any) => d.city).filter(Boolean))
-        const citiesCount = citiesSet.size
-
+ 
+        // 1. Total views
+        const { count: views } = await supabase
+          .from('site_analytics')
+          .select('*', { count: 'exact', head: true })
+ 
+        // 2. Unique sessions
+        const { data: sessionData } = await supabase
+          .from('site_analytics')
+          .select('session_id')
+        const unique = new Set(sessionData?.map(s => s.session_id) || []).size
+ 
+        // 3. Geographic info
+        const { data: geoData } = await supabase
+          .from('site_analytics')
+          .select('country, city')
+        const countriesCount = new Set(geoData?.map(g => g.country).filter(Boolean) || []).size
+        const citiesCount = new Set(geoData?.map(g => `${g.city}, ${g.country}`).filter(Boolean) || []).size
+ 
         setMetrics({
-          pageViews: totalViews,
-          uniqueSessions,
+          pageViews: views || 0,
+          uniqueSessions: unique,
           countriesCount,
           citiesCount
         })
-
-        // Chart 1: Daily traffic over last 30 days
-        const dayMap: Record<string, number> = {}
+ 
+        // 4. Traffic velocity — last 30 days
+        const thirtyDaysAgo = new Date()
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+        
+        const { data: recentViews } = await supabase
+          .from('site_analytics')
+          .select('visited_at')
+          .gte('visited_at', thirtyDaysAgo.toISOString())
+          .order('visited_at', { ascending: true })
+ 
+        // Group by date
+        const dateCounts: Record<string, number> = {}
         const now = new Date()
         for (let i = 29; i >= 0; i--) {
           const d = new Date()
           d.setDate(now.getDate() - i)
           const dateString = d.toISOString().split('T')[0]
-          dayMap[dateString] = 0
+          dateCounts[dateString] = 0
         }
-
-        safeData.forEach((item: any) => {
-          if (!item.created_at) return
-          const day = new Date(item.created_at).toISOString().split('T')[0]
-          if (dayMap[day] !== undefined) {
-            dayMap[day] += 1
+ 
+        recentViews?.forEach(v => {
+          if (v.visited_at) {
+            const date = v.visited_at.split('T')[0]
+            if (dateCounts[date] !== undefined) {
+              dateCounts[date] += 1
+            }
           }
         })
-
-        const timeline = Object.keys(dayMap).map(key => {
-          const [, month, day] = key.split('-')
+        const chartData = Object.entries(dateCounts).map(([date, count]) => {
+          const [, month, day] = date.split('-')
           return {
             date: `${month}/${day}`,
-            "Page Views": dayMap[key]
+            "Page Views": count
           }
         })
-        setTimelineData(timeline)
-
-        // Chart 2: Top Pages Visited (sorted Bar chart)
+        setTimelineData(chartData)
+ 
+        // 5. Top pages
+        const { data: pageRows } = await supabase
+          .from('site_analytics')
+          .select('page')
         const pageCounts: Record<string, number> = {}
-        pageData?.forEach((row: any) => {
-          const p = row.page || 'Unknown'
-          pageCounts[p] = (pageCounts[p] || 0) + 1
+        pageRows?.forEach(r => { 
+          const p = r.page || 'Unknown'
+          pageCounts[p] = (pageCounts[p] || 0) + 1 
         })
         const topPages = Object.entries(pageCounts)
           .sort((a, b) => b[1] - a[1])
-          .slice(0, 10)
+          .slice(0, 8)
           .map(([page, count]) => ({ page, Views: count }))
-
         setTopPagesData(topPages)
-
-        // Chart 3: Device breakdown
+ 
+        // 6. Devices
+        const { data: deviceRows } = await supabase
+          .from('site_analytics')
+          .select('device')
         const deviceCounts: Record<string, number> = {}
-        deviceData?.forEach((row: any) => {
-          if (row.device) deviceCounts[row.device] = (deviceCounts[row.device] || 0) + 1
-        })
-
-        const deviceChart = Object.keys(deviceCounts).map(key => ({
-          name: key.toUpperCase(),
-          value: deviceCounts[key]
-        }))
-        setDeviceDataChart(deviceChart)
-
-        // Table 1: Referrers distribution
-        const referrerMap: Record<string, number> = {}
-        safeData.forEach((item: any) => {
-          const ref = item.referrer || 'Direct'
-          referrerMap[ref] = (referrerMap[ref] || 0) + 1
-        })
-
-        const referrers = Object.keys(referrerMap)
-          .map(key => ({
-            name: key,
-            count: referrerMap[key],
-            percent: totalViews > 0 ? ((referrerMap[key] / totalViews) * 100).toFixed(1) : '0'
+        deviceRows?.forEach(r => { if(r.device) deviceCounts[r.device] = (deviceCounts[r.device] || 0) + 1 })
+        setDeviceDataChart(Object.entries(deviceCounts).map(([name, value]) => ({ name: name.toUpperCase(), value })))
+ 
+        // 7. Referrers
+        const { data: refRows } = await supabase
+          .from('site_analytics')
+          .select('referrer')
+          .not('referrer', 'is', null)
+        const refCounts: Record<string, number> = {}
+        refRows?.forEach(r => { if(r.referrer) refCounts[r.referrer] = (refCounts[r.referrer] || 0) + 1 })
+        const totalRef = refRows?.length || 1
+        const referrers = Object.entries(refCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 6)
+          .map(([source, count]) => ({ 
+            name: source, 
+            count, 
+            percent: ((count / totalRef) * 100).toFixed(1)
           }))
-          .sort((a, b) => b.count - a.count)
-
         setReferrersList(referrers)
-
-        // Table 2: Geography breakdown
+ 
+        // 8. Geography Footprint list
         const geoMap: Record<string, number> = {}
-        safeData.forEach((item: any) => {
+        geoData?.forEach(item => {
           if (item.country) {
             const label = item.city ? `${item.city}, ${item.country}` : item.country
             geoMap[label] = (geoMap[label] || 0) + 1
           }
         })
-
-        const geo = Object.keys(geoMap)
-          .map(key => ({
-            location: key,
-            views: geoMap[key]
-          }))
+        const geo = Object.entries(geoMap)
+          .map(([location, viewsCount]) => ({ location, views: viewsCount }))
           .sort((a, b) => b.views - a.views)
-          .slice(0, 10) // Limit top 10
-
+          .slice(0, 10)
         setGeoList(geo)
-
+ 
       } catch (err) {
         console.error(err)
       } finally {
         setLoading(false)
       }
     }
-
+ 
     fetchAnalytics()
   }, [mounted])
 

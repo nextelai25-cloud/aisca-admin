@@ -24,9 +24,87 @@ export default function AssociatesPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [selectedAssociate, setSelectedAssociate] = useState<any>(null)
 
+  // Access Control & Export History Tab
+  const [adminUser, setAdminUser] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState<'registry' | 'exports'>('registry')
+  const [exportLogs, setExportLogs] = useState<any[]>([])
+
   useEffect(() => {
     fetchAssociates()
+    fetchUser()
   }, [])
+
+  async function fetchUser() {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      setAdminUser({
+        email: session.user.email,
+        role: session.user.user_metadata?.role || 'board_member',
+        name: session.user.user_metadata?.name || 'Admin Board'
+      })
+    }
+  }
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Permanently delete ${name}? This cannot be undone.`)) return
+    const { error } = await supabase.from('associate_members').delete().eq('id', id)
+    if (!error) {
+      setData(prev => prev.filter(m => m.id !== id))
+      // Log the deletion
+      await supabase.from('audit_log').insert([{
+        action: 'DELETE_ASSOCIATE',
+        target_id: id,
+        target_name: name,
+        performed_by: adminUser?.email || 'unknown',
+        performed_at: new Date().toISOString()
+      }])
+    } else {
+      alert(`Delete failed: ${error.message}`)
+    }
+  }
+
+  const handleRequestAccess = async (section: string) => {
+    try {
+      await fetch('/api/notify-chairman', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `🔐 *ACCESS REQUEST*\n\n${adminUser?.name || 'Admin'} (${adminUser?.role || 'board_member'}) is requesting access to: *${section}*\n\nLogin to admin panel to review: ${window.location.origin}/dashboard/settings`
+        })
+      })
+      alert('Access request sent to Chairman.')
+    } catch (err: any) {
+      alert(`Request failed: ${err.message}`)
+    }
+  }
+
+  const handleExport = async () => {
+    const reason = prompt('Please enter the reason for this export:')
+    if (!reason) return
+    
+    // Log the export
+    await supabase.from('audit_log').insert([{
+      action: 'EXPORT_ASSOCIATES',
+      target_name: `${filteredData.length} records`,
+      performed_by: adminUser?.email || 'unknown',
+      reason: reason,
+      performed_at: new Date().toISOString()
+    }])
+    
+    // Proceed with CSV export
+    handleExportCSV()
+  }
+
+  const fetchExportLogs = async () => {
+    const { data: logs, error } = await supabase
+      .from('audit_log')
+      .select('*')
+      .eq('action', 'EXPORT_ASSOCIATES')
+      .order('performed_at', { ascending: false })
+    if (!error) {
+      setExportLogs(logs || [])
+    }
+  }
 
   async function fetchAssociates() {
     try {
@@ -226,7 +304,7 @@ export default function AssociatesPage() {
             </div>
           )}
           <button
-            onClick={handleExportCSV}
+            onClick={handleExport}
             disabled={filteredData.length === 0}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
@@ -236,8 +314,66 @@ export default function AssociatesPage() {
         </div>
       </div>
 
-      {/* Filter Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Tab Switcher */}
+      <div className="flex gap-4 border-b border-white/5 pb-2">
+        <button
+          onClick={() => setActiveTab('registry')}
+          className={`text-xs uppercase font-bold tracking-wider pb-2 px-1 transition-all ${
+            activeTab === 'registry' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          Registry
+        </button>
+        <button
+          onClick={() => { setActiveTab('exports'); fetchExportLogs(); }}
+          className={`text-xs uppercase font-bold tracking-wider pb-2 px-1 transition-all ${
+            activeTab === 'exports' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          Export History
+        </button>
+      </div>
+
+      {activeTab === 'exports' ? (
+        <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden shadow-xl p-6">
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Past Exports History</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-xs text-white">
+              <thead>
+                <tr className="border-b border-white/5 bg-white/[0.01] text-gray-500 uppercase tracking-widest text-[9px]">
+                  <th className="p-4 font-semibold">Who (User)</th>
+                  <th className="p-4 font-semibold">When (Date)</th>
+                  <th className="p-4 font-semibold">Records Exported</th>
+                  <th className="p-4 font-semibold">Reason</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {exportLogs.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="p-8 text-center text-gray-500 uppercase tracking-widest text-[10px]">
+                      No export logs recorded.
+                    </td>
+                  </tr>
+                ) : (
+                  exportLogs.map((log) => (
+                    <tr key={log.id} className="hover:bg-white/[0.01] transition-all">
+                      <td className="p-4 font-semibold">{log.performed_by}</td>
+                      <td className="p-4 text-gray-400">
+                        {new Date(log.performed_at).toLocaleString('en-LK')}
+                      </td>
+                      <td className="p-4 font-mono font-bold text-gray-300">{log.target_name}</td>
+                      <td className="p-4 text-gray-400">{log.reason}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Filter Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
@@ -358,6 +494,25 @@ export default function AssociatesPage() {
                           >
                             View Details
                           </button>
+                          {adminUser?.role === 'chairman' ? (
+                            <button
+                              onClick={() => handleDelete(item.id, item.full_name)}
+                              style={{
+                                padding: '6px 12px', background: 'transparent',
+                                border: '1px solid rgba(255,0,0,0.3)', borderRadius: '6px',
+                                color: 'rgba(255,80,80,0.8)', cursor: 'pointer', fontSize: '12px'
+                              }}
+                            >
+                              Delete
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleRequestAccess('associates')}
+                              style={{ padding: '6px 12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '11px' }}
+                            >
+                              Request View Access
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -393,6 +548,8 @@ export default function AssociatesPage() {
           </div>
         )}
       </div>
+      </>
+      )}
 
       {/* Selected Associate Drawer */}
       {selectedAssociate && (

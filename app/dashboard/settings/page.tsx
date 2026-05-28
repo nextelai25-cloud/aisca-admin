@@ -1,13 +1,36 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Shield, Bell, Key, Users, Info, Save } from 'lucide-react'
+
+const ROLE_LABELS: Record<string, string> = {
+  chairman: 'Chairman',
+  deputy_chairman: 'Deputy Chairman',
+  cfo: 'Chief Financial Officer',
+  marketing_manager: 'Marketing Manager',
+  co_secretary: 'Co Secretary'
+}
 
 export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [passwordUpdating, setPasswordUpdating] = useState(false)
+
+  const [adminUsers, setAdminUsers] = useState<any[]>([])
+
+  useEffect(() => {
+    async function fetchAdminUsers() {
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('name, email, role')
+        .order('role')
+      if (!error && data) {
+        setAdminUsers(data)
+      }
+    }
+    fetchAdminUsers()
+  }, [])
 
   const [emailNotifs, setEmailNotifs] = useState(true)
   const [telegramNotifs, setTelegramNotifs] = useState(true)
@@ -142,20 +165,20 @@ export default function SettingsPage() {
             <h2 className="text-sm font-bold uppercase tracking-wider">Admin Directory</h2>
           </div>
           <div className="space-y-4">
-            {[
-              { name: 'Kavindu M.', role: 'Super Admin', email: 'kavindu@aisca.lk' },
-              { name: 'Dev Team', role: 'Developer', email: 'dev@aisca.lk' }
-            ].map((admin, idx) => (
+            {adminUsers.map((admin, idx) => (
               <div key={idx} className="flex justify-between items-center bg-white/[0.02] p-3 rounded-xl border border-white/5">
                 <div>
                   <p className="text-xs font-bold text-white uppercase tracking-wider">{admin.name}</p>
                   <p className="text-[10px] text-gray-500 font-mono mt-0.5">{admin.email}</p>
                 </div>
                 <span className="text-[9px] bg-white/10 px-2 py-1 rounded text-gray-300 uppercase tracking-widest border border-white/10">
-                  {admin.role}
+                  {ROLE_LABELS[admin.role] || admin.role.replace(/_/g, ' ')}
                 </span>
               </div>
             ))}
+            {adminUsers.length === 0 && (
+              <p className="text-xs text-gray-500 uppercase tracking-wide text-center">No board members found.</p>
+            )}
           </div>
         </div>
       </div>
