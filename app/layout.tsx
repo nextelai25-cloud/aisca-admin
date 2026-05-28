@@ -17,12 +17,17 @@ export const metadata: Metadata = {
   description: 'AISCA Board Administration Dashboard',
   icons: {
     icon: [
-      { url: 'https://aisca.lk/favicon.ico', sizes: '32x32' },
-      { url: 'https://aisca.lk/icon-192.png', sizes: '192x192', type: 'image/png' }
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' }
     ],
-    apple: [{ url: 'https://aisca.lk/apple-touch-icon.png' }],
-    shortcut: 'https://aisca.lk/favicon.ico'
-  }
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+    ],
+    shortcut: '/favicon.ico'
+  },
+  manifest: '/site.webmanifest'
 };
 
 export default function RootLayout({
@@ -37,8 +42,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="icon" href="https://aisca.lk/favicon.ico" sizes="32x32" />
-        <link rel="apple-touch-icon" href="https://aisca.lk/apple-touch-icon.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <title>AISCA Admin | Board Operations Panel</title>
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>{children}</body>
