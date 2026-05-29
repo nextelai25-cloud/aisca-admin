@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 export default function MembersPage() {
   const [members, setMembers] = useState<any[]>([])
@@ -18,7 +18,7 @@ export default function MembersPage() {
   }, [])
 
   const loadMembers = async () => {
-    const { data } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('aisca_members')
       .select('*')
       .order('participation_score', { ascending: false })

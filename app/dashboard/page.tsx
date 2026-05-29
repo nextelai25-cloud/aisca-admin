@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase, supabaseAdmin } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { 
   LineChart, 
   Line, 
@@ -86,7 +86,7 @@ export default function OverviewPage() {
         // 0. Fetch Total Members data
         let totalMembers = 0
         try {
-          const { count, error } = await supabaseAdmin
+          const { count, error } = await supabase
             .from('aisca_members')
             .select('*', { count: 'exact', head: true })
           if (error) console.error("Members fetch error:", error)
