@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabaseAdmin } from '@/lib/supabase'
 import { 
   LineChart, 
   Line, 
@@ -44,6 +44,7 @@ export default function OverviewPage() {
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
+    totalMembers: 0,
     totalAssociates: 0,
     totalSchools: 0,
     totalOrders: 0,
@@ -81,6 +82,18 @@ export default function OverviewPage() {
     async function fetchDashboardStats() {
       try {
         setLoading(true)
+
+        // 0. Fetch Total Members data
+        let totalMembers = 0
+        try {
+          const { count, error } = await supabaseAdmin
+            .from('aisca_members')
+            .select('*', { count: 'exact', head: true })
+          if (error) console.error("Members fetch error:", error)
+          if (count !== null) totalMembers = count
+        } catch (err) {
+          console.error("Failed to query aisca_members:", err)
+        }
 
         // 1. Fetch Associate Members data
         let associates: any[] = []
@@ -152,6 +165,7 @@ export default function OverviewPage() {
         const monthRegistrations = thisMonthAssocs + thisMonthSchools
 
         setStats({
+          totalMembers,
           totalAssociates,
           totalSchools,
           totalOrders,
@@ -332,6 +346,17 @@ export default function OverviewPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Stat 0: Total Members */}
+        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-teal-400">
+            <span className="text-xl">👥</span>
+          </div>
+          <div>
+            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Total Members</span>
+            <h3 className="text-2xl font-bold text-white mt-1">{stats.totalMembers.toLocaleString()}</h3>
+          </div>
+        </div>
+
         {/* Stat 1: Total Associates */}
         <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
           <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-[#d4af37]">

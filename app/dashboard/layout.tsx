@@ -30,6 +30,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { name: 'Overview', path: '/dashboard', icon: LayoutDashboard, section: 'dashboard' },
+    { name: 'Members Database', path: '/dashboard/members', icon: Users, section: 'dashboard' },
     { name: 'Associates Registry', path: '/dashboard/associates', icon: Users, section: 'associates' },
     { name: 'Schools Registry', path: '/dashboard/schools', icon: GraduationCap, section: 'schools' },
     { name: 'Product Orders', path: '/dashboard/orders', icon: ShoppingBag, section: 'orders' },
