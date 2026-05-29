@@ -17,7 +17,7 @@ envContent.split('\n').forEach(line => {
 
 const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY)
 
-const fileBuffer = readFileSync(path.join(__dirname, 'AISCA_MASTER_DATABASE.xlsx'))
+const fileBuffer = readFileSync('C:/Users/Logistics/Downloads/AISCA ALL DATA/AISCA_MASTER_DATABASE.xlsx')
 const wb = XLSX.read(fileBuffer, { type: 'buffer' })
 const ws = wb.Sheets['Master Database']
 const rows = XLSX.utils.sheet_to_json(ws)

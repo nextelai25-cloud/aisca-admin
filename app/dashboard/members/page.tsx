@@ -165,7 +165,7 @@ export default function MembersPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-              {['AISCA ID', 'FULL NAME', 'EMAIL', 'PHONE', 'SCHOOL', 'A/L BATCH', 'MEMBER TYPE', 'SCORE', 'ACTION'].map(h => (
+              {['FULL NAME', 'EMAIL', 'PHONE', 'SCHOOL', 'A/L BATCH', 'ACTION'].map(h => (
                 <th key={h} style={{
                   padding: '12px 16px', textAlign: 'left',
                   fontSize: '10px', letterSpacing: '0.12em',
@@ -176,7 +176,7 @@ export default function MembersPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={9} style={{ padding: '40px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>Loading...</td></tr>
+              <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>Loading...</td></tr>
             ) : paginated.map((m, i) => (
               <tr
                 key={m.id}
@@ -185,35 +185,20 @@ export default function MembersPage() {
                   background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)'
                 }}
               >
-                <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace' }}>
-                  {m.aisca_id}
-                </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: '600', color: '#fff' }}>
+                <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#fff' }}>
                   {m.full_name}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
                   {m.email || '—'}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
                   {m.phone || '—'}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
                   {m.school || '—'}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
                   {m.al_batch || '—'}
-                </td>
-                <td style={{ padding: '12px 16px' }}>
-                  <span style={{
-                    padding: '3px 8px', borderRadius: '4px', fontSize: '10px',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    color: 'rgba(255,255,255,0.6)'
-                  }}>
-                    {m.member_type || '—'}
-                  </span>
-                </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: '700', color: m.participation_score >= 80 ? '#4ade80' : m.participation_score >= 50 ? '#facc15' : 'rgba(255,255,255,0.4)' }}>
-                  {m.participation_score || 0}
                 </td>
                 <td style={{ padding: '12px 16px' }}>
                   <button
