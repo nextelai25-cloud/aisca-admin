@@ -316,25 +316,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </button>
       </div>
 
-      {/* Overlay */}
-      <div
-        className={`admin-overlay ${sidebarOpen ? 'open' : ''}`}
-        onClick={() => setSidebarOpen(false)}
-        style={{ display: sidebarOpen ? 'block' : 'none' }}
-      />
+      {/* Only render overlay when sidebar is open */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.6)',
+            zIndex: 998,
+            display: 'block'
+          }}
+        />
+      )}
 
       {/* Sidebar */}
       <div
-        className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}
+        className={`admin-sidebar${sidebarOpen ? ' open' : ''}`}
         style={{
           width: '240px',
           position: 'fixed',
           top: 0,
-          bottom: 0,
           left: 0,
-          zIndex: 999,
           height: '100vh',
-          boxSizing: 'border-box'
+          background: '#0a0a0a',
+          borderRight: '1px solid rgba(255,255,255,0.08)',
+          zIndex: 999,
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {sidebarContent}
