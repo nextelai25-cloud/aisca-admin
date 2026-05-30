@@ -49,6 +49,7 @@ export default function OverviewPage() {
     totalSchools: 0,
     totalOrders: 0,
     totalRevenue: 0,
+    cashBalance: 0,
     pendingApprovals: 0,
     monthRegistrations: 0
   })
@@ -131,6 +132,26 @@ export default function OverviewPage() {
           console.error("Failed to query product_orders:", err)
         }
 
+        // 3.5 Fetch Cash Balance from finance_ledger
+        let cashBalance = 0
+        try {
+          const { data, error } = await supabase
+            .from('finance_ledger')
+            .select('type, amount, cash_or_bank, adjusted')
+          if (error) console.error("Finance fetch error:", error)
+          if (data) {
+            const cashIncome = data
+              .filter(e => e.type === 'income' && e.cash_or_bank === 'cash' && !e.adjusted)
+              .reduce((s, e) => s + Number(e.amount || 0), 0)
+            const cashExpense = data
+              .filter(e => e.type === 'expense' && e.cash_or_bank === 'cash' && !e.adjusted)
+              .reduce((s, e) => s + Number(e.amount || 0), 0)
+            cashBalance = cashIncome - cashExpense
+          }
+        } catch (err) {
+          console.error("Failed to query finance_ledger for cashBalance:", err)
+        }
+
         const safeAssocs = associates
         const safeSchools = schools
         const safeOrders = orders
@@ -170,6 +191,7 @@ export default function OverviewPage() {
           totalSchools,
           totalOrders,
           totalRevenue,
+          cashBalance,
           pendingApprovals,
           monthRegistrations
         })
@@ -345,7 +367,7 @@ export default function OverviewPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Stat 0: Total Members */}
         <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
           <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-teal-400">
@@ -398,6 +420,19 @@ export default function OverviewPage() {
           <div>
             <span className="text-[10px] tracking-wider text-gray-500 uppercase">Total Revenue</span>
             <h3 className="text-2xl font-bold text-white mt-1">LKR {stats.totalRevenue.toLocaleString()}</h3>
+          </div>
+        </div>
+
+        {/* Stat 4.5: Cash Balance */}
+        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+          <div className={`w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center ${stats.cashBalance >= 0 ? 'text-[#d4af37]' : 'text-red-500'}`}>
+            <CircleDollarSign size={20} />
+          </div>
+          <div>
+            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Cash Balance</span>
+            <h3 className={`text-2xl font-bold mt-1 ${stats.cashBalance >= 0 ? 'text-white' : 'text-red-400'}`}>
+              LKR {stats.cashBalance.toLocaleString()}
+            </h3>
           </div>
         </div>
 
