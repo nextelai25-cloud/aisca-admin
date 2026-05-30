@@ -411,7 +411,7 @@ export default function FinancePage() {
               </button>
             </div>
             
-            <form onSubmit={handleAddTransaction} className="space-y-5 flex-1">
+            <form onSubmit={handleAddTransaction} className="space-y-5 flex-1 finance-form-grid">
               {/* Type */}
               <div>
                 <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Type</label>
@@ -529,7 +529,7 @@ export default function FinancePage() {
       )}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 finance-stats-grid">
         {/* Income Card */}
         <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-xl">
           <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-green-400">
@@ -593,7 +593,7 @@ export default function FinancePage() {
       </div>
 
       {/* Charts & Filter Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 finance-main-grid">
         {/* Advanced Filters */}
         <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-xl flex flex-col justify-between gap-4">
           <div>

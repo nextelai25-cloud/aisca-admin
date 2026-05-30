@@ -221,7 +221,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Analytics stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 analytics-stats-grid">
         {/* Total Page Views */}
         <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-xl">
           <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-[#d4af37]">
@@ -268,7 +268,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Primary Graphs Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 analytics-charts-grid">
         {/* Timeline Chart */}
         <div className="lg:col-span-2 bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-xl">
           <div className="mb-4">
@@ -336,7 +336,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Pages and Referrers breakdown Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 analytics-bottom-grid">
         {/* Top Pages Horizontal Bar chart */}
         <div className="lg:col-span-1 bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-xl">
           <div className="mb-4">

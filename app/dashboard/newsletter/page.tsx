@@ -103,7 +103,7 @@ export default function NewsletterPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 newsletter-layout">
         {/* Compose Newsletter Panel */}
         <div className="lg:col-span-2 bg-[#0b0b0b] border border-white/5 rounded-2xl p-6 md:p-8 space-y-6">
           <div>

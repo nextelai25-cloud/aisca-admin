@@ -82,7 +82,7 @@ export default function ContactMessagesPage() {
       </div>
 
       {/* Messages List / Table */}
-      <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden">
+      <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden admin-table-wrapper">
         {loading ? (
           <div className="py-20 text-center text-xs text-gray-500 uppercase tracking-widest">
             Loading contact registry...

@@ -359,7 +359,7 @@ export default function OverviewPage() {
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in dashboard-page">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-wider uppercase text-white">Board Dashboard</h1>
@@ -367,7 +367,7 @@ export default function OverviewPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 dashboard-stats-grid">
         {/* Stat 0: Total Members */}
         <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
           <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-teal-400">
@@ -460,7 +460,7 @@ export default function OverviewPage() {
       </div>
 
       {/* Visualizations Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 dashboard-charts-grid">
         {/* Registrations Timeline */}
         <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
           <div className="mb-4">

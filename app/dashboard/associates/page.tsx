@@ -279,7 +279,7 @@ export default function AssociatesPage() {
   return (
     <div className="space-y-6">
       {/* Page Title & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 admin-page-header">
         <div>
           <h1 className="text-2xl font-bold tracking-wider uppercase text-white">Associates Registry</h1>
           <p className="text-xs text-gray-500 tracking-wide uppercase mt-1">Review and manage individual onboardings</p>
@@ -306,7 +306,7 @@ export default function AssociatesPage() {
           <button
             onClick={handleExport}
             disabled={filteredData.length === 0}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all admin-export-btn"
           >
             <Download size={14} />
             <span>Export CSV ({filteredData.length})</span>
@@ -373,7 +373,7 @@ export default function AssociatesPage() {
       ) : (
         <>
           {/* Filter Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 admin-filters-row">
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
@@ -412,7 +412,7 @@ export default function AssociatesPage() {
       </div>
 
       {/* Main Table */}
-      <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden shadow-xl admin-table-wrapper">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs text-white">
             <thead>
@@ -558,7 +558,7 @@ export default function AssociatesPage() {
             onClick={() => setSelectedAssociate(null)}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
           />
-          <div className="relative w-full max-w-lg h-full bg-[#0b0b0b] border-l border-white/5 p-8 flex flex-col justify-between overflow-y-auto z-10">
+          <div className="relative w-full max-w-lg h-full bg-[#0b0b0b] border-l border-white/5 p-8 flex flex-col justify-between overflow-y-auto z-10 admin-modal-inner">
             <div className="space-y-8">
               <div className="flex items-center justify-between pb-6 border-b border-white/5">
                 <div className="flex items-center gap-3 text-[#d4af37]">
@@ -573,7 +573,7 @@ export default function AssociatesPage() {
                 </button>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 admin-modal-grid">
                 <div>
                   <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Membership No</span>
                   <div className="text-xl font-bold text-[#d4af37] mt-1 font-mono">{selectedAssociate.membership_number}</div>

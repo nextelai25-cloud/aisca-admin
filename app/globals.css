@@ -24,3 +24,177 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ===== ADMIN MOBILE RESPONSIVE ===== */
+
+@media (max-width: 1024px) {
+  /* Sidebar collapses on tablet/mobile */
+  .admin-sidebar {
+    position: fixed !important;
+    left: -240px !important;
+    top: 0 !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    transition: left 0.3s ease !important;
+    width: 240px !important;
+  }
+  
+  .admin-sidebar.open {
+    left: 0 !important;
+  }
+
+  .admin-main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .admin-mobile-header {
+    display: flex !important;
+  }
+
+  .admin-overlay {
+    display: block !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .admin-mobile-header {
+    display: none !important;
+  }
+  .admin-overlay {
+    display: none !important;
+  }
+}
+
+/* Dashboard overview grid */
+@media (max-width: 767px) {
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  
+  .dashboard-charts-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .dashboard-page {
+    padding: 16px !important;
+  }
+}
+
+/* Tables - horizontal scroll on mobile */
+@media (max-width: 767px) {
+  .admin-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .admin-table-wrapper table {
+    min-width: 700px !important;
+  }
+  
+  .admin-filters-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  
+  .admin-filters-row input,
+  .admin-filters-row select {
+    width: 100% !important;
+  }
+  
+  .admin-page-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  
+  .admin-export-btn {
+    width: 100% !important;
+    text-align: center !important;
+  }
+}
+
+/* Finance ledger mobile */
+@media (max-width: 767px) {
+  .finance-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  
+  .finance-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .finance-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Members database mobile */
+@media (max-width: 767px) {
+  .members-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Analytics mobile */
+@media (max-width: 767px) {
+  .analytics-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .analytics-charts-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .analytics-bottom-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Modal mobile */
+@media (max-width: 767px) {
+  .admin-modal-inner {
+    margin: 10px !important;
+    border-radius: 12px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+  
+  .admin-modal-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Newsletter mobile */
+@media (max-width: 767px) {
+  .newsletter-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Settings mobile */
+@media (max-width: 767px) {
+  .settings-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Sidebar overlay */
+.admin-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 998;
+}
+
+@media (max-width: 1024px) {
+  .mobile-content-pad {
+    padding-top: 60px !important;
+  }
+  .admin-main-content {
+    padding-top: 60px !important;
+  }
+}

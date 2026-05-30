@@ -66,7 +66,7 @@ export default function SettingsPage() {
         <p className="text-xs text-gray-500 tracking-wide uppercase mt-1">Configure admin dashboard preferences and security</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 settings-grid">
         {/* Security / Password */}
         <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-xl space-y-6">
           <div className="flex items-center gap-3 text-white border-b border-white/5 pb-4">

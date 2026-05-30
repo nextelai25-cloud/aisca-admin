@@ -274,10 +274,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       
       {/* 1. Global CSS Styles injected dynamically */}
       <style jsx global>{`
-        @keyframes slideIn {
-          from { transform: translateX(-100%); }
-          to { transform: translateX(0); }
-        }
         .nav-link:hover {
           color: #ffffff !important;
           background: rgba(255,255,255,0.02) !important;
@@ -286,113 +282,79 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           color: #ff4d4d !important;
           background: rgba(255,50,50,0.04) !important;
         }
-        @media (max-width: 1023px) {
-          .desktop-sidebar {
-            display: none !important;
-          }
+        @media (max-width: 1024px) {
           .mobile-close-btn {
             display: flex !important;
           }
         }
-        @media (min-width: 1024px) {
-          .mobile-header {
-            display: none !important;
-          }
-        }
       `}</style>
 
-      {/* 2. Desktop Sidebar */}
-      <div 
-        className="desktop-sidebar" 
+      {/* Mobile header */}
+      <div
+        className="admin-mobile-header"
         style={{
-          width: '280px',
-          flexShrink: 0,
-          position: 'sticky',
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+          background: '#0a0a0a', borderBottom: '1px solid rgba(255,255,255,0.08)',
+          padding: '12px 20px',
+          alignItems: 'center', justifyContent: 'space-between',
+          display: 'none' // overridden by CSS on mobile
+        }}
+      >
+        <img src="https://aisca.lk/aisca-logo.webp" alt="AISCA" style={{ height: '32px', width: 'auto' }} />
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '8px', color: '#fff',
+            width: '40px', height: '40px',
+            cursor: 'pointer', fontSize: '18px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}
+        >
+          {sidebarOpen ? '×' : '☰'}
+        </button>
+      </div>
+
+      {/* Overlay */}
+      <div
+        className={`admin-overlay ${sidebarOpen ? 'open' : ''}`}
+        onClick={() => setSidebarOpen(false)}
+        style={{ display: sidebarOpen ? 'block' : 'none' }}
+      />
+
+      {/* Sidebar */}
+      <div
+        className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}
+        style={{
+          width: '240px',
+          position: 'fixed',
           top: 0,
-          height: '100vh'
+          bottom: 0,
+          left: 0,
+          zIndex: 999,
+          height: '100vh',
+          boxSizing: 'border-box'
         }}
       >
         {sidebarContent}
       </div>
 
-      {/* 3. Mobile Sidebar Drawer */}
-      {sidebarOpen && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 999,
-          display: 'flex'
-        }}>
-          {/* Overlay backdrop */}
-          <div 
-            onClick={() => setSidebarOpen(false)}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'rgba(0, 0, 0, 0.6)',
-              backdropFilter: 'blur(4px)'
-            }}
-          />
-          {/* Drawer panel */}
-          <div style={{
-            position: 'relative',
-            width: '280px',
-            height: '100%',
-            zIndex: 1000,
-            animation: 'slideIn 0.25s ease-out'
-          }}>
-            {sidebarContent}
-          </div>
-        </div>
-      )}
-
-
-      {/* 4. Main Layout Shell */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      {/* Main Content Wrapper */}
+      <div
+        className="admin-main-content"
+        style={{
+          marginLeft: '240px',
+          minHeight: '100vh',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0
+        }}
+      >
+        {/* Add padding for mobile header */}
+        <div style={{ paddingTop: '0' }} className="mobile-content-pad" />
         
-        {/* Mobile Header Bar */}
-        <header 
-          className="mobile-header"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '16px 24px',
-            background: '#0c0c0c',
-            borderBottom: '1px solid rgba(255,255,255,0.06)'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button
-              onClick={() => setSidebarOpen(true)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#ffffff',
-                cursor: 'pointer',
-                padding: '4px'
-              }}
-            >
-              <Menu size={22} />
-            </button>
-            <h2 style={{ color: '#ffffff', fontSize: '16px', fontWeight: '800', letterSpacing: '0.05em', margin: 0 }}>
-              AI$CA
-            </h2>
-          </div>
-          {profile && (
-            <span style={{
-              fontSize: '8px',
-              fontWeight: '700',
-              color: '#d4af37',
-              border: '1px solid rgba(212,175,55,0.2)',
-              padding: '2px 6px',
-              borderRadius: '4px'
-            }}>
-              {formatRole(profile.role)}
-            </span>
-          )}
-        </header>
-
         {/* Content Body Container */}
         <main style={{
           flex: 1,

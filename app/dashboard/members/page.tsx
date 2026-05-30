@@ -73,7 +73,7 @@ export default function MembersPage() {
       </div>
 
       {/* Stats row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '12px', marginBottom: '32px' }}>
+      <div className="members-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '12px', marginBottom: '32px' }}>
         {[
           { label: 'TOTAL MEMBERS', value: stats.total },
           { label: 'ASSOCIATES', value: stats.associates },
@@ -96,7 +96,7 @@ export default function MembersPage() {
       </div>
 
       {/* Filters */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+      <div className="admin-filters-row" style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -157,7 +157,7 @@ export default function MembersPage() {
       </div>
 
       {/* Table */}
-      <div style={{
+      <div className="admin-table-wrapper" style={{
         background: 'rgba(255,255,255,0.02)',
         border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: '12px', overflow: 'hidden'
@@ -248,6 +248,7 @@ export default function MembersPage() {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
         >
           <div
+            className="admin-modal-inner"
             onClick={e => e.stopPropagation()}
             style={{ width: '100%', maxWidth: '680px', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', overflow: 'hidden' }}
           >
@@ -261,7 +262,7 @@ export default function MembersPage() {
             </div>
 
             {/* Modal body */}
-            <div style={{ padding: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="admin-modal-grid" style={{ padding: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               {[
                 { label: 'Email', value: selectedMember.email },
                 { label: 'Phone', value: selectedMember.phone },

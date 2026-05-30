@@ -50,7 +50,7 @@ export const ROLE_PERMISSIONS = {
     associates: true,
     schools: true,
     orders: false,
-    finance: false,
+    finance: true,
     analytics: false,
     members: false,
     newsletter: false,

@@ -206,7 +206,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Dynamic Multi-Filters Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 admin-filters-row">
         {/* Search */}
         <div className="relative col-span-1 sm:col-span-2 lg:col-span-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
@@ -270,7 +270,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Main Table */}
-      <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden shadow-xl admin-table-wrapper">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-xs text-white">
             <thead>
