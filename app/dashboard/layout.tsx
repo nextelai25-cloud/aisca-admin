@@ -15,7 +15,8 @@ import {
   Settings,
   LogOut, 
   Menu, 
-  X 
+  X,
+  Lightbulb
 } from 'lucide-react'
 import { getUnreadContactMessagesCount } from './contact/actions'
 import { canAccess, AdminRole } from '@/lib/roles'
@@ -38,6 +39,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Newsletter Hub', path: '/dashboard/newsletter', icon: Mail, section: 'newsletter' },
     { name: 'Contact Messages', path: '/dashboard/contact', icon: MessageSquare, badge: unreadCount, section: 'contact' },
     { name: 'Site Analytics', path: '/dashboard/analytics', icon: BarChart3, section: 'analytics' },
+    { name: 'IdeaNet Moderation', path: '/dashboard/ideanet', icon: Lightbulb, section: 'ideanet' },
     { name: 'Settings', path: '/dashboard/settings', icon: Settings, section: 'dashboard' }
   ]
 

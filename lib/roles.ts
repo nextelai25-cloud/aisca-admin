@@ -10,7 +10,8 @@ export const ROLE_PERMISSIONS = {
     analytics: true,
     members: true,
     newsletter: true,
-    contact: true
+    contact: true,
+    ideanet: true
   },
   deputy_chairman: {
     dashboard: true,
@@ -21,7 +22,8 @@ export const ROLE_PERMISSIONS = {
     analytics: true,
     members: false,
     newsletter: false,
-    contact: true
+    contact: true,
+    ideanet: true
   },
   cfo: {
     dashboard: true,
@@ -32,7 +34,8 @@ export const ROLE_PERMISSIONS = {
     analytics: false,
     members: false,
     newsletter: false,
-    contact: false
+    contact: false,
+    ideanet: false
   },
   marketing_manager: {
     dashboard: true,
@@ -43,7 +46,8 @@ export const ROLE_PERMISSIONS = {
     analytics: true,
     members: false,
     newsletter: true,
-    contact: false
+    contact: false,
+    ideanet: true
   },
   co_secretary: {
     dashboard: true,
@@ -54,7 +58,8 @@ export const ROLE_PERMISSIONS = {
     analytics: false,
     members: false,
     newsletter: false,
-    contact: false
+    contact: false,
+    ideanet: false
   },
   administration_manager: {
     dashboard: true,
@@ -65,7 +70,8 @@ export const ROLE_PERMISSIONS = {
     analytics: false,
     members: false,
     newsletter: false,
-    contact: false
+    contact: false,
+    ideanet: false
   }
 }
 
