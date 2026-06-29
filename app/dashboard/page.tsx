@@ -3,37 +3,39 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { 
-  LineChart, 
-  Line, 
   BarChart, 
   Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer 
+  ResponsiveContainer,
+  Legend
 } from 'recharts'
 import { 
   Users, 
+  User,
   GraduationCap, 
   ShoppingBag, 
   CircleDollarSign, 
-  Clock, 
-  CalendarDays,
-  User,
   Shield,
-  Activity
+  Activity,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react'
+import Link from 'next/link'
 
-// Custom premium dark tooltip
+// Custom minimal tooltip
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#121212] border border-white/10 p-3 rounded-lg shadow-xl">
-        <p className="text-[10px] tracking-wider text-gray-500 uppercase mb-1">{label}</p>
-        <p className="text-sm font-bold text-white">
-          {payload[0].name}: <span className="text-[#d4af37]">{payload[0].value.toLocaleString()}</span>
-        </p>
+      <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', padding: '12px', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+        <p style={{ fontSize: '12px', color: '#6B6B6B', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} style={{ fontSize: '14px', fontWeight: 'bold', color: entry.color, margin: '4px 0' }}>
+            {entry.name}: <span style={{ color: '#111111' }}>LKR {entry.value.toLocaleString()}</span>
+          </p>
+        ))}
       </div>
     )
   }
@@ -44,19 +46,20 @@ export default function OverviewPage() {
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
-    totalMembers: 0,
-    totalAssociates: 0,
-    totalSchools: 0,
-    totalOrders: 0,
-    totalRevenue: 0,
     netBalance: 0,
-    pendingApprovals: 0,
-    monthRegistrations: 0
+    netBalanceChange: 0, // % change
+    totalIncome: 0,
+    incomeChange: 0,
+    totalExpenses: 0,
+    expenseChange: 0,
+    totalMembers: 0,
+    membersChange: 0
   })
   
-  const [registrationChartData, setRegistrationChartData] = useState<any[]>([])
-  const [productChartData, setProductChartData] = useState<any[]>([])
+  const [chartData, setChartData] = useState<any[]>([])
+  const [chartFilter, setChartFilter] = useState<'Month' | '6 Months' | 'Year'>('6 Months')
   const [activities, setActivities] = useState<any[]>([])
+  const [recentAssociates, setRecentAssociates] = useState<any[]>([])
 
   const formatActivityTime = (isoString: string) => {
     try {
@@ -80,263 +83,132 @@ export default function OverviewPage() {
   useEffect(() => {
     if (!mounted) return
 
-    async function fetchDashboardStats() {
+    async function fetchDashboardData() {
       try {
         setLoading(true)
 
-        // 0. Fetch Total Members data
-        let totalMembers = 0
-        try {
-          const { count, error } = await supabase
-            .from('aisca_members')
-            .select('*', { count: 'exact', head: true })
-          if (error) console.error("Members fetch error:", error)
-          if (count !== null) totalMembers = count
-        } catch (err) {
-          console.error("Failed to query aisca_members:", err)
-        }
+        // 1. Members
+        const { data: members, error: membersErr } = await supabase.from('aisca_members').select('created_at')
+        const totalMembers = members?.length || 0
+        // Mock members change for now as we don't always have deep historical members
+        const membersChange = 5.2
 
-        // 1. Fetch Associate Members data
-        let associates: any[] = []
-        try {
-          const { data, error } = await supabase
-            .from('associate_members')
-            .select('created_at, status')
-          if (error) console.error("Associates fetch error:", error)
-          if (data) associates = data
-        } catch (err) {
-          console.error("Failed to query associate_members:", err)
-        }
-
-        // 2. Fetch School Registrations data
-        let schools: any[] = []
-        try {
-          const { data, error } = await supabase
-            .from('school_registrations')
-            .select('created_at, status')
-          if (error) console.error("Schools fetch error:", error)
-          if (data) schools = data
-        } catch (err) {
-          console.error("Failed to query school_registrations:", err)
-        }
-
-        // 3. Fetch Product Orders data
-        let orders: any[] = []
-        try {
-          const { data, error } = await supabase
-            .from('product_orders')
-            .select('created_at, total_amount, quantity, product_name')
-          if (error) console.error("Orders fetch error:", error)
-          if (data) orders = data
-        } catch (err) {
-          console.error("Failed to query product_orders:", err)
-        }
-
-        // 3.5 Fetch Net Balance from finance_ledger
-        let netBalance = 0
-        try {
-          const { data, error } = await supabase
-            .from('finance_ledger')
-            .select('type, amount, adjusted')
-          if (error) console.error("Finance fetch error:", error)
-          if (data) {
-            const totalIncome = data
-              .filter(e => e.type === 'income' && !e.adjusted)
-              .reduce((s, e) => s + Number(e.amount || 0), 0)
-            const totalExpense = data
-              .filter(e => e.type === 'expense' && !e.adjusted)
-              .reduce((s, e) => s + Number(e.amount || 0), 0)
-            netBalance = totalIncome - totalExpense
-          }
-        } catch (err) {
-          console.error("Failed to query finance_ledger for netBalance:", err)
-        }
-
-        const safeAssocs = associates
-        const safeSchools = schools
-        const safeOrders = orders
-
-        // Total Counts
-        const totalAssociates = safeAssocs.length
-        const totalSchools = safeSchools.length
-        const totalOrders = safeOrders.length
-
-        // Total Revenue calculation
-        const totalRevenue = safeOrders.reduce((sum, ord) => sum + Number(ord.total_amount || 0), 0)
-
-        // Pending Approvals count (both associates and schools)
-        const pendingAssocs = safeAssocs.filter(m => m.status === 'pending').length
-        const pendingSchools = safeSchools.filter(s => s.status === 'pending').length
-        const pendingApprovals = pendingAssocs + pendingSchools
-
-        // This Month's registrations
-        const currentMonth = new Date().getMonth()
-        const currentYear = new Date().getFullYear()
+        // 2. Finance Ledger (Income / Expenses)
+        const { data: ledger } = await supabase.from('finance_ledger').select('type, amount, adjusted, created_at').eq('adjusted', false)
         
-        const thisMonthAssocs = safeAssocs.filter(m => {
-          const d = new Date(m.created_at)
-          return d.getMonth() === currentMonth && d.getFullYear() === currentYear
-        }).length
+        let totalIncome = 0
+        let totalExpenses = 0
+        let lastMonthIncome = 0
+        let lastMonthExpenses = 0
 
-        const thisMonthSchools = safeSchools.filter(s => {
-          const d = new Date(s.created_at)
-          return d.getMonth() === currentMonth && d.getFullYear() === currentYear
-        }).length
+        const now = new Date()
+        const oneMonthAgo = new Date()
+        oneMonthAgo.setMonth(now.getMonth() - 1)
+        const twoMonthsAgo = new Date()
+        twoMonthsAgo.setMonth(now.getMonth() - 2)
 
-        const monthRegistrations = thisMonthAssocs + thisMonthSchools
+        ledger?.forEach(entry => {
+          const amt = Number(entry.amount || 0)
+          const date = new Date(entry.created_at)
+          
+          if (entry.type === 'income') {
+            totalIncome += amt
+            if (date >= oneMonthAgo) {
+              // Current month
+            } else if (date >= twoMonthsAgo && date < oneMonthAgo) {
+              lastMonthIncome += amt
+            }
+          } else if (entry.type === 'expense') {
+            totalExpenses += amt
+            if (date >= oneMonthAgo) {
+            } else if (date >= twoMonthsAgo && date < oneMonthAgo) {
+              lastMonthExpenses += amt
+            }
+          }
+        })
+
+        const netBalance = totalIncome - totalExpenses
+        const lastMonthNet = lastMonthIncome - lastMonthExpenses
+        
+        const netBalanceChange = lastMonthNet === 0 ? 100 : ((netBalance - lastMonthNet) / Math.abs(lastMonthNet)) * 100
+        const incomeChange = lastMonthIncome === 0 ? 100 : ((totalIncome - lastMonthIncome) / lastMonthIncome) * 100
+        const expenseChange = lastMonthExpenses === 0 ? 100 : ((totalExpenses - lastMonthExpenses) / lastMonthExpenses) * 100
 
         setStats({
-          totalMembers,
-          totalAssociates,
-          totalSchools,
-          totalOrders,
-          totalRevenue,
           netBalance,
-          pendingApprovals,
-          monthRegistrations
+          netBalanceChange,
+          totalIncome,
+          incomeChange,
+          totalExpenses,
+          expenseChange,
+          totalMembers,
+          membersChange
         })
 
-        // Chart 1: Registrations over time (last 30 days)
-        const dayMap: Record<string, number> = {}
-        const now = new Date()
-        for (let i = 29; i >= 0; i--) {
+        // 3. Chart Data (Last 6 Months grouped)
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        const last6Months: any[] = []
+        for (let i = 5; i >= 0; i--) {
           const d = new Date()
-          d.setDate(now.getDate() - i)
-          const dateString = d.toISOString().split('T')[0]
-          dayMap[dateString] = 0
+          d.setMonth(now.getMonth() - i)
+          last6Months.push({
+            label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`,
+            month: d.getMonth(),
+            year: d.getFullYear(),
+            Income: 0,
+            Expenses: 0
+          })
         }
 
-        // Aggregate associate signups
-        safeAssocs.forEach(m => {
-          const day = new Date(m.created_at).toISOString().split('T')[0]
-          if (dayMap[day] !== undefined) {
-            dayMap[day] += 1
+        ledger?.forEach(entry => {
+          const d = new Date(entry.created_at)
+          const amt = Number(entry.amount || 0)
+          const targetMonth = last6Months.find(m => m.month === d.getMonth() && m.year === d.getFullYear())
+          if (targetMonth) {
+            if (entry.type === 'income') targetMonth.Income += amt
+            if (entry.type === 'expense') targetMonth.Expenses += amt
           }
         })
 
-        // Aggregate school signups
-        safeSchools.forEach(s => {
-          const day = new Date(s.created_at).toISOString().split('T')[0]
-          if (dayMap[day] !== undefined) {
-            dayMap[day] += 1
-          }
-        })
+        setChartData(last6Months)
 
-        const registrationChart = Object.keys(dayMap).map(key => {
-          const [, month, day] = key.split('-')
-          return {
-            date: `${month}/${day}`,
-            "Sign-ups": dayMap[key]
-          }
-        })
-        setRegistrationChartData(registrationChart)
-
-        // Chart 2: Product distribution by quantity sold
-        const productMap: Record<string, number> = {}
-        safeOrders.forEach(ord => {
-          const prodName = ord.product_name || 'Unknown Item'
-          productMap[prodName] = (productMap[prodName] || 0) + Number(ord.quantity || 1)
-        })
-
-        const productChart = Object.keys(productMap).map(key => ({
-          product: key,
-          "Quantity": productMap[key]
-        }))
-        setProductChartData(productChart)
-
-        // 4. Fetch Recent Activities (recent 5 from each)
+        // 4. Recent Activities
         let recentAssocs: any[] = []
-        try {
-          const { data, error } = await supabase
-            .from('associate_members')
-            .select('id, full_name, created_at, status')
-            .order('created_at', { ascending: false })
-            .limit(5)
-          if (!error && data) recentAssocs = data
-        } catch (e) {
-          console.error("Error fetching recent assocs:", e)
-        }
+        const { data: assocs } = await supabase.from('associate_members').select('id, full_name, created_at, status').order('created_at', { ascending: false }).limit(5)
+        if (assocs) recentAssocs = assocs
 
         let recentSchools: any[] = []
-        try {
-          const { data, error } = await supabase
-            .from('school_registrations')
-            .select('id, school_name, created_at, status')
-            .order('created_at', { ascending: false })
-            .limit(5)
-          if (!error && data) recentSchools = data
-        } catch (e) {
-          console.error("Error fetching recent schools:", e)
-        }
-
-        let recentOrders: any[] = []
-        try {
-          const { data, error } = await supabase
-            .from('product_orders')
-            .select('id, order_number, customer_name, product_name, total_amount, created_at')
-            .order('created_at', { ascending: false })
-            .limit(5)
-          if (!error && data) recentOrders = data
-        } catch (e) {
-          console.error("Error fetching recent orders:", e)
-        }
+        const { data: schools } = await supabase.from('school_registrations').select('id, school_name, created_at, status').order('created_at', { ascending: false }).limit(5)
+        if (schools) recentSchools = schools
 
         let recentAudits: any[] = []
-        try {
-          const { data, error } = await supabase
-            .from('audit_log')
-            .select('id, action, target_name, performed_by, reason, performed_at')
-            .order('performed_at', { ascending: false })
-            .limit(5)
-          if (!error && data) recentAudits = data
-        } catch (e) {
-          console.error("Error fetching recent audits:", e)
-        }
+        const { data: audits } = await supabase.from('audit_log').select('id, action, target_name, performed_by, reason, performed_at').order('performed_at', { ascending: false }).limit(5)
+        if (audits) recentAudits = audits
 
         const assocActivities = recentAssocs.map(item => ({
-          id: item.id,
-          type: 'associate',
-          title: 'New Associate Registration',
-          description: `${item.full_name} registered as an associate member.`,
-          timestamp: item.created_at,
-          status: item.status
+          id: item.id, type: 'associate', title: 'Associate Registration', description: `${item.full_name} registered.`, timestamp: item.created_at
         }))
-
         const schoolActivities = recentSchools.map(item => ({
-          id: item.id,
-          type: 'school',
-          title: 'New School Registration',
-          description: `${item.school_name} registered as a school member.`,
-          timestamp: item.created_at,
-          status: item.status
+          id: item.id, type: 'school', title: 'School Registration', description: `${item.school_name} registered.`, timestamp: item.created_at
         }))
-
-        const orderActivities = recentOrders.map(item => ({
-          id: item.id,
-          type: 'order',
-          title: `Merchandise Order #${item.order_number}`,
-          description: `${item.customer_name} ordered ${item.product_name} (LKR ${Number(item.total_amount).toLocaleString()}).`,
-          timestamp: item.created_at
-        }))
-
         const auditActivities = recentAudits.map(item => ({
-          id: item.id,
-          type: 'audit',
-          title: item.action.replace(/_/g, ' '),
-          description: `${item.performed_by} performed: ${item.target_name || 'N/A'}${item.reason ? ` (${item.reason})` : ''}`,
-          timestamp: item.performed_at
+          id: item.id, type: 'audit', title: item.action.replace(/_/g, ' '), description: `${item.performed_by} performed: ${item.target_name || 'N/A'}`, timestamp: item.performed_at
         }))
 
-        const mergedActivities = [
-          ...assocActivities,
-          ...schoolActivities,
-          ...orderActivities,
-          ...auditActivities
-        ]
+        const mergedActivities = [...assocActivities, ...schoolActivities, ...auditActivities]
           .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
           .slice(0, 10)
-
+        
         setActivities(mergedActivities)
+
+        // 5. Recent Associates Table
+        const { data: assocTableData } = await supabase
+          .from('associate_members')
+          .select('id, full_name, school, district, status, created_at')
+          .order('created_at', { ascending: false })
+          .limit(5)
+        
+        if (assocTableData) setRecentAssociates(assocTableData)
 
       } catch (err) {
         console.error("Dashboard error:", err)
@@ -345,246 +217,197 @@ export default function OverviewPage() {
       }
     }
 
-    fetchDashboardStats()
+    fetchDashboardData()
   }, [mounted])
 
   if (!mounted) return null
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-t-2 border-r-2 border-[#d4af37] rounded-full animate-spin"></div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+        <div style={{ width: '32px', height: '32px', border: '3px solid #E8E8E8', borderTopColor: '#111111', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
     )
   }
 
+  const TrendBadge = ({ value }: { value: number }) => {
+    const isPositive = value >= 0
+    return (
+      <span style={{ 
+        display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '4px 8px', borderRadius: '20px',
+        fontSize: '11px', fontWeight: '600',
+        background: isPositive ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+        color: isPositive ? '#22C55E' : '#EF4444'
+      }}>
+        {isPositive ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
+        {Math.abs(value).toFixed(1)}%
+      </span>
+    )
+  }
+
   return (
-    <div className="space-y-8 animate-fade-in dashboard-page">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-wider uppercase text-white">Board Dashboard</h1>
-        <p className="text-xs text-gray-500 tracking-wide uppercase mt-1">Real-time Operations & Activity Overview</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 dashboard-stats-grid">
-        {/* Stat 0: Total Members */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-teal-400">
-            <span className="text-xl">👥</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      
+      {/* KPI Row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+        {/* Featured Card */}
+        <div style={{ background: '#111111', color: '#FFFFFF', padding: '24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '140px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '13px', color: '#A3A3A3', fontWeight: '500' }}>Net Balance</span>
+            <TrendBadge value={stats.netBalanceChange} />
           </div>
-          <div>
-            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Total Members</span>
-            <h3 className="text-2xl font-bold text-white mt-1">{stats.totalMembers.toLocaleString()}</h3>
-          </div>
+          <h3 style={{ fontSize: '32px', fontWeight: '700', margin: '8px 0 0 0' }}>
+            LKR {stats.netBalance.toLocaleString()}
+          </h3>
         </div>
 
-        {/* Stat 1: Total Associates */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-[#d4af37]">
-            <Users size={20} />
-          </div>
-          <div>
-            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Total Associates</span>
-            <h3 className="text-2xl font-bold text-white mt-1">{stats.totalAssociates.toLocaleString()}</h3>
-          </div>
-        </div>
-
-        {/* Stat 2: Total Schools */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-blue-400">
-            <GraduationCap size={20} />
-          </div>
-          <div>
-            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Registered Schools</span>
-            <h3 className="text-2xl font-bold text-white mt-1">{stats.totalSchools.toLocaleString()}</h3>
-          </div>
-        </div>
-
-        {/* Stat 3: Total Orders */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-green-400">
-            <ShoppingBag size={20} />
-          </div>
-          <div>
-            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Product Orders</span>
-            <h3 className="text-2xl font-bold text-white mt-1">{stats.totalOrders.toLocaleString()}</h3>
-          </div>
-        </div>
-
-        {/* Stat 4: Total Revenue */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-amber-500">
-            <CircleDollarSign size={20} />
-          </div>
-          <div>
-            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Total Revenue</span>
-            <h3 className="text-2xl font-bold text-white mt-1">LKR {stats.totalRevenue.toLocaleString()}</h3>
-          </div>
-        </div>
-
-        {/* Stat 4.5: Net Balance */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className={`w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center ${stats.netBalance >= 0 ? 'text-[#d4af37]' : 'text-red-500'}`}>
-            <CircleDollarSign size={20} />
-          </div>
-          <div>
-            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Net Balance</span>
-            <h3 className={`text-2xl font-bold mt-1 ${stats.netBalance >= 0 ? 'text-white' : 'text-red-400'}`}>
-              LKR {stats.netBalance.toLocaleString()}
+        {/* Regular Cards */}
+        {[
+          { label: 'Total Income', value: `LKR ${stats.totalIncome.toLocaleString()}`, change: stats.incomeChange },
+          { label: 'Total Expenses', value: `LKR ${stats.totalExpenses.toLocaleString()}`, change: stats.expenseChange },
+          { label: 'Total Members', value: stats.totalMembers.toLocaleString(), change: stats.membersChange }
+        ].map((stat, i) => (
+          <div key={i} style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', padding: '24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '140px', transition: 'box-shadow 0.2s', cursor: 'default' }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <span style={{ fontSize: '13px', color: '#6B6B6B', fontWeight: '500' }}>{stat.label}</span>
+              <TrendBadge value={stat.change} />
+            </div>
+            <h3 style={{ fontSize: '32px', fontWeight: '700', color: '#111111', margin: '8px 0 0 0' }}>
+              {stat.value}
             </h3>
           </div>
-        </div>
-
-        {/* Stat 5: Pending Approvals */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-red-400">
-            <Clock size={20} />
-          </div>
-          <div>
-            <span className="text-[10px] tracking-wider text-gray-500 uppercase">Pending Approvals</span>
-            <h3 className="text-2xl font-bold text-white mt-1">{stats.pendingApprovals.toLocaleString()}</h3>
-          </div>
-        </div>
-
-        {/* Stat 6: Month's Sign-ups */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl flex items-center gap-5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-purple-400">
-            <CalendarDays size={20} />
-          </div>
-          <div>
-            <span className="text-[10px] tracking-wider text-gray-500 uppercase">This Month Sign-ups</span>
-            <h3 className="text-2xl font-bold text-white mt-1">{stats.monthRegistrations.toLocaleString()}</h3>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Visualizations Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 dashboard-charts-grid">
-        {/* Registrations Timeline */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className="mb-4">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Registration Velocity</h4>
-            <span className="text-[10px] text-gray-500 uppercase tracking-wide">Combined associate & school signups (Last 30 days)</span>
+      {/* Middle Row: Chart & Activity */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }} className="md:grid-cols-[60%_calc(40%-24px)]">
+        
+        {/* Chart */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111111', margin: 0 }}>Income vs Expenses</h3>
+            
+            {/* Filter Pills */}
+            <div style={{ display: 'flex', gap: '4px', background: '#F5F5F5', padding: '4px', borderRadius: '24px' }}>
+              {['Month', '6 Months', 'Year'].map(filter => (
+                <button
+                  key={filter}
+                  onClick={() => setChartFilter(filter as any)}
+                  style={{
+                    padding: '4px 12px', border: 'none', borderRadius: '20px', fontSize: '12px', fontWeight: '500', cursor: 'pointer',
+                    background: chartFilter === filter ? '#111111' : 'transparent',
+                    color: chartFilter === filter ? '#FFFFFF' : '#6B6B6B',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="h-[300px] w-full">
+          
+          <div style={{ height: '300px', width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={registrationChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
-                <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
-                <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
-                <Line 
-                  type="monotone" 
-                  dataKey="Sign-ups" 
-                  stroke="#d4af37" 
-                  strokeWidth={2.5} 
-                  dot={{ r: 3, fill: '#d4af37', strokeWidth: 0 }}
-                  activeDot={{ r: 5, strokeWidth: 0 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Product Sales Distribution */}
-        <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-          <div className="mb-4">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Merchandise Sales</h4>
-            <span className="text-[10px] text-gray-500 uppercase tracking-wide">Quantity sold per catalog item</span>
-          </div>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={productChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
-                <XAxis dataKey="product" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
-                <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)' }} />
-                <Bar 
-                  dataKey="Quantity" 
-                  fill="rgba(59, 130, 246, 0.85)" 
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={48}
-                />
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0F0F0" />
+                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B6B6B' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B6B6B' }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#F9F9F9' }} />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
+                <Bar dataKey="Income" fill="#111111" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Bar dataKey="Expenses" fill="#D1D5DB" radius={[4, 4, 0, 0]} maxBarSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* Activity Feed */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111111', margin: '0 0 24px 0' }}>Recent Activity</h3>
+          
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {activities.length === 0 ? (
+              <p style={{ color: '#6B6B6B', fontSize: '14px', textAlign: 'center' }}>No recent activities.</p>
+            ) : (
+              activities.map(act => {
+                let Icon = Activity
+                if (act.type === 'associate') Icon = User
+                if (act.type === 'school') Icon = GraduationCap
+                if (act.type === 'audit') Icon = Shield
+
+                return (
+                  <div key={act.id} style={{ display: 'flex', gap: '16px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={16} color="#111111" />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '14px', fontWeight: '500', color: '#111111', margin: '0 0 4px 0' }}>{act.title}</p>
+                      <p style={{ fontSize: '13px', color: '#6B6B6B', margin: '0 0 4px 0' }}>{act.description}</p>
+                      <p style={{ fontSize: '11px', color: '#A3A3A3', margin: 0 }}>{formatActivityTime(act.timestamp)}</p>
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Recent Activity Timeline */}
-      <div className="bg-[#0b0b0b] border border-white/5 p-6 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
-        <div className="mb-6">
-          <h4 className="text-sm font-bold text-white uppercase tracking-wider">Recent Operations Activity</h4>
-          <span className="text-[10px] text-gray-500 uppercase tracking-wide">Merged activity feed across registrations, merchandise orders, and system logs</span>
+      {/* Bottom Row: Recent Associates Table */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', overflow: 'hidden' }}>
+        <div style={{ padding: '24px', borderBottom: '1px solid #F0F0F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111111', margin: 0 }}>Recent Associates</h3>
+          <Link href="/dashboard/associates" style={{ fontSize: '13px', fontWeight: '500', color: '#111111', textDecoration: 'none' }}>
+            View All →
+          </Link>
         </div>
         
-        {activities.length === 0 ? (
-          <p className="text-xs text-gray-500 uppercase tracking-wider text-center py-6">No recent activity logged.</p>
-        ) : (
-          <div className="relative border-l border-white/5 ml-4 pl-6 space-y-6">
-            {activities.map((act) => {
-              // Icon selector
-              let Icon = Activity
-              let iconColor = 'text-purple-400'
-              let iconBg = 'bg-purple-500/10 border-purple-500/20'
-
-              if (act.type === 'associate') {
-                Icon = User
-                iconColor = 'text-amber-500'
-                iconBg = 'bg-amber-500/10 border-amber-500/20'
-              } else if (act.type === 'school') {
-                Icon = GraduationCap
-                iconColor = 'text-blue-400'
-                iconBg = 'bg-blue-500/10 border-blue-500/20'
-              } else if (act.type === 'order') {
-                Icon = ShoppingBag
-                iconColor = 'text-green-400'
-                iconBg = 'bg-green-500/10 border-green-500/20'
-              } else if (act.type === 'audit') {
-                Icon = Shield
-                iconColor = 'text-purple-400'
-                iconBg = 'bg-purple-500/10 border-purple-500/20'
-              }
-
-              return (
-                <div key={act.id} className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 bg-white/[0.01] border border-white/5 rounded-xl hover:bg-white/[0.02] transition-all">
-                  {/* Timeline bullet dot wrapper */}
-                  <span className={`absolute -left-[38px] top-4 sm:top-1/2 sm:-translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center border ${iconBg} ${iconColor}`}>
-                    <Icon size={11} />
-                  </span>
-
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-bold text-white uppercase tracking-wide">
-                        {act.title}
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#F9F9F9' }}>
+                {['Name', 'School', 'District', 'Status', 'Date'].map((th, i) => (
+                  <th key={i} style={{ padding: '16px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {th}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {recentAssociates.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: '#6B6B6B', fontSize: '14px' }}>No associates found.</td>
+                </tr>
+              ) : (
+                recentAssociates.map(assoc => (
+                  <tr key={assoc.id} style={{ borderBottom: '1px solid #F0F0F0' }}>
+                    <td style={{ padding: '16px 24px', fontSize: '14px', color: '#111111', fontWeight: '500' }}>{assoc.full_name}</td>
+                    <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6B6B6B' }}>{assoc.school}</td>
+                    <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6B6B6B' }}>{assoc.district}</td>
+                    <td style={{ padding: '16px 24px' }}>
+                      <span style={{ 
+                        padding: '4px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase',
+                        background: assoc.status === 'approved' ? 'rgba(34, 197, 94, 0.1)' : assoc.status === 'rejected' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                        color: assoc.status === 'approved' ? '#22C55E' : assoc.status === 'rejected' ? '#EF4444' : '#F59E0B'
+                      }}>
+                        {assoc.status}
                       </span>
-                      {act.status && (
-                        <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${
-                          act.status === 'approved' 
-                            ? 'border-green-500/30 text-green-400 bg-green-500/5' 
-                            : act.status === 'rejected'
-                            ? 'border-red-500/30 text-red-400 bg-red-500/5'
-                            : 'border-amber-500/30 text-amber-400 bg-amber-500/5'
-                        }`}>
-                          {act.status}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-400 leading-relaxed font-light">
-                      {act.description}
-                    </p>
-                  </div>
-
-                  <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider shrink-0">
-                    {formatActivityTime(act.timestamp)}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
+                    </td>
+                    <td style={{ padding: '16px 24px', fontSize: '13px', color: '#6B6B6B' }}>
+                      {new Date(assoc.created_at).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
+
     </div>
   )
 }

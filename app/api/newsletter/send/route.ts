@@ -1,14 +1,23 @@
 import { Resend } from 'resend'
-import { supabaseAdmin } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 
 export async function POST(req: NextRequest) {
   try {
     const { subject, html } = await req.json()
+    const authHeader = req.headers.get('Authorization')
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
     
-    const { data: subscribers, error: fetchError } = await supabaseAdmin
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 })
+    }
+
+    const supabase = createClient(supabaseUrl, token)
+    
+    const { data: subscribers, error: fetchError } = await supabase
       .from('newsletter_subscribers')
       .select('email, name')
       .eq('active', true)

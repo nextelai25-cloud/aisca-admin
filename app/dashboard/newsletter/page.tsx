@@ -43,9 +43,15 @@ export default function NewsletterPage() {
     setErrMessage('')
     
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
       const res = await fetch('/api/newsletter/send', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ subject, html: htmlContent })
       })
       
@@ -71,10 +77,10 @@ export default function NewsletterPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-wider uppercase text-white font-display">
+          <h1 className="text-3xl font-extrabold tracking-wider uppercase text-[#111111] font-display">
             NEWSLETTER HUB
           </h1>
-          <p className="text-xs text-gray-500 tracking-widest mt-1 uppercase">
+          <p className="text-xs text-[#6B6B6B] tracking-widest mt-1 uppercase">
             Broadcast messages and manage newsletter subscriptions
           </p>
         </div>
@@ -82,40 +88,40 @@ export default function NewsletterPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl p-6 flex items-center gap-5">
-          <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#d4af37]">
+        <div className="bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl p-6 flex items-center gap-5">
+          <div className="w-12 h-12 rounded-xl bg-[#F5F5F5] border border-[#E8E8E8] flex items-center justify-center text-[#d4af37]">
             <Users size={22} />
           </div>
           <div>
-            <span className="text-[10px] tracking-widest uppercase text-gray-500 font-semibold">Total Subscribers</span>
-            <h3 className="text-2xl font-bold text-white mt-1">{subscribers.length}</h3>
+            <span className="text-[10px] tracking-widest uppercase text-[#6B6B6B] font-semibold">Total Subscribers</span>
+            <h3 className="text-2xl font-bold text-[#111111] mt-1">{subscribers.length}</h3>
           </div>
         </div>
 
-        <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl p-6 flex items-center gap-5">
-          <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-green-500">
+        <div className="bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl p-6 flex items-center gap-5">
+          <div className="w-12 h-12 rounded-xl bg-[#F5F5F5] border border-[#E8E8E8] flex items-center justify-center text-green-500">
             <CheckCircle size={22} />
           </div>
           <div>
-            <span className="text-[10px] tracking-widest uppercase text-gray-500 font-semibold">Active Subscriptions</span>
-            <h3 className="text-2xl font-bold text-white mt-1">{activeSubscribers.length}</h3>
+            <span className="text-[10px] tracking-widest uppercase text-[#6B6B6B] font-semibold">Active Subscriptions</span>
+            <h3 className="text-2xl font-bold text-[#111111] mt-1">{activeSubscribers.length}</h3>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 newsletter-layout">
         {/* Compose Newsletter Panel */}
-        <div className="lg:col-span-2 bg-[#0b0b0b] border border-white/5 rounded-2xl p-6 md:p-8 space-y-6">
+        <div className="lg:col-span-2 bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl p-6 md:p-8 space-y-6">
           <div>
-            <h3 className="text-lg font-bold tracking-wide uppercase text-white mb-1">
+            <h3 className="text-lg font-bold tracking-wide uppercase text-[#111111] mb-1">
               Compose Newsletter
             </h3>
-            <p className="text-xs text-gray-500">Send an HTML/rich-text email broadcast to all active subscribers</p>
+            <p className="text-xs text-[#6B6B6B]">Send an HTML/rich-text email broadcast to all active subscribers</p>
           </div>
 
           <form onSubmit={handleSendNewsletter} className="space-y-4">
             <div className="space-y-2">
-              <label className="block text-[10px] tracking-widest uppercase text-gray-400 font-bold">
+              <label className="block text-[10px] tracking-widest uppercase text-[#6B6B6B] font-bold">
                 Email Subject
               </label>
               <input
@@ -124,12 +130,12 @@ export default function NewsletterPage() {
                 onChange={e => setSubject(e.target.value)}
                 placeholder="AISCA Onboarding Updates & Competitions"
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-white/20 transition-all"
+                className="w-full bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl px-4 py-3 text-sm text-[#111111] placeholder-[#A3A3A3] outline-none focus:border-[#D1D5DB] transition-all"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-[10px] tracking-widest uppercase text-gray-400 font-bold">
+              <label className="block text-[10px] tracking-widest uppercase text-[#6B6B6B] font-bold">
                 HTML Content / Body
               </label>
               <textarea
@@ -138,7 +144,7 @@ export default function NewsletterPage() {
                 placeholder="<h1>Hello from AISCA!</h1><p>We are excited to share...</p>"
                 required
                 rows={10}
-                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white placeholder-gray-600 outline-none font-mono focus:border-white/20 transition-all resize-y"
+                className="w-full bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl p-4 text-sm text-[#111111] placeholder-[#A3A3A3] outline-none font-mono focus:border-[#D1D5DB] transition-all resize-y"
               />
             </div>
 
@@ -168,33 +174,33 @@ export default function NewsletterPage() {
         </div>
 
         {/* Subscribers Registry List */}
-        <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl p-6 flex flex-col h-[560px]">
+        <div className="bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl p-6 flex flex-col h-[560px]">
           <div className="mb-4">
-            <h3 className="text-base font-bold tracking-wide uppercase text-white">
+            <h3 className="text-base font-bold tracking-wide uppercase text-[#111111]">
               Subscribers Registry
             </h3>
-            <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">
+            <p className="text-[10px] text-[#6B6B6B] mt-1 uppercase tracking-wider">
               Real-time subscription logs
             </p>
           </div>
 
           <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar">
             {loading ? (
-              <div className="h-full flex items-center justify-center text-xs text-gray-500">
+              <div className="h-full flex items-center justify-center text-xs text-[#6B6B6B]">
                 Loading subscribers...
               </div>
             ) : subscribers.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-xs text-gray-500">
+              <div className="h-full flex items-center justify-center text-xs text-[#6B6B6B]">
                 No active subscribers found.
               </div>
             ) : (
               subscribers.map((sub) => (
                 <div 
                   key={sub.id} 
-                  className="p-3.5 bg-white/[0.02] border border-white/5 rounded-xl flex flex-col gap-1 transition-all hover:bg-white/[0.04]"
+                  className="p-3.5 bg-white/[0.02] border border-[#E8E8E8] rounded-xl flex flex-col gap-1 transition-all hover:bg-white/[0.04]"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white truncate max-w-[150px]">
+                    <span className="text-xs font-bold text-[#111111] truncate max-w-[150px]">
                       {sub.name || 'Anonymous'}
                     </span>
                     <span className={`text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
@@ -205,7 +211,7 @@ export default function NewsletterPage() {
                       {sub.active ? 'Active' : 'Inactive'}
                     </span>
                   </div>
-                  <span className="text-[10px] text-gray-500 truncate">{sub.email}</span>
+                  <span className="text-[10px] text-[#6B6B6B] truncate">{sub.email}</span>
                   <span className="text-[8px] text-gray-600 mt-1">
                     Joined: {new Date(sub.subscribed_at).toLocaleDateString()}
                   </span>

@@ -281,8 +281,8 @@ export default function AssociatesPage() {
       {/* Page Title & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 admin-page-header">
         <div>
-          <h1 className="text-2xl font-bold tracking-wider uppercase text-white">Associates Registry</h1>
-          <p className="text-xs text-gray-500 tracking-wide uppercase mt-1">Review and manage individual onboardings</p>
+          <h1 className="text-2xl font-bold tracking-wider uppercase text-[#111111]">Associates Registry</h1>
+          <p className="text-xs text-[#6B6B6B] tracking-wide uppercase mt-1">Review and manage individual onboardings</p>
         </div>
         <div className="flex items-center gap-3">
           {selectedIds.size > 0 && (
@@ -306,7 +306,7 @@ export default function AssociatesPage() {
           <button
             onClick={handleExport}
             disabled={filteredData.length === 0}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all admin-export-btn"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl text-xs font-semibold uppercase tracking-wider text-[#111111] hover:bg-[#E8E8E8] disabled:opacity-40 disabled:cursor-not-allowed transition-all admin-export-btn"
           >
             <Download size={14} />
             <span>Export CSV ({filteredData.length})</span>
@@ -315,11 +315,11 @@ export default function AssociatesPage() {
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex gap-4 border-b border-white/5 pb-2">
+      <div className="flex gap-4 border-b border-[#E8E8E8] pb-2">
         <button
           onClick={() => setActiveTab('registry')}
           className={`text-xs uppercase font-bold tracking-wider pb-2 px-1 transition-all ${
-            activeTab === 'registry' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-gray-400 hover:text-white'
+            activeTab === 'registry' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-[#6B6B6B] hover:text-[#111111]'
           }`}
         >
           Registry
@@ -327,7 +327,7 @@ export default function AssociatesPage() {
         <button
           onClick={() => { setActiveTab('exports'); fetchExportLogs(); }}
           className={`text-xs uppercase font-bold tracking-wider pb-2 px-1 transition-all ${
-            activeTab === 'exports' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-gray-400 hover:text-white'
+            activeTab === 'exports' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-[#6B6B6B] hover:text-[#111111]'
           }`}
         >
           Export History
@@ -335,34 +335,34 @@ export default function AssociatesPage() {
       </div>
 
       {activeTab === 'exports' ? (
-        <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden shadow-xl p-6">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Past Exports History</h3>
+        <div className="bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl overflow-hidden shadow-xl p-6">
+          <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wider mb-4">Past Exports History</h3>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs text-white">
+            <table className="w-full border-collapse text-left text-xs text-[#111111]">
               <thead>
-                <tr className="border-b border-white/5 bg-white/[0.01] text-gray-500 uppercase tracking-widest text-[9px]">
+                <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
                   <th className="p-4 font-semibold">Who (User)</th>
                   <th className="p-4 font-semibold">When (Date)</th>
                   <th className="p-4 font-semibold">Records Exported</th>
                   <th className="p-4 font-semibold">Reason</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-[#E8E8E8]">
                 {exportLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="p-8 text-center text-gray-500 uppercase tracking-widest text-[10px]">
+                    <td colSpan={4} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">
                       No export logs recorded.
                     </td>
                   </tr>
                 ) : (
                   exportLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-white/[0.01] transition-all">
+                    <tr key={log.id} className="hover:bg-[#FAFAFA] transition-all">
                       <td className="p-4 font-semibold">{log.performed_by}</td>
-                      <td className="p-4 text-gray-400">
+                      <td className="p-4 text-[#6B6B6B]">
                         {new Date(log.performed_at).toLocaleString('en-LK')}
                       </td>
-                      <td className="p-4 font-mono font-bold text-gray-300">{log.target_name}</td>
-                      <td className="p-4 text-gray-400">{log.reason}</td>
+                      <td className="p-4 font-mono font-bold text-[#111111]">{log.target_name}</td>
+                      <td className="p-4 text-[#6B6B6B]">{log.reason}</td>
                     </tr>
                   ))
                 )}
@@ -376,13 +376,13 @@ export default function AssociatesPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 admin-filters-row">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B6B6B]" size={16} />
           <input
             type="text"
             placeholder="Search name, school or membership no..."
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            className="w-full pl-11 pr-4 py-3 bg-[#0b0b0b] border border-white/5 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-white/20 transition-all"
+            className="w-full pl-11 pr-4 py-3 bg-[#FFFFFF] border border-[#E8E8E8] rounded-xl text-xs text-[#111111] placeholder-[#A3A3A3] focus:outline-none focus:border-[#D1D5DB] transition-all"
           />
         </div>
 
@@ -390,7 +390,7 @@ export default function AssociatesPage() {
         <select
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-          className="w-full px-4 py-3 bg-[#0b0b0b] border border-white/5 rounded-xl text-xs text-white focus:outline-none focus:border-white/20 transition-all cursor-pointer"
+          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#D1D5DB] transition-all cursor-pointer"
         >
           <option value="all">All Onboarding Statuses</option>
           <option value="pending">Pending Review</option>
@@ -402,7 +402,7 @@ export default function AssociatesPage() {
         <select
           value={provinceFilter}
           onChange={e => { setProvinceFilter(e.target.value); setCurrentPage(1); }}
-          className="w-full px-4 py-3 bg-[#0b0b0b] border border-white/5 rounded-xl text-xs text-white focus:outline-none focus:border-white/20 transition-all cursor-pointer"
+          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#D1D5DB] transition-all cursor-pointer"
         >
           <option value="all">All Provinces</option>
           {provinces.map(p => (
@@ -412,11 +412,11 @@ export default function AssociatesPage() {
       </div>
 
       {/* Main Table */}
-      <div className="bg-[#0b0b0b] border border-white/5 rounded-2xl overflow-hidden shadow-xl admin-table-wrapper">
+      <div className="bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl overflow-hidden shadow-xl admin-table-wrapper">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-xs text-white">
+          <table className="w-full border-collapse text-left text-xs text-[#111111]">
             <thead>
-              <tr className="border-b border-white/5 bg-white/[0.01] text-gray-500 uppercase tracking-widest text-[9px]">
+              <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
                 <th className="p-4 w-10">
                   <input 
                     type="checkbox" 
@@ -432,10 +432,10 @@ export default function AssociatesPage() {
                 <th className="p-4 font-semibold text-center">Board Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-[#E8E8E8]">
               {currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="p-8 text-center text-gray-500 uppercase tracking-widest text-[10px]">
+                  <td colSpan={9} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">
                     No onboarded members found matching criteria.
                   </td>
                 </tr>
@@ -443,7 +443,7 @@ export default function AssociatesPage() {
                 currentItems.map((item) => {
                   const isActioning = actioningId === item.id
                   return (
-                    <tr key={item.id} className="hover:bg-white/[0.01] transition-all">
+                    <tr key={item.id} className="hover:bg-[#FAFAFA] transition-all">
                       <td className="p-4">
                         <input 
                           type="checkbox" 
@@ -454,20 +454,20 @@ export default function AssociatesPage() {
                       </td>
 
                       {/* Membership No */}
-                      <td className="p-4 font-mono font-bold text-gray-400">
+                      <td className="p-4 font-mono font-bold text-[#6B6B6B]">
                         {item.membership_number}
                       </td>
 
                       {/* Name */}
                       <td className="p-4 font-semibold">
                         {item.full_name}
-                        <div className="text-[10px] text-gray-500 font-normal mt-0.5">{item.email}</div>
+                        <div className="text-[10px] text-[#6B6B6B] font-normal mt-0.5">{item.email}</div>
                       </td>
 
                       {/* School Details */}
                       <td className="p-4">
-                        <span className="font-semibold text-gray-300">{item.school}</span>
-                        <div className="text-[10px] text-gray-500 mt-0.5">
+                        <span className="font-semibold text-[#111111]">{item.school}</span>
+                        <div className="text-[10px] text-[#6B6B6B] mt-0.5">
                           {item.district}, {item.province}
                         </div>
                       </td>
@@ -490,7 +490,7 @@ export default function AssociatesPage() {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => setSelectedAssociate(item)}
-                            className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-semibold text-white uppercase tracking-wider transition-all"
+                            className="px-3 py-1.5 bg-[#F5F5F5] hover:bg-[#E8E8E8] border border-[#E8E8E8] rounded-lg text-[10px] font-semibold text-[#111111] uppercase tracking-wider transition-all"
                           >
                             View Details
                           </button>
@@ -525,22 +525,22 @@ export default function AssociatesPage() {
 
         {/* Pagination Row */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 bg-white/[0.01] border-t border-white/5 flex items-center justify-between gap-4">
-            <span className="text-[10px] text-gray-500 uppercase tracking-widest">
+          <div className="px-6 py-4 bg-[#FAFAFA] border-t border-[#E8E8E8] flex items-center justify-between gap-4">
+            <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest">
               Page {currentPage} of {totalPages} ({filteredData.length} total entries)
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] text-[#111111] flex items-center justify-center hover:bg-[#E8E8E8] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] text-[#111111] flex items-center justify-center hover:bg-[#E8E8E8] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 <ChevronRight size={16} />
               </button>
@@ -558,16 +558,16 @@ export default function AssociatesPage() {
             onClick={() => setSelectedAssociate(null)}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
           />
-          <div className="relative w-full max-w-lg h-full bg-[#0b0b0b] border-l border-white/5 p-8 flex flex-col justify-between overflow-y-auto z-10 admin-modal-inner">
+          <div className="relative w-full max-w-lg h-full bg-[#FFFFFF] border-l border-[#E8E8E8] p-8 flex flex-col justify-between overflow-y-auto z-10 admin-modal-inner">
             <div className="space-y-8">
-              <div className="flex items-center justify-between pb-6 border-b border-white/5">
+              <div className="flex items-center justify-between pb-6 border-b border-[#E8E8E8]">
                 <div className="flex items-center gap-3 text-[#d4af37]">
                   <User size={20} />
                   <span className="text-xs font-extrabold uppercase tracking-widest">Full Details</span>
                 </div>
                 <button
                   onClick={() => setSelectedAssociate(null)}
-                  className="text-gray-500 hover:text-white transition-all"
+                  className="text-[#6B6B6B] hover:text-[#111111] transition-all"
                 >
                   <X size={18} />
                 </button>
@@ -575,43 +575,43 @@ export default function AssociatesPage() {
 
               <div className="space-y-6 admin-modal-grid">
                 <div>
-                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Membership No</span>
+                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Membership No</span>
                   <div className="text-xl font-bold text-[#d4af37] mt-1 font-mono">{selectedAssociate.membership_number}</div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Personal Info</span>
-                  <div className="flex flex-col gap-2 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
+                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Personal Info</span>
+                  <div className="flex flex-col gap-2 text-xs text-[#111111] bg-white/[0.02] border border-[#E8E8E8] px-4 py-3 rounded-xl">
                     <span className="font-semibold">{selectedAssociate.full_name}</span>
-                    <span className="text-gray-400">Email: {selectedAssociate.email}</span>
-                    <span className="text-gray-400">WhatsApp: {selectedAssociate.whatsapp}</span>
+                    <span className="text-[#6B6B6B]">Email: {selectedAssociate.email}</span>
+                    <span className="text-[#6B6B6B]">WhatsApp: {selectedAssociate.whatsapp}</span>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Academic Details</span>
-                  <div className="flex flex-col gap-2 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
-                    <div className="flex items-center gap-2"><School size={14} className="text-gray-400"/> {selectedAssociate.school}</div>
-                    <span className="text-gray-400">Stream: {selectedAssociate.commerce_stream ? 'Commerce' : 'Non-Commerce'}</span>
+                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Academic Details</span>
+                  <div className="flex flex-col gap-2 text-xs text-[#111111] bg-white/[0.02] border border-[#E8E8E8] px-4 py-3 rounded-xl">
+                    <div className="flex items-center gap-2"><School size={14} className="text-[#6B6B6B]"/> {selectedAssociate.school}</div>
+                    <span className="text-[#6B6B6B]">Stream: {selectedAssociate.commerce_stream ? 'Commerce' : 'Non-Commerce'}</span>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Location</span>
-                  <div className="flex flex-col gap-2 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
-                    <div className="flex items-center gap-2"><MapPin size={14} className="text-gray-400"/> {selectedAssociate.district}, {selectedAssociate.province}</div>
+                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Location</span>
+                  <div className="flex flex-col gap-2 text-xs text-[#111111] bg-white/[0.02] border border-[#E8E8E8] px-4 py-3 rounded-xl">
+                    <div className="flex items-center gap-2"><MapPin size={14} className="text-[#6B6B6B]"/> {selectedAssociate.district}, {selectedAssociate.province}</div>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <span className="block text-[9px] font-bold tracking-widest text-gray-500 uppercase">Identity & Role</span>
-                  <div className="flex flex-col gap-2 text-xs text-white bg-white/[0.02] border border-white/5 px-4 py-3 rounded-xl">
-                    <span className="text-gray-300">{selectedAssociate.who_are_you}</span>
-                    <span className="text-gray-400">Willing to volunteer: {selectedAssociate.actively_participate ? 'Yes' : 'No'}</span>
+                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Identity & Role</span>
+                  <div className="flex flex-col gap-2 text-xs text-[#111111] bg-white/[0.02] border border-[#E8E8E8] px-4 py-3 rounded-xl">
+                    <span className="text-[#111111]">{selectedAssociate.who_are_you}</span>
+                    <span className="text-[#6B6B6B]">Willing to volunteer: {selectedAssociate.actively_participate ? 'Yes' : 'No'}</span>
                   </div>
                 </div>
 
-                <div className="space-y-1.5 flex gap-4 pt-4 border-t border-white/5">
+                <div className="space-y-1.5 flex gap-4 pt-4 border-t border-[#E8E8E8]">
                   {selectedAssociate.status !== 'approved' && (
                     <button
                       onClick={() => { handleUpdateStatus(selectedAssociate.id, 'approved'); setSelectedAssociate((prev: any) => ({...prev, status: 'approved'})); }}

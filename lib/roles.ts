@@ -78,3 +78,23 @@ export const ROLE_PERMISSIONS = {
 export const canAccess = (role: AdminRole, section: string): boolean => {
   return ROLE_PERMISSIONS[role]?.[section as keyof typeof ROLE_PERMISSIONS[typeof role]] ?? false
 }
+
+// Granular button-level UI visibility checks
+export const canDelete = (role: AdminRole): boolean => {
+  // Only Chairman has destructive deletion rights
+  return role === 'chairman'
+}
+
+export const canAccessFinanceTab = (role: AdminRole, tab: string): boolean => {
+  if (role === 'chairman' || role === 'cfo') return true
+  // Co-secretary can view basic finance but not budgets/reconciliation
+  if (role === 'co_secretary') {
+    return ['dashboard', 'transactions', 'reports'].includes(tab)
+  }
+  return false
+}
+
+export const canExport = (role: AdminRole): boolean => {
+  // Only high-level officers can export CSV/PDF reports
+  return ['chairman', 'cfo', 'co_secretary'].includes(role)
+}
