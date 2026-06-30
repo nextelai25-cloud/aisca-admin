@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { FileText, Download, Printer } from 'lucide-react'
 import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import autoTable from 'jspdf-autotable'
 
 export default function ReportsTab() {
   const [loading, setLoading] = useState(false)
@@ -88,7 +88,7 @@ export default function ReportsTab() {
       ["Net Assets", `LKR ${overallNetAssets.toLocaleString()}`]
     ]
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: 50,
       head: [["Category", "Amount"]],
       body: sfpData,
@@ -110,7 +110,7 @@ export default function ReportsTab() {
       ["Net Surplus / (Deficit)", `LKR ${overallNetAssets.toLocaleString()}`]
     ]
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: soaY + 5,
       head: [["Account / Category", "Amount"]],
       body: soaData,

@@ -178,10 +178,10 @@ export default function IdeaNetAdminPage() {
           { label: 'Active', value: stats.active, color: '#4ade80' },
           { label: 'Hidden', value: stats.hidden, color: '#f5c842' },
           { label: 'Deleted', value: stats.deleted, color: '#f87171' },
-          { label: 'Comments', value: stats.totalComments, color: 'rgba(255,255,255,0.6)' }
+          { label: 'Comments', value: stats.totalComments, color: '#6B6B6B' }
         ].map(stat => (
-          <div key={stat.label} style={{ background: '#0b0b0b', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '16px 20px' }}>
-            <p style={{ fontSize: '10px', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.3)', margin: '0 0 8px', textTransform: 'uppercase' }}>{stat.label}</p>
+          <div key={stat.label} style={{ background: '#0b0b0b', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '16px 20px' }}>
+            <p style={{ fontSize: '10px', letterSpacing: '0.12em', color: '#6B6B6B', margin: '0 0 8px', textTransform: 'uppercase' }}>{stat.label}</p>
             <p style={{ fontSize: '24px', fontWeight: '800', color: stat.color, margin: 0 }}>{stat.value}</p>
           </div>
         ))}
@@ -189,7 +189,7 @@ export default function IdeaNetAdminPage() {
 
       {/* Tabs + Filters */}
       <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', border: '1px solid #E8E8E8', borderRadius: '10px', padding: '4px', gap: '4px' }}>
+        <div style={{ display: 'flex', background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '10px', padding: '4px', gap: '4px' }}>
           {(['posts', 'comments'] as Tab[]).map(t => (
             <button
               key={t}
@@ -197,7 +197,7 @@ export default function IdeaNetAdminPage() {
               style={{
                 padding: '8px 20px',
                 background: tab === t ? '#E8E8E8' : 'transparent',
-                border: tab === t ? '1px solid rgba(255,255,255,0.12)' : '1px solid transparent',
+                border: tab === t ? '1px solid #E8E8E8' : '1px solid transparent',
                 borderRadius: '8px', color: tab === t ? '#fff' : '#6B6B6B',
                 fontSize: '13px', fontWeight: tab === t ? '600' : '400', cursor: 'pointer',
                 transition: 'all 0.15s ease', textTransform: 'capitalize'
@@ -214,7 +214,7 @@ export default function IdeaNetAdminPage() {
               style={{
                 padding: '7px 14px',
                 background: statusFilter === s ? '#E8E8E8' : 'transparent',
-                border: `1px solid ${statusFilter === s ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)'}`,
+                border: `1px solid ${statusFilter === s ? '#E8E8E8' : '#E8E8E8'}`,
                 borderRadius: '8px', color: statusFilter === s ? '#fff' : '#6B6B6B',
                 fontSize: '12px', fontWeight: statusFilter === s ? '600' : '400', cursor: 'pointer',
                 transition: 'all 0.15s ease', textTransform: 'capitalize'
@@ -229,7 +229,7 @@ export default function IdeaNetAdminPage() {
           placeholder={`Search ${tab}...`}
           style={{
             flex: 1, minWidth: '200px', padding: '9px 16px',
-            background: 'rgba(255,255,255,0.04)', border: '1px solid #E8E8E8',
+            background: '#FFFFFF', border: '1px solid #E8E8E8',
             borderRadius: '10px', color: '#111111', fontSize: '13px', outline: 'none'
           }}
         />
@@ -241,17 +241,17 @@ export default function IdeaNetAdminPage() {
         {/* Posts / Comments list */}
         <div>
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '60px', color: 'rgba(255,255,255,0.3)', fontSize: '13px' }}>Loading...</div>
+            <div style={{ textAlign: 'center', padding: '60px', color: '#6B6B6B', fontSize: '13px' }}>Loading...</div>
           ) : tab === 'posts' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {filteredPosts.length === 0 ? (
-                <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.25)', padding: '40px', fontSize: '13px' }}>No posts found</p>
+                <p style={{ textAlign: 'center', color: '#6B6B6B', padding: '40px', fontSize: '13px' }}>No posts found</p>
               ) : filteredPosts.map(post => (
                 <div
                   key={post.id}
                   style={{
-                    background: selectedPost?.id === post.id ? 'rgba(255,255,255,0.04)' : '#0b0b0b',
-                    border: `1px solid ${selectedPost?.id === post.id ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)'}`,
+                    background: selectedPost?.id === post.id ? '#E8E8E8' : '#0b0b0b',
+                    border: `1px solid ${selectedPost?.id === post.id ? '#E8E8E8' : '#E8E8E8'}`,
                     borderRadius: '12px', padding: '16px 20px', cursor: 'pointer',
                     transition: 'all 0.15s ease'
                   }}
@@ -277,9 +277,9 @@ export default function IdeaNetAdminPage() {
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                     <div style={{ display: 'flex', gap: '16px' }}>
-                      <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>▲ {post.upvotes - post.downvotes} votes</span>
-                      <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>💬 {post.comment_count}</span>
-                      <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)' }}>{timeAgo(post.created_at)}</span>
+                      <span style={{ fontSize: '12px', color: '#6B6B6B' }}>▲ {post.upvotes - post.downvotes} votes</span>
+                      <span style={{ fontSize: '12px', color: '#6B6B6B' }}>💬 {post.comment_count}</span>
+                      <span style={{ fontSize: '12px', color: '#6B6B6B' }}>{timeAgo(post.created_at)}</span>
                     </div>
 
                     <div style={{ display: 'flex', gap: '6px' }} onClick={e => e.stopPropagation()}>
@@ -318,26 +318,26 @@ export default function IdeaNetAdminPage() {
             /* Comments tab */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {filteredComments.length === 0 ? (
-                <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.25)', padding: '40px', fontSize: '13px' }}>No comments found</p>
+                <p style={{ textAlign: 'center', color: '#6B6B6B', padding: '40px', fontSize: '13px' }}>No comments found</p>
               ) : filteredComments.map(comment => (
                 <div
                   key={comment.id}
                   style={{
-                    background: '#0b0b0b', border: '1px solid rgba(255,255,255,0.07)',
+                    background: '#0b0b0b', border: '1px solid #E8E8E8',
                     borderRadius: '12px', padding: '16px 20px', transition: 'border-color 0.15s ease'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.6)' }}>{comment.author_name}</span>
-                      {comment.author_school && <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>· {comment.author_school}</span>}
-                      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.15)' }}>· {comment.membership_number}</span>
-                      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.15)' }}>· {timeAgo(comment.created_at)}</span>
-                      {comment.parent_id && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.04)', padding: '2px 6px', borderRadius: '4px' }}>reply</span>}
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#6B6B6B' }}>{comment.author_name}</span>
+                      {comment.author_school && <span style={{ fontSize: '11px', color: '#6B6B6B' }}>· {comment.author_school}</span>}
+                      <span style={{ fontSize: '11px', color: '#6B6B6B' }}>· {comment.membership_number}</span>
+                      <span style={{ fontSize: '11px', color: '#6B6B6B' }}>· {timeAgo(comment.created_at)}</span>
+                      {comment.parent_id && <span style={{ fontSize: '10px', color: '#6B6B6B', background: '#FFFFFF', padding: '2px 6px', borderRadius: '4px' }}>reply</span>}
                     </div>
                     {statusBadge(comment.status)}
                   </div>
-                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', lineHeight: '1.65', margin: '0 0 12px' }}>{comment.content}</p>
+                  <p style={{ color: '#6B6B6B', fontSize: '13px', lineHeight: '1.65', margin: '0 0 12px' }}>{comment.content}</p>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     {comment.status !== 'active' && (
                       <button
@@ -369,21 +369,21 @@ export default function IdeaNetAdminPage() {
           <div style={{ position: 'sticky', top: '20px', alignSelf: 'flex-start' }}>
             <div style={{ background: '#0b0b0b', border: '1px solid #E8E8E8', borderRadius: '14px', overflow: 'hidden' }}>
               {/* Detail header */}
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #E8E8E8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h4 style={{ color: '#111111', fontSize: '13px', fontWeight: '700', margin: 0 }}>Post Detail</h4>
                 <button
                   onClick={() => setSelectedPost(null)}
-                  style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '6px', color: 'rgba(255,255,255,0.5)', width: '28px', height: '28px', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{ background: '#FFFFFF', border: 'none', borderRadius: '6px', color: '#6B6B6B', width: '28px', height: '28px', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >×</button>
               </div>
 
               <div style={{ padding: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                   {statusBadge(selectedPost.status)}
-                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>{selectedPost.membership_number}</span>
+                  <span style={{ fontSize: '11px', color: '#6B6B6B' }}>{selectedPost.membership_number}</span>
                 </div>
                 <h3 style={{ color: '#111111', fontSize: '16px', fontWeight: '700', margin: '0 0 10px', lineHeight: '1.3' }}>{selectedPost.title}</h3>
-                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', lineHeight: '1.75', margin: '0 0 14px' }}>{selectedPost.description}</p>
+                <p style={{ color: '#6B6B6B', fontSize: '13px', lineHeight: '1.75', margin: '0 0 14px' }}>{selectedPost.description}</p>
 
                 {selectedPost.images?.length > 0 && (
                   <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
@@ -415,26 +415,26 @@ export default function IdeaNetAdminPage() {
                 </div>
 
                 {/* Comments for this post */}
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '16px' }}>
-                  <p style={{ fontSize: '10px', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.3)', margin: '0 0 14px', textTransform: 'uppercase' }}>
+                <div style={{ borderTop: '1px solid #E8E8E8', paddingTop: '16px' }}>
+                  <p style={{ fontSize: '10px', letterSpacing: '0.12em', color: '#6B6B6B', margin: '0 0 14px', textTransform: 'uppercase' }}>
                     Comments ({postComments.length})
                   </p>
                   {loadingComments ? (
-                    <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '12px' }}>Loading comments...</p>
+                    <p style={{ color: '#6B6B6B', fontSize: '12px' }}>Loading comments...</p>
                   ) : postComments.length === 0 ? (
-                    <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '12px' }}>No comments</p>
+                    <p style={{ color: '#6B6B6B', fontSize: '12px' }}>No comments</p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflowY: 'auto' }}>
                       {postComments.map(c => (
-                        <div key={c.id} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '12px' }}>
+                        <div key={c.id} style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '8px', padding: '12px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(255,255,255,0.55)' }}>{c.author_name}</span>
-                              {c.parent_id && <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.04)', padding: '2px 5px', borderRadius: '3px' }}>reply</span>}
+                              <span style={{ fontSize: '11px', fontWeight: '600', color: '#6B6B6B' }}>{c.author_name}</span>
+                              {c.parent_id && <span style={{ fontSize: '9px', color: '#6B6B6B', background: '#FFFFFF', padding: '2px 5px', borderRadius: '3px' }}>reply</span>}
                               {statusBadge(c.status)}
                             </div>
                           </div>
-                          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px', lineHeight: '1.6', margin: '0 0 8px' }}>{c.content}</p>
+                          <p style={{ color: '#6B6B6B', fontSize: '12px', lineHeight: '1.6', margin: '0 0 8px' }}>{c.content}</p>
                           <div style={{ display: 'flex', gap: '6px' }}>
                             {c.status !== 'active' && (
                               <button onClick={() => updateCommentStatus(c.id, 'active')} style={{ padding: '3px 10px', background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: '4px', color: '#4ade80', fontSize: '10px', fontWeight: '600', cursor: 'pointer' }}>Restore</button>

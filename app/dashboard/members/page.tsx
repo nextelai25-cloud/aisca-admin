@@ -103,7 +103,7 @@ export default function MembersPage() {
           placeholder="Search name, email, school, phone, AISCA ID..."
           style={{
             flex: 1, minWidth: '280px', padding: '10px 16px',
-            background: 'rgba(255,255,255,0.04)',
+            background: '#FFFFFF',
             border: '1px solid #E8E8E8',
             borderRadius: '8px', color: '#111111', fontSize: '13px', outline: 'none'
           }}
@@ -147,7 +147,7 @@ export default function MembersPage() {
           }}
           style={{
             padding: '10px 20px', background: '#E8E8E8',
-            border: '1px solid rgba(255,255,255,0.15)',
+            border: '1px solid #E8E8E8',
             borderRadius: '8px', color: '#111111', fontSize: '13px',
             cursor: 'pointer', fontWeight: '600'
           }}
@@ -158,7 +158,7 @@ export default function MembersPage() {
 
       {/* Table */}
       <div className="admin-table-wrapper" style={{
-        background: 'rgba(255,255,255,0.02)',
+        background: '#FFFFFF',
         border: '1px solid #E8E8E8',
         borderRadius: '12px', overflow: 'hidden'
       }}>
@@ -176,28 +176,28 @@ export default function MembersPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>Loading...</td></tr>
+              <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#6B6B6B' }}>Loading...</td></tr>
             ) : paginated.map((m, i) => (
               <tr
                 key={m.id}
                 style={{
-                  borderBottom: '1px solid rgba(255,255,255,0.04)',
-                  background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)'
+                  borderBottom: '1px solid #E8E8E8',
+                  background: i % 2 === 0 ? 'transparent' : '#E8E8E8'
                 }}
               >
                 <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#111111' }}>
                   {m.full_name}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6B6B6B' }}>
                   {m.email || '—'}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6B6B6B' }}>
                   {m.phone || '—'}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6B6B6B' }}>
                   {m.school || '—'}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6B6B6B' }}>
                   {m.al_batch || '—'}
                 </td>
                 <td style={{ padding: '12px 16px' }}>
@@ -205,7 +205,7 @@ export default function MembersPage() {
                     onClick={() => setSelectedMember(m)}
                     style={{
                       padding: '5px 12px', background: 'transparent',
-                      border: '1px solid rgba(255,255,255,0.15)',
+                      border: '1px solid #E8E8E8',
                       borderRadius: '6px', color: '#111111',
                       cursor: 'pointer', fontSize: '11px'
                     }}
@@ -228,7 +228,7 @@ export default function MembersPage() {
           <button
             onClick={() => setPage(p => Math.max(0, p - 1))}
             disabled={page === 0}
-            style={{ padding: '6px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid #E8E8E8', borderRadius: '6px', color: page === 0 ? 'rgba(255,255,255,0.2)' : '#fff', cursor: page === 0 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
+            style={{ padding: '6px 16px', background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '6px', color: page === 0 ? '#6B6B6B' : '#fff', cursor: page === 0 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
           >← Prev</button>
           <span style={{ padding: '6px 12px', color: '#6B6B6B', fontSize: '12px' }}>
             {page + 1} / {totalPages}
@@ -236,7 +236,7 @@ export default function MembersPage() {
           <button
             onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            style={{ padding: '6px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid #E8E8E8', borderRadius: '6px', color: page >= totalPages - 1 ? 'rgba(255,255,255,0.2)' : '#fff', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
+            style={{ padding: '6px 16px', background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '6px', color: page >= totalPages - 1 ? '#6B6B6B' : '#fff', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
           >Next →</button>
         </div>
       </div>
@@ -253,12 +253,12 @@ export default function MembersPage() {
             style={{ width: '100%', maxWidth: '680px', background: '#0d0d0d', border: '1px solid #E8E8E8', borderRadius: '16px', overflow: 'hidden' }}
           >
             {/* Modal header */}
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #E8E8E8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h3 style={{ color: '#111111', fontSize: '18px', fontWeight: '700', margin: 0 }}>{selectedMember.full_name}</h3>
                 <p style={{ color: '#6B6B6B', fontSize: '12px', margin: '4px 0 0', fontFamily: 'monospace' }}>{selectedMember.aisca_id}</p>
               </div>
-              <button onClick={() => setSelectedMember(null)} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid #E8E8E8', borderRadius: '8px', color: '#111111', width: '36px', height: '36px', cursor: 'pointer', fontSize: '18px' }}>×</button>
+              <button onClick={() => setSelectedMember(null)} style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '8px', color: '#111111', width: '36px', height: '36px', cursor: 'pointer', fontSize: '18px' }}>×</button>
             </div>
 
             {/* Modal body */}
@@ -301,7 +301,7 @@ export default function MembersPage() {
                   <span key={a.label} style={{
                     padding: '4px 10px', borderRadius: '6px', fontSize: '11px',
                     border: `1px solid ${a.value ? 'rgba(74,222,128,0.3)' : '#E8E8E8'}`,
-                    color: a.value ? '#4ade80' : 'rgba(255,255,255,0.25)',
+                    color: a.value ? '#4ade80' : '#6B6B6B',
                     background: a.value ? 'rgba(74,222,128,0.08)' : 'transparent'
                   }}>{a.label}</span>
                 ))}

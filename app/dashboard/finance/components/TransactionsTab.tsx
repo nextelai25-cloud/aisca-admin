@@ -16,6 +16,7 @@ export default function TransactionsTab() {
   
   // Drawer State
   const [selectedEntry, setSelectedEntry] = useState<any>(null)
+  const [billFile, setBillFile] = useState<File | null>(null)
 
   // Form State
   const [formData, setFormData] = useState({
@@ -88,6 +89,28 @@ export default function TransactionsTab() {
         }
       }
 
+      // 1.5 Handle File Upload
+      let billUrl = null
+      let billFilename = null
+      if (billFile) {
+        const fileExt = billFile.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+        const { error: uploadError } = await supabase.storage
+          .from('finance_attachments')
+          .upload(fileName, billFile)
+        
+        if (uploadError) {
+          console.error("Upload error:", uploadError)
+          // We don't fail the whole transaction if upload fails, but we can log it.
+        } else {
+          const { data: publicUrlData } = supabase.storage
+            .from('finance_attachments')
+            .getPublicUrl(fileName)
+          billUrl = publicUrlData.publicUrl
+          billFilename = billFile.name
+        }
+      }
+
       // 2. Insert into finance_ledger
       const { data: insertedLedger, error: ledgerError } = await supabase
         .from('finance_ledger')
@@ -100,7 +123,9 @@ export default function TransactionsTab() {
           cash_or_bank: formData.cash_or_bank,
           fund: formData.fund,
           event_project: formData.event_project || null,
-          recorded_by: recordedBy
+          recorded_by: recordedBy,
+          bill_url: billUrl,
+          bill_filename: billFilename
         }])
         .select()
         .single()
@@ -133,6 +158,7 @@ export default function TransactionsTab() {
         bank_reference_number: '',
         invoice_number: ''
       })
+      setBillFile(null)
       await fetchLedger() // Refresh
 
     } catch (err) {
@@ -395,6 +421,17 @@ export default function TransactionsTab() {
                   style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #E8E8E8', fontSize: '14px', outline: 'none' }}
                 />
               </div>
+              
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', color: '#6B6B6B', marginBottom: '8px' }}>Bill / Receipt Attachment (Optional)</label>
+                <input 
+                  type="file"
+                  accept="image/jpeg, image/png, application/pdf"
+                  onChange={(e) => setBillFile(e.target.files ? e.target.files[0] : null)}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #E8E8E8', fontSize: '13px', outline: 'none', background: '#F9F9F9' }}
+                />
+                <p style={{ fontSize: '11px', color: '#A3A3A3', marginTop: '4px' }}>JPG, PNG, or PDF. Max 5MB.</p>
+              </div>
 
               <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                 <button 
@@ -476,6 +513,15 @@ export default function TransactionsTab() {
                 <p style={{ fontSize: '12px', color: '#A3A3A3', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Bank Reference</p>
                 <p style={{ fontSize: '14px', color: '#111111', fontFamily: 'monospace' }}>{selectedEntry.finance_ledger_details?.bank_reference_number || '-'}</p>
               </div>
+
+              {selectedEntry.bill_url && (
+                <div>
+                  <p style={{ fontSize: '12px', color: '#A3A3A3', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Attachment</p>
+                  <a href={selectedEntry.bill_url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: '14px', color: '#3B82F6', textDecoration: 'underline' }}>
+                    {selectedEntry.bill_filename || 'View Receipt'}
+                  </a>
+                </div>
+              )}
 
               <div style={{ height: '1px', background: '#E8E8E8' }} />
 

@@ -455,7 +455,7 @@ export default function SchoolsPage() {
                             ) : (
                               <button
                                 onClick={() => handleRequestAccess('schools')}
-                                style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #E8E8E8', borderRadius: '6px', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '11px' }}
+                                style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #E8E8E8', borderRadius: '6px', color: '#6B6B6B', cursor: 'pointer', fontSize: '11px' }}
                               >
                                 Request View Access
                               </button>

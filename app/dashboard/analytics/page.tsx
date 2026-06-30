@@ -279,8 +279,8 @@ export default function AnalyticsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={timelineData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#FFFFFF" />
-                <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
-                <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
+                <XAxis dataKey="date" stroke="#6B6B6B" fontSize={10} tickLine={false} />
+                <YAxis stroke="#6B6B6B" fontSize={10} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#F5F5F5' }} />
                 <Line 
                   type="monotone" 
@@ -347,8 +347,8 @@ export default function AnalyticsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={topPagesData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#FFFFFF" />
-                <XAxis type="number" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
-                <YAxis dataKey="page" type="category" stroke="rgba(255,255,255,0.3)" fontSize={9} tickLine={false} width={80} />
+                <XAxis type="number" stroke="#6B6B6B" fontSize={10} tickLine={false} />
+                <YAxis dataKey="page" type="category" stroke="#6B6B6B" fontSize={9} tickLine={false} width={80} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="Views" fill="#d4af37" radius={[0, 4, 4, 0]} maxBarSize={16} />
               </BarChart>
