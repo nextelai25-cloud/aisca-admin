@@ -53,7 +53,7 @@ export default function TransactionsTab() {
             bank_reference_number,
             invoice_number
           ),
-          admin_users:recorded_by (
+          public_admin_profiles:recorded_by (
             name
           )
         `)
@@ -83,7 +83,7 @@ export default function TransactionsTab() {
           .from('admin_users')
           .select('id')
           .eq('email', session.user.email)
-          .single()
+          .maybeSingle()
         if (adminUser) {
           recordedBy = adminUser.id
         }
@@ -272,7 +272,7 @@ export default function TransactionsTab() {
                       <td style={{ padding: '16px 24px', fontSize: '13px', color: '#6B6B6B' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <User size={12} />
-                          {entry.admin_users?.name || 'Legacy Entry'}
+                          {entry.public_admin_profiles?.name || 'Legacy Entry'}
                         </div>
                       </td>
                       <td style={{ padding: '16px 24px', fontSize: '14px', color: entry.type === 'income' ? '#22C55E' : '#EF4444', fontWeight: '700', textAlign: 'right', whiteSpace: 'nowrap' }}>
@@ -531,7 +531,7 @@ export default function TransactionsTab() {
                   <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <User size={12} color="#6B6B6B" />
                   </div>
-                  <p style={{ fontSize: '14px', color: '#111111', fontWeight: '500' }}>{selectedEntry.admin_users?.name || 'Legacy Entry'}</p>
+                  <p style={{ fontSize: '14px', color: '#111111', fontWeight: '500' }}>{selectedEntry.public_admin_profiles?.name || 'Legacy Entry'}</p>
                 </div>
                 {selectedEntry.recorded_by === null && (
                   <p style={{ fontSize: '12px', color: '#F59E0B', marginTop: '8px' }}>* This is a historical entry imported before attribution tracking was enabled.</p>
