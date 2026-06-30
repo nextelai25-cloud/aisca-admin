@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { 
-  BarChart, 
-  Bar, 
+  LineChart, 
+  Line,
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -15,17 +15,16 @@ import {
 import { 
   Users, 
   User,
-  GraduationCap, 
-  ShoppingBag, 
-  CircleDollarSign, 
+  Eye, 
   Shield,
   Activity,
-  ArrowUp,
-  ArrowDown
+  ArrowRight,
+  TrendingUp,
+  Wallet
 } from 'lucide-react'
 import Link from 'next/link'
 
-// Custom minimal tooltip
+// Custom minimal tooltip for line chart
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -33,7 +32,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p style={{ fontSize: '12px', color: '#6B6B6B', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} style={{ fontSize: '14px', fontWeight: 'bold', color: entry.color, margin: '4px 0' }}>
-            {entry.name}: <span style={{ color: '#111111' }}>LKR {entry.value.toLocaleString()}</span>
+            {entry.name}: <span style={{ color: '#111111' }}>{entry.value.toLocaleString()}</span>
           </p>
         ))}
       </div>
@@ -46,18 +45,14 @@ export default function OverviewPage() {
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
-    netBalance: 0,
-    netBalanceChange: 0, // % change
-    totalIncome: 0,
-    incomeChange: 0,
-    totalExpenses: 0,
-    expenseChange: 0,
+    fundBadge: 'Loading...',
+    fundBalance: null as number | null,
     totalMembers: 0,
-    membersChange: 0
+    totalPageViews: 0,
+    approvedAssociates: 0
   })
   
   const [chartData, setChartData] = useState<any[]>([])
-  const [chartFilter, setChartFilter] = useState<'Month' | '6 Months' | 'Year'>('6 Months')
   const [activities, setActivities] = useState<any[]>([])
   const [recentAssociates, setRecentAssociates] = useState<any[]>([])
 
@@ -87,95 +82,92 @@ export default function OverviewPage() {
       try {
         setLoading(true)
 
-        // 1. Members
-        const { data: members, error: membersErr } = await supabase.from('aisca_members').select('created_at')
-        const totalMembers = members?.length || 0
-        // Mock members change for now as we don't always have deep historical members
-        const membersChange = 5.2
+        // 1. Fetch Fund Status from Secure API Route
+        let fundBadge = 'Error'
+        let fundBalance = null
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          const token = session?.access_token
 
-        // 2. Finance Ledger (Income / Expenses)
-        const { data: ledger } = await supabase.from('finance_ledger').select('type, amount, adjusted, created_at').eq('adjusted', false)
-        
-        let totalIncome = 0
-        let totalExpenses = 0
-        let lastMonthIncome = 0
-        let lastMonthExpenses = 0
-
-        const now = new Date()
-        const oneMonthAgo = new Date()
-        oneMonthAgo.setMonth(now.getMonth() - 1)
-        const twoMonthsAgo = new Date()
-        twoMonthsAgo.setMonth(now.getMonth() - 2)
-
-        ledger?.forEach(entry => {
-          const amt = Number(entry.amount || 0)
-          const date = new Date(entry.created_at)
+          const res = await fetch('/api/dashboard-kpis', {
+            headers: token ? {
+              'Authorization': `Bearer ${token}`
+            } : {}
+          })
           
-          if (entry.type === 'income') {
-            totalIncome += amt
-            if (date >= oneMonthAgo) {
-              // Current month
-            } else if (date >= twoMonthsAgo && date < oneMonthAgo) {
-              lastMonthIncome += amt
-            }
-          } else if (entry.type === 'expense') {
-            totalExpenses += amt
-            if (date >= oneMonthAgo) {
-            } else if (date >= twoMonthsAgo && date < oneMonthAgo) {
-              lastMonthExpenses += amt
-            }
+          if (res.ok) {
+            const data = await res.json()
+            fundBadge = data.fundStatus?.badge || 'Unknown'
+            fundBalance = data.fundStatus?.exact_balance ?? null
           }
-        })
+        } catch (e) {
+          console.error('Failed to fetch secure KPIs')
+        }
 
-        const netBalance = totalIncome - totalExpenses
-        const lastMonthNet = lastMonthIncome - lastMonthExpenses
-        
-        const netBalanceChange = lastMonthNet === 0 ? 100 : ((netBalance - lastMonthNet) / Math.abs(lastMonthNet)) * 100
-        const incomeChange = lastMonthIncome === 0 ? 100 : ((totalIncome - lastMonthIncome) / lastMonthIncome) * 100
-        const expenseChange = lastMonthExpenses === 0 ? 100 : ((totalExpenses - lastMonthExpenses) / lastMonthExpenses) * 100
+        // 2. Fetch Total Members
+        const { count: totalMembers } = await supabase.from('aisca_members').select('*', { count: 'exact', head: true })
+
+        // 3. Fetch Total Page Views (Website Visitors)
+        const { count: totalPageViews } = await supabase.from('site_analytics').select('*', { count: 'exact', head: true })
+
+        // 4. Fetch Approved Associates
+        const { count: approvedAssociates } = await supabase.from('associate_members').select('*', { count: 'exact', head: true }).eq('status', 'approved')
 
         setStats({
-          netBalance,
-          netBalanceChange,
-          totalIncome,
-          incomeChange,
-          totalExpenses,
-          expenseChange,
-          totalMembers,
-          membersChange
+          fundBadge,
+          fundBalance,
+          totalMembers: totalMembers || 0,
+          totalPageViews: totalPageViews || 0,
+          approvedAssociates: approvedAssociates || 0
         })
 
-        // 3. Chart Data (Last 6 Months grouped)
+        // 5. Chart Data: Organization Growth (Members + Traffic over 6 months)
+        // For demonstration, we'll fetch historical members and traffic
+        const now = new Date()
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         const last6Months: any[] = []
         for (let i = 5; i >= 0; i--) {
           const d = new Date()
           d.setMonth(now.getMonth() - i)
           last6Months.push({
-            label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`,
+            label: `${monthNames[d.getMonth()]}`,
             month: d.getMonth(),
             year: d.getFullYear(),
-            Income: 0,
-            Expenses: 0
+            "New Members": 0,
+            "Page Views": 0
           })
         }
 
-        ledger?.forEach(entry => {
-          const d = new Date(entry.created_at)
-          const amt = Number(entry.amount || 0)
-          const targetMonth = last6Months.find(m => m.month === d.getMonth() && m.year === d.getFullYear())
-          if (targetMonth) {
-            if (entry.type === 'income') targetMonth.Income += amt
-            if (entry.type === 'expense') targetMonth.Expenses += amt
+        const sixMonthsAgo = new Date()
+        sixMonthsAgo.setMonth(now.getMonth() - 6)
+
+        // Group members
+        const { data: recentMembers } = await supabase.from('aisca_members').select('created_at').gte('created_at', sixMonthsAgo.toISOString())
+        recentMembers?.forEach(m => {
+          const d = new Date(m.created_at)
+          const target = last6Months.find(x => x.month === d.getMonth() && x.year === d.getFullYear())
+          if (target) target["New Members"]++
+        })
+
+        // Group traffic
+        const { data: recentTraffic } = await supabase.from('site_analytics').select('visited_at').gte('visited_at', sixMonthsAgo.toISOString())
+        recentTraffic?.forEach(v => {
+          if (v.visited_at) {
+            const d = new Date(v.visited_at)
+            const target = last6Months.find(x => x.month === d.getMonth() && x.year === d.getFullYear())
+            if (target) target["Page Views"]++
           }
         })
 
         setChartData(last6Months)
 
-        // 4. Recent Activities
+        // 6. Recent Activities
         let recentAssocs: any[] = []
         const { data: assocs } = await supabase.from('associate_members').select('id, full_name, created_at, status').order('created_at', { ascending: false }).limit(5)
-        if (assocs) recentAssocs = assocs
+        if (assocs) {
+          recentAssocs = assocs
+          setRecentAssociates(assocs)
+        }
 
         let recentSchools: any[] = []
         const { data: schools } = await supabase.from('school_registrations').select('id, school_name, created_at, status').order('created_at', { ascending: false }).limit(5)
@@ -201,17 +193,8 @@ export default function OverviewPage() {
         
         setActivities(mergedActivities)
 
-        // 5. Recent Associates Table
-        const { data: assocTableData } = await supabase
-          .from('associate_members')
-          .select('id, full_name, school, district, status, created_at')
-          .order('created_at', { ascending: false })
-          .limit(5)
-        
-        if (assocTableData) setRecentAssociates(assocTableData)
-
       } catch (err) {
-        console.error("Dashboard error:", err)
+        console.error(err)
       } finally {
         setLoading(false)
       }
@@ -225,186 +208,197 @@ export default function OverviewPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
-        <div style={{ width: '32px', height: '32px', border: '3px solid #E8E8E8', borderTopColor: '#111111', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+        <div style={{ width: '32px', height: '32px', borderTop: '2px solid #111111', borderRight: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
-    )
-  }
-
-  const TrendBadge = ({ value }: { value: number }) => {
-    const isPositive = value >= 0
-    return (
-      <span style={{ 
-        display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '4px 8px', borderRadius: '20px',
-        fontSize: '11px', fontWeight: '600',
-        background: isPositive ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-        color: isPositive ? '#22C55E' : '#EF4444'
-      }}>
-        {isPositive ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
-        {Math.abs(value).toFixed(1)}%
-      </span>
     )
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="dashboard-page" style={{ display: 'flex', flexDirection: 'column', gap: '32px', padding: '32px', maxWidth: '1600px', margin: '0 auto' }}>
       
-      {/* KPI Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
-        {/* Featured Card */}
-        <div style={{ background: '#111111', color: '#FFFFFF', padding: '24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '140px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <span style={{ fontSize: '13px', color: '#A3A3A3', fontWeight: '500' }}>Net Balance</span>
-            <TrendBadge value={stats.netBalanceChange} />
-          </div>
-          <h3 style={{ fontSize: '32px', fontWeight: '700', margin: '8px 0 0 0' }}>
-            LKR {stats.netBalance.toLocaleString()}
-          </h3>
+      <div className="admin-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #E8E8E8', paddingBottom: '24px' }}>
+        <div>
+          <h1 style={{ fontSize: '28px', fontWeight: '800', letterSpacing: '-0.02em', color: '#111111', margin: '0 0 8px 0' }}>Dashboard</h1>
+          <p style={{ color: '#6B6B6B', fontSize: '14px', margin: 0 }}>Overview of AISCA organization metrics and activity.</p>
         </div>
-
-        {/* Regular Cards */}
-        {[
-          { label: 'Total Income', value: `LKR ${stats.totalIncome.toLocaleString()}`, change: stats.incomeChange },
-          { label: 'Total Expenses', value: `LKR ${stats.totalExpenses.toLocaleString()}`, change: stats.expenseChange },
-          { label: 'Total Members', value: stats.totalMembers.toLocaleString(), change: stats.membersChange }
-        ].map((stat, i) => (
-          <div key={i} style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', padding: '24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '140px', transition: 'box-shadow 0.2s', cursor: 'default' }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)'}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '13px', color: '#6B6B6B', fontWeight: '500' }}>{stat.label}</span>
-              <TrendBadge value={stat.change} />
-            </div>
-            <h3 style={{ fontSize: '32px', fontWeight: '700', color: '#111111', margin: '8px 0 0 0' }}>
-              {stat.value}
-            </h3>
-          </div>
-        ))}
       </div>
 
-      {/* Middle Row: Chart & Activity */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }} className="md:grid-cols-[60%_calc(40%-24px)]">
+      {/* 4-Card KPI Row */}
+      <div className="dashboard-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
         
-        {/* Chart */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '24px' }}>
+        {/* Card 1: Fund Status */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Wallet size={20} color="#111111" />
+            </div>
+            {stats.fundBalance !== null && (
+              <span style={{ fontSize: '12px', fontWeight: '600', color: '#22C55E', background: 'rgba(34, 197, 94, 0.1)', padding: '4px 8px', borderRadius: '20px' }}>
+                Executive View
+              </span>
+            )}
+          </div>
+          <div>
+            <p style={{ fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Fund Status</p>
+            {stats.fundBalance !== null ? (
+              <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#111111', margin: 0 }}>
+                LKR {stats.fundBalance.toLocaleString()}
+              </h2>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: stats.fundBadge === 'Healthy' ? '#22C55E' : stats.fundBadge === 'Tight' ? '#F59E0B' : '#EF4444' }} />
+                <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#111111', margin: 0 }}>
+                  {stats.fundBadge}
+                </h2>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Card 2: Total Members */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Users size={20} color="#111111" />
+          </div>
+          <div>
+            <p style={{ fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Total Members</p>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#111111', margin: 0 }}>
+              {stats.totalMembers.toLocaleString()}
+            </h2>
+          </div>
+        </div>
+
+        {/* Card 3: Website Visitors (Page Views) */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Eye size={20} color="#111111" />
+          </div>
+          <div>
+            <p style={{ fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Total Page Views</p>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#111111', margin: 0 }}>
+              {stats.totalPageViews.toLocaleString()}
+            </h2>
+          </div>
+        </div>
+
+        {/* Card 4: Approved Associates */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Shield size={20} color="#111111" />
+          </div>
+          <div>
+            <p style={{ fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Approved Associates</p>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#111111', margin: 0 }}>
+              {stats.approvedAssociates.toLocaleString()}
+            </h2>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Grid */}
+      <div className="dashboard-charts-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+        
+        {/* Organization Growth Chart */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111111', margin: 0 }}>Income vs Expenses</h3>
-            
-            {/* Filter Pills */}
-            <div style={{ display: 'flex', gap: '4px', background: '#F5F5F5', padding: '4px', borderRadius: '24px' }}>
-              {['Month', '6 Months', 'Year'].map(filter => (
-                <button
-                  key={filter}
-                  onClick={() => setChartFilter(filter as any)}
-                  style={{
-                    padding: '4px 12px', border: 'none', borderRadius: '20px', fontSize: '12px', fontWeight: '500', cursor: 'pointer',
-                    background: chartFilter === filter ? '#111111' : 'transparent',
-                    color: chartFilter === filter ? '#FFFFFF' : '#6B6B6B',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {filter}
-                </button>
-              ))}
+            <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111111', margin: 0 }}>Organization Growth</h2>
+            <div style={{ padding: '6px 12px', background: '#F5F5F5', borderRadius: '20px', fontSize: '12px', fontWeight: '600', color: '#6B6B6B' }}>
+              Past 6 Months
             </div>
           </div>
-          
-          <div style={{ height: '300px', width: '100%' }}>
+          <div style={{ flex: 1, minHeight: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0F0F0" />
-                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B6B6B' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B6B6B' }} />
+                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#A3A3A3' }} dy={10} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#A3A3A3' }} />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#A3A3A3' }} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#F9F9F9' }} />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
-                <Bar dataKey="Income" fill="#111111" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                <Bar dataKey="Expenses" fill="#D1D5DB" radius={[4, 4, 0, 0]} maxBarSize={40} />
-              </BarChart>
+                <Line yAxisId="left" type="monotone" dataKey="New Members" stroke="#111111" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                <Line yAxisId="right" type="monotone" dataKey="Page Views" stroke="#d4af37" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Activity Feed */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111111', margin: '0 0 24px 0' }}>Recent Activity</h3>
+        {/* Recent Associates */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111111', margin: 0 }}>Recent Associates</h2>
+            <Link href="/dashboard/associates" style={{ fontSize: '13px', color: '#6B6B6B', textDecoration: 'none', fontWeight: '500' }}>View All</Link>
+          </div>
           
-          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {activities.length === 0 ? (
-              <p style={{ color: '#6B6B6B', fontSize: '14px', textAlign: 'center' }}>No recent activities.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+            {recentAssociates.length === 0 ? (
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A3A3A3', fontSize: '13px' }}>
+                No recent associate registrations.
+              </div>
             ) : (
-              activities.map(act => {
-                let Icon = Activity
-                if (act.type === 'associate') Icon = User
-                if (act.type === 'school') Icon = GraduationCap
-                if (act.type === 'audit') Icon = Shield
-
-                return (
-                  <div key={act.id} style={{ display: 'flex', gap: '16px' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Icon size={16} color="#111111" />
+              recentAssociates.map(assoc => (
+                <div key={assoc.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: '1px solid #F5F5F5' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#F9F9F9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <User size={16} color="#6B6B6B" />
                     </div>
                     <div>
-                      <p style={{ fontSize: '14px', fontWeight: '500', color: '#111111', margin: '0 0 4px 0' }}>{act.title}</p>
-                      <p style={{ fontSize: '13px', color: '#6B6B6B', margin: '0 0 4px 0' }}>{act.description}</p>
-                      <p style={{ fontSize: '11px', color: '#A3A3A3', margin: 0 }}>{formatActivityTime(act.timestamp)}</p>
+                      <p style={{ fontSize: '14px', fontWeight: '600', color: '#111111', margin: '0 0 2px 0' }}>{assoc.full_name}</p>
+                      <p style={{ fontSize: '12px', color: '#A3A3A3', margin: 0 }}>{new Date(assoc.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
-                )
-              })
+                  <span style={{ 
+                    padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase',
+                    background: assoc.status === 'approved' ? 'rgba(34, 197, 94, 0.1)' : assoc.status === 'rejected' ? 'rgba(239, 68, 68, 0.1)' : '#F5F5F5',
+                    color: assoc.status === 'approved' ? '#22C55E' : assoc.status === 'rejected' ? '#EF4444' : '#6B6B6B'
+                  }}>
+                    {assoc.status}
+                  </span>
+                </div>
+              ))
             )}
           </div>
         </div>
+
       </div>
 
-      {/* Bottom Row: Recent Associates Table */}
-      <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', overflow: 'hidden' }}>
-        <div style={{ padding: '24px', borderBottom: '1px solid #F0F0F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111111', margin: 0 }}>Recent Associates</h3>
-          <Link href="/dashboard/associates" style={{ fontSize: '13px', fontWeight: '500', color: '#111111', textDecoration: 'none' }}>
-            View All →
-          </Link>
+      {/* Full Width Activity Feed */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111111', margin: 0 }}>System Activity Log</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#6B6B6B' }}>
+            <Activity size={16} /> Live Feed
+          </div>
         </div>
-        
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: '#F9F9F9' }}>
-                {['Name', 'School', 'District', 'Status', 'Date'].map((th, i) => (
-                  <th key={i} style={{ padding: '16px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {th}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {recentAssociates.length === 0 ? (
-                <tr>
-                  <td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: '#6B6B6B', fontSize: '14px' }}>No associates found.</td>
-                </tr>
-              ) : (
-                recentAssociates.map(assoc => (
-                  <tr key={assoc.id} style={{ borderBottom: '1px solid #F0F0F0' }}>
-                    <td style={{ padding: '16px 24px', fontSize: '14px', color: '#111111', fontWeight: '500' }}>{assoc.full_name}</td>
-                    <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6B6B6B' }}>{assoc.school}</td>
-                    <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6B6B6B' }}>{assoc.district}</td>
-                    <td style={{ padding: '16px 24px' }}>
-                      <span style={{ 
-                        padding: '4px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase',
-                        background: assoc.status === 'approved' ? 'rgba(34, 197, 94, 0.1)' : assoc.status === 'rejected' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                        color: assoc.status === 'approved' ? '#22C55E' : assoc.status === 'rejected' ? '#EF4444' : '#F59E0B'
-                      }}>
-                        {assoc.status}
-                      </span>
-                    </td>
-                    <td style={{ padding: '16px 24px', fontSize: '13px', color: '#6B6B6B' }}>
-                      {new Date(assoc.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+          {activities.length === 0 ? (
+            <div style={{ padding: '40px', textAlign: 'center', color: '#A3A3A3', fontSize: '14px' }}>
+              No recent activity recorded.
+            </div>
+          ) : (
+            activities.map((act, index) => (
+              <div key={index} style={{ display: 'flex', gap: '20px', padding: '16px 0', borderBottom: index < activities.length - 1 ? '1px solid #F5F5F5' : 'none' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F9F9F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {act.type === 'associate' ? <User size={18} color="#111111" /> :
+                   act.type === 'school' ? <TrendingUp size={18} color="#111111" /> :
+                   <Shield size={18} color="#111111" />}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#111111', margin: 0 }}>{act.title}</h4>
+                    <span style={{ fontSize: '12px', color: '#A3A3A3' }}>{formatActivityTime(act.timestamp)}</span>
+                  </div>
+                  <p style={{ fontSize: '14px', color: '#6B6B6B', margin: 0, lineHeight: '1.5' }}>{act.description}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
