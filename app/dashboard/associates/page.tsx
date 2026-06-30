@@ -508,7 +508,7 @@ export default function AssociatesPage() {
                           ) : (
                             <button
                               onClick={() => handleRequestAccess('associates')}
-                              style={{ padding: '6px 12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '11px' }}
+                              style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #E8E8E8', borderRadius: '6px', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '11px' }}
                             >
                               Request View Access
                             </button>

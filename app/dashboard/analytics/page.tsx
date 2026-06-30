@@ -278,10 +278,10 @@ export default function AnalyticsPage() {
           <div className="h-[260px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={timelineData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#FFFFFF" />
                 <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
                 <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.05)' }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#F5F5F5' }} />
                 <Line 
                   type="monotone" 
                   dataKey="Page Views" 
@@ -346,7 +346,7 @@ export default function AnalyticsPage() {
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={topPagesData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#FFFFFF" />
                 <XAxis type="number" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
                 <YAxis dataKey="page" type="category" stroke="rgba(255,255,255,0.3)" fontSize={9} tickLine={false} width={80} />
                 <Tooltip content={<CustomTooltip />} />

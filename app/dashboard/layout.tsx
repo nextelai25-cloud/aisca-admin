@@ -235,8 +235,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className={`nav-link ${isActive ? 'active' : ''}`}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '12px', padding: '0 12px', height: '40px',
-                  borderRadius: '8px', color: isActive ? '#ffffff' : '#6B6B6B',
-                  fontSize: '14px', fontWeight: isActive ? '500' : '500', textDecoration: 'none',
+                  borderRadius: '8px', 
+                  background: isActive ? '#111111' : '#FFFFFF',
+                  color: isActive ? '#ffffff' : '#6B6B6B',
+                  fontSize: '14px', fontWeight: '500', textDecoration: 'none',
                   transition: 'all 0.15s ease'
                 }}
               >
@@ -258,8 +260,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className={`nav-link ${isActive ? 'active' : ''}`}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '12px', padding: '0 12px', height: '40px',
-                  borderRadius: '8px', color: isActive ? '#ffffff' : '#6B6B6B',
-                  fontSize: '14px', fontWeight: '500', textDecoration: 'none'
+                  borderRadius: '8px', 
+                  background: isActive ? '#111111' : '#FFFFFF',
+                  color: isActive ? '#ffffff' : '#6B6B6B',
+                  fontSize: '14px', fontWeight: '500', textDecoration: 'none',
+                  transition: 'all 0.15s ease'
                 }}
               >
                 <Icon size={18} />
@@ -364,7 +369,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               >
                 <Bell size={18} color="#6B6B6B" />
                 {notifications.length > 0 && (
-                  <span style={{ position: 'absolute', top: 0, right: 0, background: '#EF4444', color: '#fff', fontSize: '10px', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                  <span style={{ position: 'absolute', top: 0, right: 0, background: '#EF4444', color: '#111111', fontSize: '10px', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                     {notifications.length}
                   </span>
                 )}

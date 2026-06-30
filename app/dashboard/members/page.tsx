@@ -61,13 +61,13 @@ export default function MembersPage() {
   }
 
   return (
-    <div style={{ padding: '32px', color: '#fff' }}>
+    <div style={{ padding: '32px', color: '#111111' }}>
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: '800', letterSpacing: '0.05em', margin: 0 }}>
           AISCA MEMBERS DATABASE
         </h1>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginTop: '4px' }}>
+        <p style={{ color: '#6B6B6B', fontSize: '13px', marginTop: '4px' }}>
           Master registry of all AISCA members across all activities
         </p>
       </div>
@@ -83,14 +83,14 @@ export default function MembersPage() {
           { label: 'AVG SCORE', value: stats.avgScore }
         ].map(s => (
           <div key={s.label} style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: '#FFFFFF',
+            border: '1px solid #E8E8E8',
             borderRadius: '12px', padding: '16px'
           }}>
-            <p style={{ fontSize: '9px', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.35)', margin: '0 0 8px' }}>
+            <p style={{ fontSize: '9px', letterSpacing: '0.15em', color: '#6B6B6B', margin: '0 0 8px' }}>
               {s.label}
             </p>
-            <p style={{ fontSize: '24px', fontWeight: '700', color: '#fff', margin: 0 }}>{s.value}</p>
+            <p style={{ fontSize: '24px', fontWeight: '700', color: '#111111', margin: 0 }}>{s.value}</p>
           </div>
         ))}
       </div>
@@ -104,8 +104,8 @@ export default function MembersPage() {
           style={{
             flex: 1, minWidth: '280px', padding: '10px 16px',
             background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '8px', color: '#fff', fontSize: '13px', outline: 'none'
+            border: '1px solid #E8E8E8',
+            borderRadius: '8px', color: '#111111', fontSize: '13px', outline: 'none'
           }}
         />
         <select
@@ -113,8 +113,8 @@ export default function MembersPage() {
           onChange={e => setBatchFilter(e.target.value)}
           style={{
             padding: '10px 16px', background: '#1a1a1a',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '8px', color: '#fff', fontSize: '13px', cursor: 'pointer'
+            border: '1px solid #E8E8E8',
+            borderRadius: '8px', color: '#111111', fontSize: '13px', cursor: 'pointer'
           }}
         >
           {batches.map(b => <option key={b} value={b}>{b === 'All' ? 'All Batches' : b}</option>)}
@@ -124,8 +124,8 @@ export default function MembersPage() {
           onChange={e => setTypeFilter(e.target.value)}
           style={{
             padding: '10px 16px', background: '#1a1a1a',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '8px', color: '#fff', fontSize: '13px', cursor: 'pointer'
+            border: '1px solid #E8E8E8',
+            borderRadius: '8px', color: '#111111', fontSize: '13px', cursor: 'pointer'
           }}
         >
           {types.map(t => <option key={t} value={t}>{t === 'All' ? 'All Types' : t}</option>)}
@@ -146,9 +146,9 @@ export default function MembersPage() {
             a.click()
           }}
           style={{
-            padding: '10px 20px', background: 'rgba(255,255,255,0.08)',
+            padding: '10px 20px', background: '#E8E8E8',
             border: '1px solid rgba(255,255,255,0.15)',
-            borderRadius: '8px', color: '#fff', fontSize: '13px',
+            borderRadius: '8px', color: '#111111', fontSize: '13px',
             cursor: 'pointer', fontWeight: '600'
           }}
         >
@@ -159,17 +159,17 @@ export default function MembersPage() {
       {/* Table */}
       <div className="admin-table-wrapper" style={{
         background: 'rgba(255,255,255,0.02)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid #E8E8E8',
         borderRadius: '12px', overflow: 'hidden'
       }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            <tr style={{ borderBottom: '1px solid #E8E8E8' }}>
               {['FULL NAME', 'EMAIL', 'PHONE', 'SCHOOL', 'A/L BATCH', 'ACTION'].map(h => (
                 <th key={h} style={{
                   padding: '12px 16px', textAlign: 'left',
                   fontSize: '10px', letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.35)', fontWeight: '600'
+                  color: '#6B6B6B', fontWeight: '600'
                 }}>{h}</th>
               ))}
             </tr>
@@ -185,7 +185,7 @@ export default function MembersPage() {
                   background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)'
                 }}
               >
-                <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#fff' }}>
+                <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#111111' }}>
                   {m.full_name}
                 </td>
                 <td style={{ padding: '12px 16px', fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
@@ -206,7 +206,7 @@ export default function MembersPage() {
                     style={{
                       padding: '5px 12px', background: 'transparent',
                       border: '1px solid rgba(255,255,255,0.15)',
-                      borderRadius: '6px', color: '#fff',
+                      borderRadius: '6px', color: '#111111',
                       cursor: 'pointer', fontSize: '11px'
                     }}
                   >
@@ -221,22 +221,22 @@ export default function MembersPage() {
 
       {/* Pagination */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
-        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px' }}>
+        <p style={{ color: '#6B6B6B', fontSize: '12px' }}>
           Showing {page * PER_PAGE + 1}–{Math.min((page + 1) * PER_PAGE, filtered.length)} of {filtered.length} members
         </p>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={() => setPage(p => Math.max(0, p - 1))}
             disabled={page === 0}
-            style={{ padding: '6px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: page === 0 ? 'rgba(255,255,255,0.2)' : '#fff', cursor: page === 0 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
+            style={{ padding: '6px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid #E8E8E8', borderRadius: '6px', color: page === 0 ? 'rgba(255,255,255,0.2)' : '#fff', cursor: page === 0 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
           >← Prev</button>
-          <span style={{ padding: '6px 12px', color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>
+          <span style={{ padding: '6px 12px', color: '#6B6B6B', fontSize: '12px' }}>
             {page + 1} / {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            style={{ padding: '6px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: page >= totalPages - 1 ? 'rgba(255,255,255,0.2)' : '#fff', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
+            style={{ padding: '6px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid #E8E8E8', borderRadius: '6px', color: page >= totalPages - 1 ? 'rgba(255,255,255,0.2)' : '#fff', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
           >Next →</button>
         </div>
       </div>
@@ -250,15 +250,15 @@ export default function MembersPage() {
           <div
             className="admin-modal-inner"
             onClick={e => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: '680px', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', overflow: 'hidden' }}
+            style={{ width: '100%', maxWidth: '680px', background: '#0d0d0d', border: '1px solid #E8E8E8', borderRadius: '16px', overflow: 'hidden' }}
           >
             {/* Modal header */}
             <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h3 style={{ color: '#fff', fontSize: '18px', fontWeight: '700', margin: 0 }}>{selectedMember.full_name}</h3>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: '4px 0 0', fontFamily: 'monospace' }}>{selectedMember.aisca_id}</p>
+                <h3 style={{ color: '#111111', fontSize: '18px', fontWeight: '700', margin: 0 }}>{selectedMember.full_name}</h3>
+                <p style={{ color: '#6B6B6B', fontSize: '12px', margin: '4px 0 0', fontFamily: 'monospace' }}>{selectedMember.aisca_id}</p>
               </div>
-              <button onClick={() => setSelectedMember(null)} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff', width: '36px', height: '36px', cursor: 'pointer', fontSize: '18px' }}>×</button>
+              <button onClick={() => setSelectedMember(null)} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid #E8E8E8', borderRadius: '8px', color: '#111111', width: '36px', height: '36px', cursor: 'pointer', fontSize: '18px' }}>×</button>
             </div>
 
             {/* Modal body */}
@@ -280,15 +280,15 @@ export default function MembersPage() {
                 { label: 'Participation Score', value: selectedMember.participation_score },
               ].map(f => (
                 <div key={f.label}>
-                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', margin: '0 0 4px' }}>{f.label.toUpperCase()}</p>
-                  <p style={{ fontSize: '14px', color: '#fff', margin: 0 }}>{f.value || '—'}</p>
+                  <p style={{ fontSize: '10px', color: '#6B6B6B', letterSpacing: '0.1em', margin: '0 0 4px' }}>{f.label.toUpperCase()}</p>
+                  <p style={{ fontSize: '14px', color: '#111111', margin: 0 }}>{f.value || '—'}</p>
                 </div>
               ))}
             </div>
 
             {/* Activities */}
             <div style={{ padding: '0 24px 24px' }}>
-              <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', margin: '0 0 12px' }}>ACTIVITIES PARTICIPATED</p>
+              <p style={{ fontSize: '10px', color: '#6B6B6B', letterSpacing: '0.1em', margin: '0 0 12px' }}>ACTIVITIES PARTICIPATED</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {[
                   { label: 'Forum', value: selectedMember.appeared_in_forum },
@@ -300,14 +300,14 @@ export default function MembersPage() {
                 ].map(a => (
                   <span key={a.label} style={{
                     padding: '4px 10px', borderRadius: '6px', fontSize: '11px',
-                    border: `1px solid ${a.value ? 'rgba(74,222,128,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                    border: `1px solid ${a.value ? 'rgba(74,222,128,0.3)' : '#E8E8E8'}`,
                     color: a.value ? '#4ade80' : 'rgba(255,255,255,0.25)',
                     background: a.value ? 'rgba(74,222,128,0.08)' : 'transparent'
                   }}>{a.label}</span>
                 ))}
               </div>
               {selectedMember.member_type_detail && (
-                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '12px' }}>
+                <p style={{ fontSize: '12px', color: '#6B6B6B', marginTop: '12px' }}>
                   {selectedMember.member_type_detail}
                 </p>
               )}

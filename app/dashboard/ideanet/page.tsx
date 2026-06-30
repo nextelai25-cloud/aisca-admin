@@ -163,10 +163,10 @@ export default function IdeaNetAdminPage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#fff', margin: '0 0 6px', letterSpacing: '-0.02em' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#111111', margin: '0 0 6px', letterSpacing: '-0.02em' }}>
           💡 IdeaNet Moderation
         </h1>
-        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', margin: 0 }}>
+        <p style={{ color: '#6B6B6B', fontSize: '13px', margin: 0 }}>
           Review, hide, and manage student project idea posts and comments
         </p>
       </div>
@@ -174,7 +174,7 @@ export default function IdeaNetAdminPage() {
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '28px' }}>
         {[
-          { label: 'Total Posts', value: stats.total, color: '#fff' },
+          { label: 'Total Posts', value: stats.total, color: '#111111' },
           { label: 'Active', value: stats.active, color: '#4ade80' },
           { label: 'Hidden', value: stats.hidden, color: '#f5c842' },
           { label: 'Deleted', value: stats.deleted, color: '#f87171' },
@@ -189,16 +189,16 @@ export default function IdeaNetAdminPage() {
 
       {/* Tabs + Filters */}
       <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '4px', gap: '4px' }}>
+        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', border: '1px solid #E8E8E8', borderRadius: '10px', padding: '4px', gap: '4px' }}>
           {(['posts', 'comments'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => { setTab(t); setSearch(''); setStatusFilter('active'); setSelectedPost(null) }}
               style={{
                 padding: '8px 20px',
-                background: tab === t ? 'rgba(255,255,255,0.08)' : 'transparent',
+                background: tab === t ? '#E8E8E8' : 'transparent',
                 border: tab === t ? '1px solid rgba(255,255,255,0.12)' : '1px solid transparent',
-                borderRadius: '8px', color: tab === t ? '#fff' : 'rgba(255,255,255,0.4)',
+                borderRadius: '8px', color: tab === t ? '#fff' : '#6B6B6B',
                 fontSize: '13px', fontWeight: tab === t ? '600' : '400', cursor: 'pointer',
                 transition: 'all 0.15s ease', textTransform: 'capitalize'
               }}
@@ -213,9 +213,9 @@ export default function IdeaNetAdminPage() {
               onClick={() => setStatusFilter(s)}
               style={{
                 padding: '7px 14px',
-                background: statusFilter === s ? 'rgba(255,255,255,0.08)' : 'transparent',
+                background: statusFilter === s ? '#E8E8E8' : 'transparent',
                 border: `1px solid ${statusFilter === s ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)'}`,
-                borderRadius: '8px', color: statusFilter === s ? '#fff' : 'rgba(255,255,255,0.35)',
+                borderRadius: '8px', color: statusFilter === s ? '#fff' : '#6B6B6B',
                 fontSize: '12px', fontWeight: statusFilter === s ? '600' : '400', cursor: 'pointer',
                 transition: 'all 0.15s ease', textTransform: 'capitalize'
               }}
@@ -229,8 +229,8 @@ export default function IdeaNetAdminPage() {
           placeholder={`Search ${tab}...`}
           style={{
             flex: 1, minWidth: '200px', padding: '9px 16px',
-            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: '10px', color: '#fff', fontSize: '13px', outline: 'none'
+            background: 'rgba(255,255,255,0.04)', border: '1px solid #E8E8E8',
+            borderRadius: '10px', color: '#111111', fontSize: '13px', outline: 'none'
           }}
         />
       </div>
@@ -259,10 +259,10 @@ export default function IdeaNetAdminPage() {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <h3 style={{ color: '#fff', fontSize: '14px', fontWeight: '700', margin: '0 0 4px', lineHeight: '1.3', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <h3 style={{ color: '#111111', fontSize: '14px', fontWeight: '700', margin: '0 0 4px', lineHeight: '1.3', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {post.title}
                       </h3>
-                      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: 0 }}>
+                      <p style={{ color: '#6B6B6B', fontSize: '12px', margin: 0 }}>
                         {post.author_name}
                         {post.author_school && ` · ${post.author_school}`}
                         {' · '}{post.membership_number}
@@ -271,7 +271,7 @@ export default function IdeaNetAdminPage() {
                     {statusBadge(post.status)}
                   </div>
 
-                  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', margin: '0 0 12px', lineHeight: '1.5', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <p style={{ color: '#6B6B6B', fontSize: '12px', margin: '0 0 12px', lineHeight: '1.5', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {post.description}
                   </p>
 
@@ -307,7 +307,7 @@ export default function IdeaNetAdminPage() {
                   {post.images?.length > 0 && (
                     <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
                       {post.images.map((img, i) => (
-                        <img key={i} src={img} alt="" style={{ width: '60px', height: '45px', objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }} />
+                        <img key={i} src={img} alt="" style={{ width: '60px', height: '45px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #E8E8E8' }} />
                       ))}
                     </div>
                   )}
@@ -367,10 +367,10 @@ export default function IdeaNetAdminPage() {
         {/* Post detail panel — shown when a post is selected in the posts tab */}
         {selectedPost && tab === 'posts' && (
           <div style={{ position: 'sticky', top: '20px', alignSelf: 'flex-start' }}>
-            <div style={{ background: '#0b0b0b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', overflow: 'hidden' }}>
+            <div style={{ background: '#0b0b0b', border: '1px solid #E8E8E8', borderRadius: '14px', overflow: 'hidden' }}>
               {/* Detail header */}
               <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 style={{ color: '#fff', fontSize: '13px', fontWeight: '700', margin: 0 }}>Post Detail</h4>
+                <h4 style={{ color: '#111111', fontSize: '13px', fontWeight: '700', margin: 0 }}>Post Detail</h4>
                 <button
                   onClick={() => setSelectedPost(null)}
                   style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '6px', color: 'rgba(255,255,255,0.5)', width: '28px', height: '28px', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -382,13 +382,13 @@ export default function IdeaNetAdminPage() {
                   {statusBadge(selectedPost.status)}
                   <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>{selectedPost.membership_number}</span>
                 </div>
-                <h3 style={{ color: '#fff', fontSize: '16px', fontWeight: '700', margin: '0 0 10px', lineHeight: '1.3' }}>{selectedPost.title}</h3>
+                <h3 style={{ color: '#111111', fontSize: '16px', fontWeight: '700', margin: '0 0 10px', lineHeight: '1.3' }}>{selectedPost.title}</h3>
                 <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', lineHeight: '1.75', margin: '0 0 14px' }}>{selectedPost.description}</p>
 
                 {selectedPost.images?.length > 0 && (
                   <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
                     {selectedPost.images.map((img, i) => (
-                      <img key={i} src={img} alt="" style={{ width: '90px', height: '68px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }} />
+                      <img key={i} src={img} alt="" style={{ width: '90px', height: '68px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #E8E8E8' }} />
                     ))}
                   </div>
                 )}
