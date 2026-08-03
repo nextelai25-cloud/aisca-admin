@@ -91,7 +91,20 @@ export default function DashboardTab() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      
+
+      {/* Bank opening / re-correction note */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px 18px', borderRadius: '12px', background: '#FBF7EC', border: '1px solid #EBDFBD' }}>
+        <span style={{ fontSize: '18px', lineHeight: 1 }}>🏦</span>
+        <div>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: '#111111', marginBottom: '3px' }}>
+            Bank account opened · Opening balance Rs. 5,000
+          </div>
+          <div style={{ fontSize: '12.5px', color: '#6B6B6B', lineHeight: 1.5 }}>
+            The ledger has been re-corrected to real bank values from this point onward. All earlier entries are kept in Transactions for records but are excluded from the live balance.
+          </div>
+        </div>
+      </div>
+
       {/* KPI Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
         <div style={{ background: '#111111', border: '1px solid #111111', padding: '24px', borderRadius: '12px', color: '#FFFFFF' }}>
