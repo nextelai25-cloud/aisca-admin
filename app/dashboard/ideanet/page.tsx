@@ -180,7 +180,7 @@ export default function IdeaNetAdminPage() {
           { label: 'Deleted', value: stats.deleted, color: '#f87171' },
           { label: 'Comments', value: stats.totalComments, color: '#6B6B6B' }
         ].map(stat => (
-          <div key={stat.label} style={{ background: '#0b0b0b', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '16px 20px' }}>
+          <div key={stat.label} style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '16px 20px' }}>
             <p style={{ fontSize: '10px', letterSpacing: '0.12em', color: '#6B6B6B', margin: '0 0 8px', textTransform: 'uppercase' }}>{stat.label}</p>
             <p style={{ fontSize: '24px', fontWeight: '800', color: stat.color, margin: 0 }}>{stat.value}</p>
           </div>
@@ -250,8 +250,8 @@ export default function IdeaNetAdminPage() {
                 <div
                   key={post.id}
                   style={{
-                    background: selectedPost?.id === post.id ? '#E8E8E8' : '#0b0b0b',
-                    border: `1px solid ${selectedPost?.id === post.id ? '#E8E8E8' : '#E8E8E8'}`,
+                    background: selectedPost?.id === post.id ? '#F5F5F5' : '#FFFFFF',
+                    border: '1px solid #E8E8E8',
                     borderRadius: '12px', padding: '16px 20px', cursor: 'pointer',
                     transition: 'all 0.15s ease'
                   }}
@@ -323,7 +323,7 @@ export default function IdeaNetAdminPage() {
                 <div
                   key={comment.id}
                   style={{
-                    background: '#0b0b0b', border: '1px solid #E8E8E8',
+                    background: '#FFFFFF', border: '1px solid #E8E8E8',
                     borderRadius: '12px', padding: '16px 20px', transition: 'border-color 0.15s ease'
                   }}
                 >
@@ -367,7 +367,7 @@ export default function IdeaNetAdminPage() {
         {/* Post detail panel — shown when a post is selected in the posts tab */}
         {selectedPost && tab === 'posts' && (
           <div style={{ position: 'sticky', top: '20px', alignSelf: 'flex-start' }}>
-            <div style={{ background: '#0b0b0b', border: '1px solid #E8E8E8', borderRadius: '14px', overflow: 'hidden' }}>
+            <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '14px', overflow: 'hidden' }}>
               {/* Detail header */}
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #E8E8E8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h4 style={{ color: '#111111', fontSize: '13px', fontWeight: '700', margin: 0 }}>Post Detail</h4>

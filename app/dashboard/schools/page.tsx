@@ -367,7 +367,7 @@ export default function SchoolsPage() {
                   return (
                     <tr key={item.id} className="hover:bg-[#FAFAFA] transition-all">
                       {/* School Name */}
-                      <td className="p-4 font-semibold text-gray-200">
+                      <td className="p-4 font-semibold text-[#111111]">
                         {item.school_name}
                       </td>
 

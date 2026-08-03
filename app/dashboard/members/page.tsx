@@ -112,7 +112,7 @@ export default function MembersPage() {
           value={batchFilter}
           onChange={e => setBatchFilter(e.target.value)}
           style={{
-            padding: '10px 16px', background: '#1a1a1a',
+            padding: '10px 16px', background: '#FFFFFF',
             border: '1px solid #E8E8E8',
             borderRadius: '8px', color: '#111111', fontSize: '13px', cursor: 'pointer'
           }}
@@ -123,7 +123,7 @@ export default function MembersPage() {
           value={typeFilter}
           onChange={e => setTypeFilter(e.target.value)}
           style={{
-            padding: '10px 16px', background: '#1a1a1a',
+            padding: '10px 16px', background: '#FFFFFF',
             border: '1px solid #E8E8E8',
             borderRadius: '8px', color: '#111111', fontSize: '13px', cursor: 'pointer'
           }}
@@ -250,7 +250,7 @@ export default function MembersPage() {
           <div
             className="admin-modal-inner"
             onClick={e => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: '680px', background: '#0d0d0d', border: '1px solid #E8E8E8', borderRadius: '16px', overflow: 'hidden' }}
+            style={{ width: '100%', maxWidth: '680px', background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', overflow: 'hidden' }}
           >
             {/* Modal header */}
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #E8E8E8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

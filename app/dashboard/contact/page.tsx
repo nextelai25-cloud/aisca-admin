@@ -106,7 +106,7 @@ export default function ContactMessagesPage() {
                   <tr
                     key={msg.id}
                     onClick={() => handleSelectMessage(msg)}
-                    className={`cursor-pointer transition-all duration-200 ${msg.read ? 'hover:bg-[#FAFAFA]' : 'bg-[#1a1a1a] hover:bg-[#222222] border-l-2 border-l-[#d4af37]'}`}
+                    className={`cursor-pointer transition-all duration-200 ${msg.read ? 'hover:bg-[#FAFAFA]' : 'bg-[#FBF7EC] hover:bg-[#F5EFDD] border-l-2 border-l-[#d4af37]'}`}
                   >
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-0.5">
