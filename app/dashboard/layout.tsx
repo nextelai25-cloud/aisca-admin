@@ -19,7 +19,8 @@ import {
   Bell,
   Menu, 
   X,
-  Lightbulb
+  Lightbulb,
+  Rocket
 } from 'lucide-react'
 import { canAccess, AdminRole } from '@/lib/roles'
 
@@ -48,6 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Finance', path: '/dashboard/finance', icon: BarChart3, section: 'finance' },
     { name: 'Orders', path: '/dashboard/orders', icon: ShoppingBag, section: 'orders' },
     { name: 'IdeaNet', path: '/dashboard/ideanet', icon: Lightbulb, section: 'ideanet' },
+    { name: 'NextUp', path: '/dashboard/nextup', icon: Rocket, section: 'ideanet' },
     { name: 'Newsletter', path: '/dashboard/newsletter', icon: Mail, section: 'newsletter' },
     { name: 'Analytics', path: '/dashboard/analytics', icon: TrendingUp, section: 'analytics' },
     { name: 'Contact', path: '/dashboard/contact', icon: MessageSquare, section: 'contact' },
