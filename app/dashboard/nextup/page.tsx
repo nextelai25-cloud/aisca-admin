@@ -20,7 +20,8 @@ interface App {
 }
 
 const STATUSES = ['new', 'shortlisted', 'selected', 'rejected']
-const isPdf = (url: string) => url.toLowerCase().split('?')[0].endsWith('.pdf')
+// PDFs and HEIC/HEIF can't be previewed in an <img>, so show a file tile instead.
+const noPreview = (url: string) => /\.(pdf|heic|heif)$/i.test(url.toLowerCase().split('?')[0])
 
 const badgeClass = (s: string) =>
   s === 'selected' ? 'border-green-500/30 text-green-600 bg-green-50'
@@ -253,9 +254,9 @@ export default function NextUpPage() {
                       <div className="grid grid-cols-3 gap-2">
                         {(selected.uploads || []).map((u, i) => (
                           <a key={i} href={u.url} target="_blank" rel="noopener noreferrer" className="block rounded-lg overflow-hidden border border-[#E8E8E8] aspect-square bg-[#FAFAFA]" title={u.filename}>
-                            {isPdf(u.url) ? (
+                            {noPreview(u.url) ? (
                               <div className="w-full h-full flex flex-col items-center justify-center gap-1 text-[#6B6B6B] p-2">
-                                <FileText size={22} /><span className="text-[9px] flex items-center gap-1">PDF <ExternalLink size={9} /></span>
+                                <FileText size={22} /><span className="text-[9px] flex items-center gap-1">View file <ExternalLink size={9} /></span>
                               </div>
                             ) : (
                               <img src={u.url} alt="" className="w-full h-full object-cover" />

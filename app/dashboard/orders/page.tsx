@@ -22,7 +22,8 @@ interface Order {
 const itemsSummary = (items: Item[] = []) =>
   items.map(i => `${i.name}${i.size ? ` (${i.size})` : ''} ×${i.quantity}`).join(', ')
 
-const isPdf = (url?: string | null) => !!url && url.toLowerCase().split('?')[0].endsWith('.pdf')
+// PDFs and HEIC/HEIF can't preview in an <img> — show a link instead.
+const isPdf = (url?: string | null) => !!url && /\.(pdf|heic|heif)$/i.test(url.toLowerCase().split('?')[0])
 
 export default function OrdersPage() {
   const [loading, setLoading] = useState(true)
@@ -305,7 +306,7 @@ export default function OrdersPage() {
                 <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Payment Receipt</span>
                 {selected.receipt_url ? (
                   isPdf(selected.receipt_url) ? (
-                    <a href={selected.receipt_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-3 border border-[#E8E8E8] rounded-xl text-xs text-[#d4af37] hover:bg-[#FAFAFA]"><FileText size={14} /> Open receipt PDF <ExternalLink size={12} /></a>
+                    <a href={selected.receipt_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-3 border border-[#E8E8E8] rounded-xl text-xs text-[#d4af37] hover:bg-[#FAFAFA]"><FileText size={14} /> Open receipt file <ExternalLink size={12} /></a>
                   ) : (
                     <a href={selected.receipt_url} target="_blank" rel="noopener noreferrer" className="block">
                       <img src={selected.receipt_url} alt="Receipt" className="w-full rounded-xl border border-[#E8E8E8]" />
