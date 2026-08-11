@@ -1,5 +1,1 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": { "noEmit": true, "skipLibCheck": true, "incremental": false },
-  "include": ["app/dashboard/nextup/page.tsx", "app/dashboard/layout.tsx", "next-env.d.ts"]
-}
+{ "extends": "./tsconfig.json", "compilerOptions": { "noEmit": true, "skipLibCheck": true, "incremental": false }, "include": ["app/dashboard/nextup/page.tsx", "app/dashboard/orders/page.tsx", "next-env.d.ts"] }

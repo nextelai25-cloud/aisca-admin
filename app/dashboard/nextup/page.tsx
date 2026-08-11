@@ -86,7 +86,7 @@ export default function NextUpPage() {
 
   function exportCSV() {
     if (!filtered.length) return
-    const headers = ['Type', 'Status', 'Name', 'Age', 'School', 'District', 'WhatsApp', 'Email', 'Venture', 'Description', 'Podcast', 'Referrer', 'Referrer Phone', 'Founder Referred', 'Founder Phone', 'Files', 'Date']
+    const headers = ['Type', 'Status', 'Name', 'Category', 'School', 'District', 'WhatsApp', 'Email', 'Venture', 'Description', 'Podcast', 'Referrer', 'Referrer Phone', 'Founder Referred', 'Founder Phone', 'Files', 'Date']
     const rows = [headers.join(','), ...filtered.map(a => [
       a.application_type, a.status,
       `"${a.full_name || ''}"`, `"${a.age || ''}"`, `"${a.school || ''}"`, `"${a.district || ''}"`,
@@ -228,7 +228,8 @@ export default function NextUpPage() {
               ) : (
                 <>
                   <Section title="About the applicant">
-                    <Row label="Name" value={`${selected.full_name || '—'}  (age ${selected.age || '—'})`} />
+                    <Row label="Name" value={selected.full_name} />
+                    <Row label="Best describes them" value={selected.age} />
                     <Row label="School / District" value={`${selected.school || '—'} · ${selected.district || '—'}`} />
                     <Row label="WhatsApp" value={selected.whatsapp} />
                     <Row label="Email" value={selected.email} />
