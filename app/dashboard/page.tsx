@@ -133,7 +133,7 @@ export default function OverviewPage() {
             label: `${monthNames[d.getMonth()]}`,
             month: d.getMonth(),
             year: d.getFullYear(),
-            "New Members": 0,
+            "Associate Registrations": 0,
             "Page Views": 0
           })
         }
@@ -141,12 +141,12 @@ export default function OverviewPage() {
         const sixMonthsAgo = new Date()
         sixMonthsAgo.setMonth(now.getMonth() - 6)
 
-        // Group members
-        const { data: recentMembers } = await supabase.from('aisca_members').select('created_at').gte('created_at', sixMonthsAgo.toISOString())
-        recentMembers?.forEach(m => {
-          const d = new Date(m.created_at)
+        // Group associate registrations
+        const { data: recentAssocReg } = await supabase.from('associate_members').select('created_at').gte('created_at', sixMonthsAgo.toISOString())
+        recentAssocReg?.forEach(a => {
+          const d = new Date(a.created_at)
           const target = last6Months.find(x => x.month === d.getMonth() && x.year === d.getFullYear())
-          if (target) target["New Members"]++
+          if (target) target["Associate Registrations"]++
         })
 
         // Group traffic
@@ -321,7 +321,7 @@ export default function OverviewPage() {
                 <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#A3A3A3' }} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#F9F9F9' }} />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
-                <Line yAxisId="left" type="monotone" dataKey="New Members" stroke="#111111" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                <Line yAxisId="left" type="monotone" dataKey="Associate Registrations" stroke="#111111" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
                 <Line yAxisId="right" type="monotone" dataKey="Page Views" stroke="#d4af37" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
