@@ -20,7 +20,8 @@ import {
   Menu, 
   X,
   Lightbulb,
-  Rocket
+  Rocket,
+  Palette
 } from 'lucide-react'
 import { canAccess, AdminRole } from '@/lib/roles'
 
@@ -43,6 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, section: 'dashboard' },
+    { name: "Rangeela '26", path: '/dashboard/rangeela', icon: Palette, section: 'rangeela' },
     { name: 'Members', path: '/dashboard/members', icon: Users, section: 'dashboard' },
     { name: 'Associates', path: '/dashboard/associates', icon: UserCheck, section: 'associates' },
     { name: 'Schools', path: '/dashboard/schools', icon: Building2, section: 'schools' },
@@ -71,14 +73,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         })
 
         const currentPath = window.location.pathname
-        const matchedItem = navItems.find(item => currentPath === item.path || currentPath.startsWith(item.path + '/'))
+        // Most specific match wins (so /dashboard/rangeela/scan matches Rangeela, not Dashboard)
+        const matchedItem = [...navItems]
+          .sort((a, b) => b.path.length - a.path.length)
+          .find(item => currentPath === item.path || currentPath.startsWith(item.path + '/'))
         if (matchedItem && !canAccess(userRole as AdminRole, matchedItem.section)) {
           if (canAccess(userRole as AdminRole, 'dashboard')) {
             router.push('/dashboard')
+            return
           } else {
             const allowedItem = navItems.find(item => canAccess(userRole as AdminRole, item.section))
             if (allowedItem) {
               router.push(allowedItem.path)
+              return // keep the loader up until the allowed page opens
             } else {
               await supabase.auth.signOut()
               window.location.href = '/'
@@ -87,7 +94,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
 
         setLoading(false)
-        fetchNotifications()
+        // Rangeela-only accounts have no access to the main tables
+        if (canAccess(userRole as AdminRole, 'dashboard')) fetchNotifications()
       }
     }
     checkSession()
