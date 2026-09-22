@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   Search, Download, X, CheckCircle2, XCircle, ExternalLink, FileText, Mail, RefreshCw,
-  AlertTriangle, Ticket, Clock, Banknote, Landmark, DoorOpen, User, Phone, School,
+  AlertTriangle, Ticket, Clock, Banknote, Landmark, DoorOpen, User, Phone, School, ChevronRight,
 } from 'lucide-react'
 import RangeelaTabs from './RangeelaTabs'
 import { rgApi, fmtTime, type RgTicket, type RgMe } from '@/lib/rangeela-client'
@@ -12,19 +12,23 @@ interface Scan { id: number; ticket_id: string | null; code: string | null; resu
 
 const isFileLink = (url?: string | null) => !!url && /\.(pdf|heic|heif)$/i.test(url.toLowerCase().split('?')[0])
 
-const statusBadge = (s: string) =>
-  s === 'approved' ? 'border-green-500/30 text-green-700 bg-green-50'
-    : s === 'rejected' ? 'border-red-500/30 text-red-600 bg-red-50'
-      : 'border-amber-500/30 text-amber-700 bg-amber-50'
+const FILTERS = [
+  { key: 'pending', label: 'To approve' },
+  { key: 'approved', label: 'Approved' },
+  { key: 'checked_in', label: 'Checked in' },
+  { key: 'rejected', label: 'Rejected' },
+  { key: 'all', label: 'All' },
+] as const
 
 export default function RangeelaTicketsPage() {
   const [me, setMe] = useState<RgMe | null>(null)
   const [tickets, setTickets] = useState<RgTicket[]>([])
   const [scans, setScans] = useState<Scan[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [loadError, setLoadError] = useState('')
   const [q, setQ] = useState('')
-  const [statusFilter, setStatusFilter] = useState('pending')
+  const [statusFilter, setStatusFilter] = useState<string>('pending')
   const [methodFilter, setMethodFilter] = useState('all')
   const [selected, setSelected] = useState<RgTicket | null>(null)
   const [busy, setBusy] = useState(false)
@@ -33,13 +37,20 @@ export default function RangeelaTicketsPage() {
   const [rejectNotify, setRejectNotify] = useState(true)
   const [showReject, setShowReject] = useState(false)
   const [newEmail, setNewEmail] = useState('')
-  const [page, setPage] = useState(1)
-  const perPage = 25
+  const [shown, setShown] = useState(30)
 
   useEffect(() => { load() }, [])
 
+  // Lock page scroll while the detail sheet is open (mobile friendly).
+  useEffect(() => {
+    if (!selected) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [selected])
+
   async function load(silent = false) {
-    if (!silent) setLoading(true)
+    if (silent) setRefreshing(true); else setLoading(true)
     const r = await rgApi<{ tickets: RgTicket[]; scans: Scan[]; me: RgMe; error?: string }>('tickets')
     if (r.ok) {
       setTickets(r.data.tickets)
@@ -50,6 +61,7 @@ export default function RangeelaTicketsPage() {
       setLoadError(r.data?.error || 'Could not load tickets.')
     }
     setLoading(false)
+    setRefreshing(false)
   }
 
   function open(t: RgTicket) {
@@ -75,7 +87,7 @@ export default function RangeelaTicketsPage() {
     replace(r.data.ticket)
     setNotice(r.data.emailed
       ? { kind: 'ok', text: `Approved. The QR ticket was emailed to ${r.data.ticket.email}.` }
-      : { kind: 'err', text: `Approved, but the email failed: ${r.data.emailError}. Use "Resend ticket" to try again.` })
+      : { kind: 'err', text: `Approved, but the email failed: ${r.data.emailError}. Use "Save and resend ticket" to try again.` })
   }
 
   async function reject(t: RgTicket) {
@@ -127,7 +139,11 @@ export default function RangeelaTicketsPage() {
     }
   }, [tickets])
 
-  // Possible duplicates: same email or same WhatsApp on more than one live ticket
+  const counts: Record<string, number> = {
+    pending: stats.pending, approved: stats.approved, checked_in: stats.checkedIn, rejected: stats.rejected, all: stats.total,
+  }
+
+  // Possible duplicates: same email, WhatsApp or NIC on more than one live ticket
   const dupes = useMemo(() => {
     const live = tickets.filter((t) => t.status !== 'rejected')
     const count = (key: (t: RgTicket) => string) => {
@@ -155,12 +171,13 @@ export default function RangeelaTicketsPage() {
     })
   }, [tickets, q, statusFilter, methodFilter])
 
-  const pages = Math.max(1, Math.ceil(filtered.length / perPage))
-  const rows = filtered.slice((page - 1) * perPage, page * perPage)
+  useEffect(() => { setShown(30) }, [q, statusFilter, methodFilter])
+
+  const rows = filtered.slice(0, shown)
   const nameById = useMemo(() => new Map(tickets.map((t) => [t.id, t])), [tickets])
 
   function exportCSV() {
-    const head = ['Ticket', 'Name', 'Email', 'WhatsApp', 'School', 'A/L batch', 'NIC/ID', 'Method', 'Amount', 'Status', 'Approved by', 'Emailed', 'Checked in', 'Checked in by', 'Receipt', 'Submitted']
+    const head = ['Ticket', 'Name', 'Email', 'WhatsApp', 'School', 'A/L batch', 'NIC', 'Method', 'Amount', 'Status', 'Approved by', 'Emailed', 'Checked in', 'Checked in by', 'Receipt', 'Submitted']
     const cell = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
     const lines = [head.join(','), ...filtered.map((t) => [
       t.ticket_number, t.full_name, t.email, t.whatsapp, t.school, t.al_batch, t.nic, t.payment_method, t.amount, t.status,
@@ -178,139 +195,130 @@ export default function RangeelaTicketsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <RangeelaTabs me={me} subtitle="Ticket requests, payment approvals, cash sales and entrance check in" />
+    <div className="rg-page space-y-4">
+      <RangeelaTabs me={me} subtitle="Ticket requests, payment approvals and entrance check in" />
 
       {loadError && (
-        <div className="flex gap-2 items-start p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm"><AlertTriangle size={18} className="shrink-0" /> {loadError}</div>
+        <div className="rg-glass flex gap-2 items-start p-4 text-red-700 text-sm"><AlertTriangle size={18} className="shrink-0" /> {loadError}</div>
       )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Stat label="Waiting for approval" value={stats.pending} icon={Clock} tone="text-amber-600" onClick={() => { setStatusFilter('pending'); setPage(1) }} />
-        <Stat label="Tickets issued" value={stats.approved} icon={Ticket} tone="text-green-600" sub={`${stats.rejected} rejected · ${stats.total} requests`} onClick={() => { setStatusFilter('approved'); setPage(1) }} />
-        <Stat label="Checked in at gate" value={stats.checkedIn} icon={DoorOpen} tone="text-[#7B2FF7]" sub={stats.approved ? `${Math.round((stats.checkedIn / stats.approved) * 100)}% of issued tickets` : ''} onClick={() => { setStatusFilter('checked_in'); setPage(1) }} />
-        <div className="rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(135deg, #2B1B2E, #4A2A55)' }}>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-white/60">Ticket income</div>
-          <div className="text-2xl font-bold mt-2">LKR {(stats.bankTotal + stats.cashTotal).toLocaleString()}</div>
-          <div className="text-[11px] text-white/60 mt-1 space-y-0.5">
-            <div className="flex items-center gap-1.5"><Landmark size={12} /> Bank: {stats.bankCount} · LKR {stats.bankTotal.toLocaleString()}</div>
-            <div className="flex items-center gap-1.5"><Banknote size={12} /> Cash: {stats.cashCount} · LKR {stats.cashTotal.toLocaleString()}</div>
+        <Stat label="To approve" value={stats.pending} icon={Clock} tone="#D97706" onClick={() => setStatusFilter('pending')} />
+        <Stat label="Issued" value={stats.approved} icon={Ticket} tone="#16A34A" sub={`${stats.total} requests`} onClick={() => setStatusFilter('approved')} />
+        <Stat label="Checked in" value={stats.checkedIn} icon={DoorOpen} tone="#7B2FF7" sub={stats.approved ? `${Math.round((stats.checkedIn / stats.approved) * 100)}% of issued` : undefined} onClick={() => setStatusFilter('checked_in')} />
+        <div className="rg-glass p-4 text-white" style={{ background: 'linear-gradient(135deg, rgba(36,22,40,0.92), rgba(88,40,110,0.88))', borderColor: 'rgba(255,255,255,0.25)' }}>
+          <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/60">Ticket income</div>
+          <div className="text-2xl font-extrabold mt-1.5">LKR {(stats.bankTotal + stats.cashTotal).toLocaleString()}</div>
+          <div className="text-[11px] text-white/65 mt-1 space-y-0.5">
+            <div className="flex items-center gap-1.5"><Landmark size={12} /> Bank {stats.bankCount} · LKR {stats.bankTotal.toLocaleString()}</div>
+            <div className="flex items-center gap-1.5"><Banknote size={12} /> Cash {stats.cashCount} · LKR {stats.cashTotal.toLocaleString()}</div>
           </div>
         </div>
       </div>
 
       {Object.keys(stats.cashBy).length > 0 && (
-        <div className="rounded-2xl bg-white border border-[#E8E8E8] p-4">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B6B] mb-2">Cash collected by account</div>
+        <div className="rg-glass p-4">
+          <div className="rg-label mb-2">Cash collected by account</div>
           <div className="flex flex-wrap gap-2">
             {Object.entries(stats.cashBy).map(([k, v]) => (
-              <span key={k} className="px-3 py-1.5 rounded-lg bg-[#F5F5F5] text-xs text-[#111]"><b>{k}</b> · {v.count} tickets · LKR {v.total.toLocaleString()}</span>
+              <span key={k} className="px-3 py-1.5 rounded-full bg-white/70 text-xs text-[#1B1320]"><b>{k}</b> · {v.count} · LKR {v.total.toLocaleString()}</span>
             ))}
           </div>
         </div>
       )}
 
-      {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B6B6B]" size={16} />
-          <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1) }} placeholder="Search name, ticket no, email, phone, school, NIC"
-            className="w-full pl-11 pr-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-sm text-[#111] placeholder-[#A3A3A3] focus:outline-none focus:border-[#D1D5DB]" />
-        </div>
-        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
-          className="px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-sm text-[#111] focus:outline-none cursor-pointer">
-          <option value="pending">Waiting for approval ({stats.pending})</option>
-          <option value="approved">Approved ({stats.approved})</option>
-          <option value="checked_in">Checked in ({stats.checkedIn})</option>
-          <option value="rejected">Rejected ({stats.rejected})</option>
-          <option value="all">All ({stats.total})</option>
-        </select>
-        <select value={methodFilter} onChange={(e) => { setMethodFilter(e.target.value); setPage(1) }}
-          className="px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-sm text-[#111] focus:outline-none cursor-pointer">
-          <option value="all">Bank and cash</option>
-          <option value="bank">Bank transfer</option>
-          <option value="cash">Cash</option>
-        </select>
-        <button onClick={() => load()} className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs font-semibold uppercase tracking-wider text-[#111] hover:bg-[#F5F5F5]">
-          <RefreshCw size={14} /> Refresh
-        </button>
-        {(me?.role === 'chairman' || me?.role === 'cfo') && (
-          <button onClick={exportCSV} disabled={!filtered.length} className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs font-semibold uppercase tracking-wider text-[#111] hover:bg-[#F5F5F5] disabled:opacity-40">
-            <Download size={14} /> CSV
+      {/* Search + filters */}
+      <div className="rg-glass p-3 space-y-3">
+        <div className="flex gap-2">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B5E68]" size={17} />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, ticket, phone, NIC" className="rg-input" style={{ paddingLeft: 40 }} />
+          </div>
+          <button onClick={() => load(true)} aria-label="Refresh" className="rg-btn rg-btn-ghost" style={{ width: 48, padding: 0 }}>
+            <RefreshCw size={17} className={refreshing ? 'animate-spin' : ''} />
           </button>
-        )}
+          {(me?.role === 'chairman' || me?.role === 'cfo') && (
+            <span className="hidden sm:block">
+              <button onClick={exportCSV} disabled={!filtered.length} aria-label="Export CSV" className="rg-btn rg-btn-ghost">
+                <Download size={16} /> CSV
+              </button>
+            </span>
+          )}
+        </div>
+        <div className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-0.5" style={{ scrollbarWidth: 'none' }}>
+          {FILTERS.map((fl) => (
+            <button key={fl.key} onClick={() => setStatusFilter(fl.key)}
+              className={`shrink-0 h-9 px-3.5 rounded-full text-[13px] font-bold border transition-all ${statusFilter === fl.key ? 'bg-[#1B1320] text-white border-[#1B1320]' : 'bg-white/70 text-[#3A2E38] border-white'}`}>
+              {fl.label} <span className={statusFilter === fl.key ? 'text-white/70' : 'text-[#9A8D97]'}>{counts[fl.key]}</span>
+            </button>
+          ))}
+          <span className="w-px bg-[#1B1320]/10 shrink-0 mx-1" />
+          {[['all', 'Bank + cash'], ['bank', 'Bank'], ['cash', 'Cash']].map(([k, l]) => (
+            <button key={k} onClick={() => setMethodFilter(k)}
+              className={`shrink-0 h-9 px-3.5 rounded-full text-[13px] font-bold border transition-all ${methodFilter === k ? 'bg-[#7B2FF7] text-white border-[#7B2FF7]' : 'bg-white/70 text-[#3A2E38] border-white'}`}>
+              {l}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* List */}
-      <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-[#111] min-w-[760px]">
-            <thead>
-              <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
-                <th className="p-4 font-semibold">Ticket</th>
-                <th className="p-4 font-semibold">Attendee</th>
-                <th className="p-4 font-semibold">School</th>
-                <th className="p-4 font-semibold text-center">Paid by</th>
-                <th className="p-4 font-semibold text-center">Status</th>
-                <th className="p-4 font-semibold">Submitted</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#E8E8E8]">
-              {rows.length === 0 ? (
-                <tr><td colSpan={6} className="p-10 text-center text-[#6B6B6B] text-xs">Nothing here yet.</td></tr>
-              ) : rows.map((t) => (
-                <tr key={t.id} onClick={() => open(t)} className="hover:bg-[#FAFAFA] cursor-pointer">
-                  <td className="p-4">
-                    <div className="font-mono font-bold text-[#7B2FF7]">{t.ticket_number}</div>
-                    {dupes.has(t.id) && <div className="inline-flex items-center gap-1 mt-1 text-[10px] text-orange-600 font-semibold"><AlertTriangle size={11} /> Possible duplicate</div>}
-                  </td>
-                  <td className="p-4">
-                    <div className="font-semibold">{t.full_name}</div>
-                    <div className="text-[11px] text-[#6B6B6B] mt-0.5">{t.email}</div>
-                  </td>
-                  <td className="p-4">
-                    <div>{t.school}</div>
-                    <div className="text-[11px] text-[#6B6B6B] mt-0.5">{t.al_batch}</div>
-                  </td>
-                  <td className="p-4 text-center">
-                    <span className="inline-flex items-center gap-1 text-[11px]">{t.payment_method === 'cash' ? <><Banknote size={13} /> Cash</> : <><Landmark size={13} /> Bank</>}</span>
-                  </td>
-                  <td className="p-4 text-center">
-                    <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase border ${statusBadge(t.status)}`}>{t.status}</span>
-                    {t.checked_in_at && <div className="text-[10px] text-[#7B2FF7] font-semibold mt-1">Checked in</div>}
-                    {t.status === 'approved' && t.email_error && <div className="text-[10px] text-red-600 font-semibold mt-1">Email failed</div>}
-                  </td>
-                  <td className="p-4 text-[#6B6B6B]">{fmtTime(t.created_at)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {pages > 1 && (
-          <div className="px-5 py-3 bg-[#FAFAFA] border-t border-[#E8E8E8] flex items-center justify-between text-[11px] text-[#6B6B6B]">
-            <span>Page {page} of {pages} · {filtered.length} tickets</span>
-            <div className="flex gap-2">
-              <button disabled={page === 1} onClick={() => setPage((p) => p - 1)} className="px-3 py-1.5 rounded-lg border border-[#E8E8E8] bg-white disabled:opacity-40">Previous</button>
-              <button disabled={page === pages} onClick={() => setPage((p) => p + 1)} className="px-3 py-1.5 rounded-lg border border-[#E8E8E8] bg-white disabled:opacity-40">Next</button>
-            </div>
+      {/* Ticket list (cards, work on any screen) */}
+      <div className="rg-glass overflow-hidden">
+        {rows.length === 0 ? (
+          <div className="p-10 text-center text-sm text-[#6B5E68]">Nothing here yet.</div>
+        ) : (
+          <ul className="divide-y divide-[#1B1320]/[0.06]">
+            {rows.map((t) => (
+              <li key={t.id}>
+                <button onClick={() => open(t)} className="w-full text-left px-4 py-3.5 flex items-center gap-3 hover:bg-white/50 active:bg-white/70 transition-colors">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-sm font-extrabold"
+                    style={{ background: t.status === 'approved' ? (t.checked_in_at ? '#7B2FF7' : '#16A34A') : t.status === 'rejected' ? '#DC2626' : '#F59E0B' }}>
+                    {t.full_name.trim().charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-bold text-[15px] text-[#1B1320] truncate">{t.full_name}</span>
+                      {t.payment_method === 'cash' && <Banknote size={14} className="text-[#6B5E68] shrink-0" />}
+                    </div>
+                    <div className="text-[12.5px] text-[#6B5E68] truncate">{t.school} · {t.al_batch}</div>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                      <span className="font-mono text-[11.5px] font-bold text-[#7B2FF7]">{t.ticket_number}</span>
+                      <span className={`rg-chip ${t.status}`}>{t.status === 'pending' ? 'To approve' : t.status}</span>
+                      {t.checked_in_at && <span className="rg-chip in">Checked in</span>}
+                      {t.status === 'approved' && t.email_error && <span className="rg-chip rejected">Email failed</span>}
+                      {dupes.has(t.id) && <span className="rg-chip warn">Duplicate?</span>}
+                    </div>
+                  </div>
+                  <div className="hidden sm:block text-[11.5px] text-[#6B5E68] text-right shrink-0">{fmtTime(t.created_at)}</div>
+                  <ChevronRight size={18} className="text-[#B3A6B0] shrink-0" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {filtered.length > shown && (
+          <div className="p-3 border-t border-[#1B1320]/[0.06]">
+            <button onClick={() => setShown((n) => n + 30)} className="rg-btn rg-btn-ghost w-full">Show more ({filtered.length - shown} left)</button>
           </div>
         )}
       </div>
 
       {/* Recent gate scans */}
       {scans.length > 0 && (
-        <div className="bg-white border border-[#E8E8E8] rounded-2xl p-5">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B6B] mb-3">Recent gate scans</div>
-          <div className="divide-y divide-[#F0F0F0]">
-            {scans.slice(0, 15).map((s) => {
+        <div className="rg-glass p-4">
+          <div className="rg-label mb-2">Recent gate scans</div>
+          <div className="divide-y divide-[#1B1320]/[0.06]">
+            {scans.slice(0, 12).map((s) => {
               const t = s.ticket_id ? nameById.get(s.ticket_id) : undefined
-              const tone = s.result === 'admitted' ? 'text-green-700' : s.result === 'already_used' ? 'text-red-600' : 'text-amber-700'
+              const cls = s.result === 'admitted' ? 'approved' : s.result === 'already_used' ? 'rejected' : 'pending'
               return (
-                <div key={s.id} className="py-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-                  <span className={`font-bold uppercase text-[10px] w-24 ${tone}`}>{s.result.replace('_', ' ')}</span>
-                  <span className="font-semibold text-[#111]">{t ? `${t.full_name} (${t.ticket_number})` : s.code}</span>
-                  <span className="text-[#6B6B6B] ml-auto">{s.scanned_by} · {fmtTime(s.scanned_at)}</span>
+                <div key={s.id} className="py-2.5 flex items-center gap-3 text-[13px]">
+                  <span className={`rg-chip ${cls} shrink-0`}>{s.result.replace('_', ' ')}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-[#1B1320] truncate">{t ? t.full_name : s.code}</div>
+                    <div className="text-[11.5px] text-[#6B5E68] truncate">{s.scanned_by} · {fmtTime(s.scanned_at)}</div>
+                  </div>
                 </div>
               )
             })}
@@ -318,113 +326,107 @@ export default function RangeelaTicketsPage() {
         </div>
       )}
 
-      {/* Drawer */}
+      {/* Detail sheet: bottom sheet on phones, side panel on desktop */}
       {selected && (
-        <div className="fixed inset-0 z-[1000] flex justify-end">
-          <div onClick={() => setSelected(null)} className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          <div className="relative w-full max-w-lg h-full bg-white overflow-y-auto">
-            <div style={{ height: 5, background: 'linear-gradient(90deg,#E6007E,#FF7A00,#FFC300,#0FB5AE,#2F6BFF,#7B2FF7)' }} />
-            <div className="p-6 space-y-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="font-mono text-lg font-bold text-[#7B2FF7]">{selected.ticket_number}</div>
-                  <div className="text-[11px] text-[#6B6B6B]">Submitted {fmtTime(selected.created_at)}{selected.source === 'cash_desk' ? ` · cash desk (${selected.created_by})` : ''}</div>
-                </div>
-                <button onClick={() => setSelected(null)} className="text-[#6B6B6B] hover:text-[#111]"><X size={20} /></button>
+        <div className="fixed inset-0 z-[1000] flex items-end sm:items-stretch sm:justify-end">
+          <div onClick={() => setSelected(null)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="relative w-full sm:max-w-lg max-h-[92vh] sm:max-h-none sm:h-full flex flex-col rounded-t-[28px] sm:rounded-none overflow-hidden"
+            style={{ background: 'rgba(252,249,252,0.94)', WebkitBackdropFilter: 'blur(30px) saturate(180%)', backdropFilter: 'blur(30px) saturate(180%)', boxShadow: '0 -20px 60px -20px rgba(0,0,0,0.35)' }}>
+            <div className="sm:hidden flex justify-center pt-2.5"><span className="w-10 h-1.5 rounded-full bg-[#1B1320]/15" /></div>
+            <div className="flex items-start justify-between gap-4 px-5 pt-3 sm:pt-6 pb-3">
+              <div className="min-w-0">
+                <div className="font-mono text-lg font-extrabold text-[#7B2FF7]">{selected.ticket_number}</div>
+                <div className="text-[12px] text-[#6B5E68]">Submitted {fmtTime(selected.created_at)}{selected.source === 'cash_desk' ? ` · cash desk` : ''}</div>
               </div>
+              <button onClick={() => setSelected(null)} aria-label="Close" className="w-9 h-9 rounded-full bg-[#1B1320]/[0.06] flex items-center justify-center text-[#1B1320] shrink-0"><X size={18} /></button>
+            </div>
 
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase border ${statusBadge(selected.status)}`}>{selected.status}</span>
-                {selected.checked_in_at && <span className="px-2.5 py-1 rounded text-[10px] font-bold uppercase border border-purple-300 text-[#7B2FF7] bg-purple-50">Checked in {fmtTime(selected.checked_in_at)}</span>}
-                {dupes.has(selected.id) && <span className="px-2.5 py-1 rounded text-[10px] font-bold uppercase border border-orange-300 text-orange-700 bg-orange-50">Possible duplicate</span>}
+            <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-4" style={{ overscrollBehavior: 'contain' }}>
+              <div className="flex flex-wrap gap-1.5">
+                <span className={`rg-chip ${selected.status}`}>{selected.status === 'pending' ? 'Waiting for approval' : selected.status}</span>
+                {selected.checked_in_at && <span className="rg-chip in">Checked in {fmtTime(selected.checked_in_at)}</span>}
+                {dupes.has(selected.id) && <span className="rg-chip warn">Possible duplicate</span>}
               </div>
 
               {notice && (
-                <div className={`flex gap-2 items-start p-3 rounded-xl text-xs ${notice.kind === 'ok' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-700'}`}>
-                  {notice.kind === 'ok' ? <CheckCircle2 size={16} className="shrink-0" /> : <AlertTriangle size={16} className="shrink-0" />} {notice.text}
+                <div className={`flex gap-2 items-start p-3 rounded-2xl text-[13px] ${notice.kind === 'ok' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+                  {notice.kind === 'ok' ? <CheckCircle2 size={16} className="shrink-0 mt-0.5" /> : <AlertTriangle size={16} className="shrink-0 mt-0.5" />} {notice.text}
                 </div>
               )}
 
-              <div className="border border-[#E8E8E8] rounded-xl divide-y divide-[#F0F0F0] text-sm">
+              <div className="rounded-2xl bg-white/80 border border-white divide-y divide-[#1B1320]/[0.06] text-[14px]">
                 <Row icon={User} label="Name" value={selected.full_name} />
                 <Row icon={Mail} label="Email" value={selected.email} />
                 <Row icon={Phone} label="WhatsApp" value={<a className="text-[#16A34A] font-semibold" href={`https://wa.me/${selected.whatsapp.replace(/\D/g, '').replace(/^0/, '94')}`} target="_blank" rel="noreferrer">{selected.whatsapp}</a>} />
                 <Row icon={School} label="School" value={`${selected.school} · ${selected.al_batch}`} />
-                <Row icon={Ticket} label="NIC / ID" value={<span className="font-mono">{selected.nic}</span>} />
+                <Row icon={Ticket} label="NIC" value={<span className="font-mono">{selected.nic}</span>} />
                 <Row icon={selected.payment_method === 'cash' ? Banknote : Landmark} label="Payment" value={`LKR ${Number(selected.amount).toLocaleString()} · ${selected.payment_method === 'cash' ? 'Cash' : 'Bank transfer'}`} />
                 {selected.approved_by && <Row icon={CheckCircle2} label="Approved" value={`${selected.approved_by} · ${fmtTime(selected.approved_at)}`} />}
-                {selected.ticket_emailed_at && <Row icon={Mail} label="Ticket emailed" value={fmtTime(selected.ticket_emailed_at)} />}
+                {selected.ticket_emailed_at && <Row icon={Mail} label="Emailed" value={fmtTime(selected.ticket_emailed_at)} />}
                 {selected.checked_in_by && <Row icon={DoorOpen} label="Scanned by" value={selected.checked_in_by} />}
                 {selected.reject_reason && <Row icon={XCircle} label="Reject note" value={selected.reject_reason} />}
                 {selected.notes && <Row icon={FileText} label="Notes" value={selected.notes} />}
               </div>
 
               {selected.email_error && selected.status === 'approved' && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">Last email attempt failed: {selected.email_error}</div>
+                <div className="p-3 rounded-2xl bg-red-50 border border-red-200 text-[13px] text-red-700">Last email attempt failed: {selected.email_error}</div>
               )}
 
               {selected.payment_method === 'bank' && (
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B6B] mb-2">Bank receipt</div>
+                  <div className="rg-label mb-2">Bank receipt</div>
                   {selected.receipt_url ? (
                     isFileLink(selected.receipt_url) ? (
-                      <a href={selected.receipt_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-3 border border-[#E8E8E8] rounded-xl text-xs text-[#7B2FF7] font-semibold"><FileText size={14} /> Open receipt file <ExternalLink size={12} /></a>
+                      <a href={selected.receipt_url} target="_blank" rel="noreferrer" className="rg-btn rg-btn-ghost"><FileText size={15} /> Open receipt file <ExternalLink size={13} /></a>
                     ) : (
                       <a href={selected.receipt_url} target="_blank" rel="noreferrer" className="block">
-                        <img src={selected.receipt_url} alt="Bank receipt" className="w-full rounded-xl border border-[#E8E8E8]" />
+                        <img src={selected.receipt_url} alt="Bank receipt" className="w-full max-h-[420px] object-contain rounded-2xl border border-white bg-white" />
                       </a>
                     )
-                  ) : <p className="text-xs text-[#6B6B6B]">No receipt.</p>}
-                  <p className="text-[11px] text-[#6B6B6B] mt-2">Check the amount is LKR 1,200 and it went to Sampath Bank 1069 6100 6902 before approving.</p>
+                  ) : <p className="text-[13px] text-[#6B5E68]">No receipt.</p>}
+                  <p className="text-[12px] text-[#6B5E68] mt-2">Check it shows LKR 1,200 paid to Sampath Bank 1069 6100 6902 before approving.</p>
                 </div>
               )}
 
-              {/* Actions */}
-              {me?.can.approve && (
-                <div className="space-y-3 pt-1">
-                  {selected.status !== 'approved' && (
-                    <button onClick={() => approve(selected)} disabled={busy}
-                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold bg-green-600 text-white hover:bg-green-700 disabled:opacity-50">
-                      <CheckCircle2 size={16} /> {busy ? 'Working...' : 'Approve and email QR ticket'}
-                    </button>
-                  )}
+              {me?.can.edit && (
+                <div className="rounded-2xl bg-white/80 border border-white p-3.5 space-y-2">
+                  <div className="rg-label">Wrong email? Fix it here</div>
+                  <input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} type="email" autoCapitalize="off" autoCorrect="off" className="rg-input" />
+                  <button onClick={() => resend(selected)} disabled={busy} className="rg-btn rg-btn-dark w-full">
+                    <Mail size={15} /> {selected.status === 'approved' ? 'Save and resend ticket' : 'Save email'}
+                  </button>
+                </div>
+              )}
 
-                  {selected.status !== 'rejected' && (selected.status === 'pending' || me.can.revoke) && !selected.checked_in_at && (
-                    showReject ? (
-                      <div className="p-4 rounded-xl border border-red-200 bg-red-50/40 space-y-3">
-                        <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} rows={3} maxLength={500}
-                          placeholder="Short note for the student, e.g. The receipt is unclear, or the amount does not match."
-                          className="w-full p-3 rounded-lg border border-[#E8E8E8] text-sm text-[#111] bg-white focus:outline-none" />
-                        <label className="flex items-center gap-2 text-xs text-[#111]"><input type="checkbox" checked={rejectNotify} onChange={(e) => setRejectNotify(e.target.checked)} /> Email the student about this</label>
-                        <div className="flex gap-2">
-                          <button onClick={() => reject(selected)} disabled={busy} className="flex-1 px-4 py-2.5 rounded-xl text-xs font-bold bg-red-600 text-white disabled:opacity-50">
-                            {selected.status === 'approved' ? 'Cancel ticket' : 'Reject request'}
-                          </button>
-                          <button onClick={() => setShowReject(false)} className="px-4 py-2.5 rounded-xl text-xs font-bold border border-[#E8E8E8] bg-white">Back</button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button onClick={() => setShowReject(true)} disabled={busy}
-                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold border border-[#E8E8E8] text-red-600 bg-white hover:bg-red-50">
-                        <XCircle size={16} /> {selected.status === 'approved' ? 'Cancel this ticket' : 'Reject'}
-                      </button>
-                    )
-                  )}
-
-                  {me.can.edit && (
-                    <div className="p-4 rounded-xl border border-[#E8E8E8] space-y-2">
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B6B]">Wrong email? Fix it here</div>
-                      <input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} type="email"
-                        className="w-full px-3 py-2.5 rounded-lg border border-[#E8E8E8] text-sm text-[#111] focus:outline-none" />
-                      <button onClick={() => resend(selected)} disabled={busy}
-                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#111] text-white disabled:opacity-50">
-                        <Mail size={14} /> {selected.status === 'approved' ? 'Save and resend ticket' : 'Save email'}
-                      </button>
-                    </div>
-                  )}
+              {me?.can.approve && selected.status !== 'rejected' && (selected.status === 'pending' || me.can.revoke) && !selected.checked_in_at && showReject && (
+                <div className="rounded-2xl border border-red-200 bg-red-50/70 p-3.5 space-y-3">
+                  <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} rows={3} maxLength={500}
+                    placeholder="Short note for the student, e.g. The receipt is unclear, or the amount does not match."
+                    className="w-full p-3 rounded-xl border border-[#1B1320]/10 text-[15px] text-[#1B1320] bg-white focus:outline-none" />
+                  <label className="flex items-center gap-2 text-[13px] text-[#1B1320]"><input type="checkbox" className="w-4 h-4" checked={rejectNotify} onChange={(e) => setRejectNotify(e.target.checked)} /> Email the student about this</label>
+                  <div className="flex gap-2">
+                    <button onClick={() => reject(selected)} disabled={busy} className="rg-btn flex-1 bg-red-600 text-white">{selected.status === 'approved' ? 'Cancel ticket' : 'Reject request'}</button>
+                    <button onClick={() => setShowReject(false)} className="rg-btn rg-btn-ghost">Back</button>
+                  </div>
                 </div>
               )}
             </div>
+
+            {/* Sticky action bar */}
+            {me?.can.approve && !showReject && (selected.status !== 'approved' || (me.can.revoke && !selected.checked_in_at)) && (
+              <div className="px-5 pt-3 border-t border-[#1B1320]/[0.06] flex gap-2" style={{ paddingBottom: 'calc(14px + env(safe-area-inset-bottom))' }}>
+                {selected.status !== 'approved' && (
+                  <button onClick={() => approve(selected)} disabled={busy} className="rg-btn rg-btn-green flex-1">
+                    <CheckCircle2 size={17} /> {busy ? 'Working...' : 'Approve and email ticket'}
+                  </button>
+                )}
+                {selected.status !== 'rejected' && (selected.status === 'pending' || me.can.revoke) && !selected.checked_in_at && (
+                  <button onClick={() => setShowReject(true)} disabled={busy} className={`rg-btn rg-btn-danger ${selected.status === 'approved' ? 'flex-1' : ''}`}>
+                    <XCircle size={17} /> {selected.status === 'approved' ? 'Cancel ticket' : 'Reject'}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -434,20 +436,23 @@ export default function RangeelaTicketsPage() {
 
 function Stat({ label, value, sub, icon: Icon, tone, onClick }: { label: string; value: number; sub?: string; icon: React.ElementType; tone: string; onClick?: () => void }) {
   return (
-    <button onClick={onClick} className="text-left rounded-2xl p-5 bg-white border border-[#E8E8E8] hover:border-[#D1D5DB] transition-all">
-      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-[#6B6B6B]">{label} <Icon size={15} className={tone} /></div>
-      <div className={`text-3xl font-bold mt-2 ${tone}`}>{value}</div>
-      {sub && <div className="text-[11px] text-[#6B6B6B] mt-1">{sub}</div>}
+    <button onClick={onClick} className="rg-glass text-left p-4 active:scale-[0.98] transition-transform">
+      <div className="flex items-center justify-between gap-2">
+        <span className="rg-label truncate">{label}</span>
+        <span className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ background: `${tone}1A`, color: tone }}><Icon size={15} /></span>
+      </div>
+      <div className="text-3xl font-extrabold mt-1.5" style={{ color: tone }}>{value}</div>
+      {sub && <div className="text-[11.5px] text-[#6B5E68] mt-0.5 truncate">{sub}</div>}
     </button>
   )
 }
 
 function Row({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3 px-4 py-2.5">
-      <Icon size={15} className="text-[#6B6B6B] mt-0.5 shrink-0" />
-      <span className="text-[11px] uppercase tracking-wider text-[#6B6B6B] w-24 shrink-0 mt-0.5">{label}</span>
-      <span className="text-[#111] break-words min-w-0 flex-1">{value}</span>
+    <div className="flex items-start gap-3 px-3.5 py-2.5">
+      <Icon size={15} className="text-[#6B5E68] mt-0.5 shrink-0" />
+      <span className="text-[11px] uppercase tracking-wider text-[#6B5E68] w-[76px] shrink-0 mt-0.5">{label}</span>
+      <span className="text-[#1B1320] break-words min-w-0 flex-1">{value}</span>
     </div>
   )
 }

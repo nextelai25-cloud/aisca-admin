@@ -54,11 +54,9 @@ body {
     display: flex !important;
   }
 
-  .mobile-content-pad {
-    padding-top: 60px !important;
-  }
+  /* The sticky header lives inside the content column, so no extra top padding is needed */
   .admin-main-content {
-    padding-top: 60px !important;
+    padding-top: 0 !important;
   }
 }
 

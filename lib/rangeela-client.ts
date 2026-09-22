@@ -54,7 +54,7 @@ export interface RgMe {
   can: { view: boolean; approve: boolean; cash: boolean; scan: boolean; revoke: boolean; edit: boolean }
 }
 
-export const AL_BATCHES = ['2026', '2027', '2028', '2029', 'Already finished A/Ls', 'Not a student']
+export const AL_BATCHES = ['2025', '2026', '2027', '2028', 'Other']
 
 export const fmtTime = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString('en-LK', { timeZone: 'Asia/Colombo', dateStyle: 'medium', timeStyle: 'short' }) : ''

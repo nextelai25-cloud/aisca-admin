@@ -126,7 +126,7 @@ export async function sendTicketEmail(t: TicketEmailInput): Promise<{ ok: boolea
       <tr><td align="center" style="padding:20px 20px 4px;">
         <img src="cid:rangeela-qr" width="220" height="220" alt="Your RANGEELA '26 entry QR code" style="display:block;width:220px;height:220px;border:0;margin:0 auto;" />
         <p style="margin:12px 0 0;font-size:20px;font-weight:bold;color:#7B2FF7;font-family:'Courier New',monospace;letter-spacing:1px;">${esc(t.ticketNumber)}</p>
-        <p style="margin:6px 0 0;font-size:12px;color:#8A7A86;font-family:${FONT};">NIC / ID: ${esc(t.nic)} · ${esc(paid)}</p>
+        <p style="margin:6px 0 0;font-size:12px;color:#8A7A86;font-family:${FONT};">NIC: ${esc(t.nic)} · ${esc(paid)}</p>
       </td></tr>
       <tr><td align="center" style="padding:14px 22px 22px;">
         <p style="margin:0 0 12px;font-size:12.5px;line-height:1.6;color:#5B4A58;font-family:${FONT};">This QR code works for <strong>one entry only</strong>. Once it is scanned at the gate it cannot be used again.</p>
@@ -142,7 +142,7 @@ export async function sendTicketEmail(t: TicketEmailInput): Promise<{ ok: boolea
       ${[
         ['#E6007E', 'Wear white. It is the best canvas for the colours.'],
         ['#FF7A00', 'Colour packets are included with your ticket, along with music, a DJ, food stalls and games.'],
-        ['#FFC300', 'Bring your NIC or school ID. Your name and ID may be checked with this ticket.'],
+        ['#FFC300', 'Bring your NIC. Your name and NIC number may be checked with this ticket.'],
         ['#0FB5AE', 'Please do not share or post your QR code. Anyone who scans it first uses your entry.'],
         ['#7B2FF7', 'Tickets are non refundable and non transferable.'],
       ].map(([c, t]) => `<tr><td width="18" valign="top" style="padding:6px 0;"><div style="width:9px;height:9px;border-radius:50%;background:${c};margin-top:5px;"></div></td><td style="padding:6px 0;font-size:13.5px;line-height:1.6;color:#5B4A58;font-family:${FONT};">${t}</td></tr>`).join('')}

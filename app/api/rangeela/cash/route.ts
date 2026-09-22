@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   if (!school) return NextResponse.json({ error: 'Enter the school.' }, { status: 400 })
   if (!al_batch) return NextResponse.json({ error: 'Choose the A/L batch.' }, { status: 400 })
   const nic_norm = normaliseId(nic)
-  if (nic_norm.length < 4) return NextResponse.json({ error: 'Enter the NIC or school ID number.' }, { status: 400 })
+  if (!looksLikeNic(nic)) return NextResponse.json({ error: 'Enter a valid NIC number (12 digits, or 9 digits followed by V or X).' }, { status: 400 })
   if (!Number.isFinite(amount) || amount < 0 || amount > 100000) return NextResponse.json({ error: 'Check the amount.' }, { status: 400 })
 
   const now = new Date().toISOString()

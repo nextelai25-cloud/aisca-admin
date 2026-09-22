@@ -191,6 +191,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .logout-btn:hover {
           background: #F5F5F5 !important;
         }
+        @media (max-width: 767px) {
+          .admin-search { display: none !important; }
+          .admin-page-title { font-size: 17px !important; }
+          .admin-header-right { gap: 12px !important; }
+          .admin-main { padding: 14px !important; }
+        }
         @media (max-width: 1024px) {
           .mobile-close-btn { display: flex !important; }
           .admin-sidebar {
@@ -302,20 +308,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         
         {/* Top Header Bar */}
         <header style={{
-          height: '64px', background: '#FFFFFF', borderBottom: '1px solid #E8E8E8',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px',
+          height: '64px', background: 'rgba(255,255,255,0.86)', WebkitBackdropFilter: 'blur(18px) saturate(170%)', backdropFilter: 'blur(18px) saturate(170%)', borderBottom: '1px solid #E8E8E8',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '0 24px',
           position: 'sticky', top: 0, zIndex: 90
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button className="mobile-close-btn" onClick={() => setSidebarOpen(true)} style={{ display: 'none', background: 'none', border: 'none' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
+            <button className="mobile-close-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)} style={{ display: 'none', background: 'none', border: 'none', padding: '8px', margin: '-8px', minHeight: 0 }}>
               <Menu size={24} color="#111111" />
             </button>
-            <h1 style={{ fontSize: '20px', fontWeight: '600', color: '#111111', margin: 0 }}>{currentPageName}</h1>
+            <h1 className="admin-page-title" style={{ fontSize: '20px', fontWeight: '600', color: '#111111', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{currentPageName}</h1>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div className="admin-header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px', flexShrink: 0 }}>
             {/* Search Bar */}
-            <div style={{ position: 'relative' }}>
+            <div className="admin-search" style={{ position: 'relative' }}>
               <div style={{ display: 'flex', alignItems: 'center', background: '#F5F5F5', borderRadius: '8px', padding: '0 12px', width: '280px', height: '36px' }}>
                 <Search size={16} color="#6B6B6B" />
                 <input 
@@ -416,7 +422,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        <main style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+        <main className="admin-main" style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
             {children}
           </div>
