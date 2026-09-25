@@ -3,7 +3,7 @@
 // Needs these on the admin server (.env.local):
 //   QUICKSEND_EMAIL      the email address of the QuickSend account
 //   QUICKSEND_API_KEY    the API key from the QuickSend dashboard
-//   QUICKSEND_SENDER_ID  approved sender name, "ORIGINS" for now, "AISCA" later
+//   QUICKSEND_SENDER_ID  approved sender name (AISCA)
 // If the email or key is missing, SMS is skipped quietly and email still works.
 
 const API = 'https://quicksend.lk/Client/api.php?FUN=SEND_SINGLE'
@@ -36,7 +36,7 @@ export async function sendSms(to: string, msg: string): Promise<{ ok: boolean; s
         'Content-Type': 'application/json',
         Authorization: 'Basic ' + Buffer.from(`${email}:${key}`).toString('base64'),
       },
-      body: JSON.stringify({ senderID: process.env.QUICKSEND_SENDER_ID || 'ORIGINS', to: phone, msg }),
+      body: JSON.stringify({ senderID: process.env.QUICKSEND_SENDER_ID || 'AISCA', to: phone, msg }),
       signal: AbortSignal.timeout(15000),
     })
     const text = (await res.text()).slice(0, 300)
