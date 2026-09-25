@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { randomInt } from 'crypto'
 import { svc, getCaller, can, newQrToken, normaliseId, looksLikeNic, EMAIL_RE } from '@/lib/rangeela-server'
 import { sendTicketEmail } from '@/lib/rangeela-email'
+import { sendTicketSms } from '@/lib/rangeela-sms'
 
 const PRICE = 1200
 
@@ -66,5 +67,13 @@ export async function POST(req: NextRequest) {
   const patch = sent.ok ? { ticket_emailed_at: new Date().toISOString(), email_error: null } : { email_error: sent.error || 'Email failed' }
   await svc().from('rangeela_tickets').update(patch).eq('id', t.id)
 
-  return NextResponse.json({ ok: true, emailed: sent.ok, emailError: sent.error || null, ticket: { ...t, ...patch } })
+  const sms = await sendTicketSms({ whatsapp, full_name, ticket_number: t.ticket_number }, token)
+  const { error: smsDbErr } = await svc().from('rangeela_tickets').update(sms.patch).eq('id', t.id)
+  const smsPatch = smsDbErr ? {} : sms.patch
+
+  return NextResponse.json({
+    ok: true, emailed: sent.ok, emailError: sent.error || null,
+    sms: sms.result.ok, smsSkipped: !!sms.result.skipped, smsError: sms.result.ok ? null : sms.result.error || null,
+    ticket: { ...t, ...patch, ...smsPatch },
+  })
 }

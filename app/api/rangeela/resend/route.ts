@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { svc, getCaller, can, EMAIL_RE } from '@/lib/rangeela-server'
 import { sendTicketEmail } from '@/lib/rangeela-email'
+import { sendTicketSms } from '@/lib/rangeela-sms'
 
 // POST /api/rangeela/resend { id, email? }
 // Sends the same QR ticket again. If the student typed the wrong email,
@@ -34,5 +35,14 @@ export async function POST(req: NextRequest) {
   })
   const patch = sent.ok ? { ticket_emailed_at: new Date().toISOString(), email_error: null } : { email_error: sent.error || 'Email failed' }
   await svc().from('rangeela_tickets').update(patch).eq('id', id)
-  return NextResponse.json({ ok: true, emailed: sent.ok, emailError: sent.error || null, ticket: { ...t, email, ...patch } })
+
+  const sms = await sendTicketSms(t, t.qr_token)
+  const { error: smsDbErr } = await svc().from('rangeela_tickets').update(sms.patch).eq('id', id)
+  const smsPatch = smsDbErr ? {} : sms.patch
+
+  return NextResponse.json({
+    ok: true, emailed: sent.ok, emailError: sent.error || null,
+    sms: sms.result.ok, smsSkipped: !!sms.result.skipped, smsError: sms.result.ok ? null : sms.result.error || null,
+    ticket: { ...t, email, ...patch, ...smsPatch },
+  })
 }

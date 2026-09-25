@@ -85,9 +85,7 @@ export default function RangeelaTicketsPage() {
     setBusy(false)
     if (!r.ok) { setNotice({ kind: 'err', text: r.data?.error || 'Could not approve.' }); load(true); return }
     replace(r.data.ticket)
-    setNotice(r.data.emailed
-      ? { kind: 'ok', text: `Approved. The QR ticket was emailed to ${r.data.ticket.email}.` }
-      : { kind: 'err', text: `Approved, but the email failed: ${r.data.emailError}. Use "Save and resend ticket" to try again.` })
+    setNotice(deliveryNotice('Approved.', r.data))
   }
 
   async function reject(t: RgTicket) {
@@ -109,9 +107,7 @@ export default function RangeelaTicketsPage() {
     setBusy(false)
     if (!r.ok) { setNotice({ kind: 'err', text: r.data?.error || 'Could not resend.' }); return }
     replace(r.data.ticket)
-    setNotice(r.data.note ? { kind: 'ok', text: r.data.note }
-      : r.data.emailed ? { kind: 'ok', text: `Ticket sent to ${r.data.ticket.email}.` }
-        : { kind: 'err', text: `Email failed: ${r.data.emailError}` })
+    setNotice(r.data.note ? { kind: 'ok', text: r.data.note } : deliveryNotice('Sent again.', r.data))
   }
 
   // ── Stats ──
@@ -363,6 +359,8 @@ export default function RangeelaTicketsPage() {
                 <Row icon={selected.payment_method === 'cash' ? Banknote : Landmark} label="Payment" value={`LKR ${Number(selected.amount).toLocaleString()} · ${selected.payment_method === 'cash' ? 'Cash' : 'Bank transfer'}`} />
                 {selected.approved_by && <Row icon={CheckCircle2} label="Approved" value={`${selected.approved_by} · ${fmtTime(selected.approved_at)}`} />}
                 {selected.ticket_emailed_at && <Row icon={Mail} label="Emailed" value={fmtTime(selected.ticket_emailed_at)} />}
+                {selected.sms_sent_at && <Row icon={Phone} label="SMS sent" value={fmtTime(selected.sms_sent_at)} />}
+                {selected.status === 'approved' && !selected.sms_sent_at && selected.sms_error && <Row icon={Phone} label="SMS" value={<span className="text-red-600">{selected.sms_error}</span>} />}
                 {selected.checked_in_by && <Row icon={DoorOpen} label="Scanned by" value={selected.checked_in_by} />}
                 {selected.reject_reason && <Row icon={XCircle} label="Reject note" value={selected.reject_reason} />}
                 {selected.notes && <Row icon={FileText} label="Notes" value={selected.notes} />}
@@ -393,7 +391,7 @@ export default function RangeelaTicketsPage() {
                   <div className="rg-label">Wrong email? Fix it here</div>
                   <input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} type="email" autoCapitalize="off" autoCorrect="off" className="rg-input" />
                   <button onClick={() => resend(selected)} disabled={busy} className="rg-btn rg-btn-dark w-full">
-                    <Mail size={15} /> {selected.status === 'approved' ? 'Save and resend ticket' : 'Save email'}
+                    <Mail size={15} /> {selected.status === 'approved' ? 'Save and resend email + SMS' : 'Save email'}
                   </button>
                 </div>
               )}
@@ -432,6 +430,15 @@ export default function RangeelaTicketsPage() {
       )}
     </div>
   )
+}
+
+/** One line that says what reached the student: email, SMS, or what failed. */
+function deliveryNotice(prefix: string, d: { emailed?: boolean; emailError?: string | null; sms?: boolean; smsSkipped?: boolean; smsError?: string | null; ticket: { email: string; whatsapp: string } }) {
+  const parts: string[] = [prefix]
+  parts.push(d.emailed ? `Ticket emailed to ${d.ticket.email}.` : `Email failed: ${d.emailError}.`)
+  if (d.sms) parts.push(`SMS sent to ${d.ticket.whatsapp}.`)
+  else if (!d.smsSkipped && d.smsError) parts.push(`SMS failed: ${d.smsError}.`)
+  return { kind: (d.emailed ? 'ok' : 'err') as 'ok' | 'err', text: parts.join(' ') }
 }
 
 function Stat({ label, value, sub, icon: Icon, tone, onClick }: { label: string; value: number; sub?: string; icon: React.ElementType; tone: string; onClick?: () => void }) {

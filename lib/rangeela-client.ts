@@ -41,6 +41,8 @@ export interface RgTicket {
   approved_at: string | null
   ticket_emailed_at: string | null
   email_error: string | null
+  sms_sent_at?: string | null
+  sms_error?: string | null
   created_by: string | null
   checked_in_at: string | null
   checked_in_by: string | null

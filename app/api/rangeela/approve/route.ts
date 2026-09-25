@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { svc, getCaller, can, newQrToken } from '@/lib/rangeela-server'
 import { sendTicketEmail } from '@/lib/rangeela-email'
+import { sendTicketSms } from '@/lib/rangeela-sms'
 
 // POST /api/rangeela/approve { id }
 // Marks the bank receipt as verified, creates the one time QR token and
@@ -43,5 +44,14 @@ export async function POST(req: NextRequest) {
     : { email_error: sent.error || 'Email failed' }
   await svc().from('rangeela_tickets').update(patch).eq('id', t.id)
 
-  return NextResponse.json({ ok: true, emailed: sent.ok, emailError: sent.error || null, ticket: { ...t, ...patch } })
+  // "Here is your ticket" SMS with the online ticket link (best effort).
+  const sms = await sendTicketSms(t, token)
+  const { error: smsDbErr } = await svc().from('rangeela_tickets').update(sms.patch).eq('id', t.id)
+  const smsPatch = smsDbErr ? {} : sms.patch
+
+  return NextResponse.json({
+    ok: true, emailed: sent.ok, emailError: sent.error || null,
+    sms: sms.result.ok, smsSkipped: !!sms.result.skipped, smsError: sms.result.ok ? null : sms.result.error || null,
+    ticket: { ...t, ...patch, ...smsPatch },
+  })
 }

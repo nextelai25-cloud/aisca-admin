@@ -17,7 +17,7 @@ export default function CashDeskPage() {
   const [admitNow, setAdmitNow] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const [done, setDone] = useState<{ ticket: RgTicket; emailed: boolean; emailError: string | null } | null>(null)
+  const [done, setDone] = useState<{ ticket: RgTicket; emailed: boolean; emailError: string | null; sms?: boolean; smsError?: string | null } | null>(null)
   const [today, setToday] = useState<{ count: number; total: number }>({ count: 0, total: 0 })
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function CashDeskPage() {
     if (!f.al_batch) { setError('Choose the A/L batch.'); return }
     if (!confirm(`Record a cash sale of LKR ${Number(amount).toLocaleString()} for ${f.full_name || 'this student'}? The QR ticket will be emailed straight away.`)) return
     setBusy(true)
-    const r = await rgApi<{ ticket: RgTicket; emailed: boolean; emailError: string | null; error?: string }>('cash', {
+    const r = await rgApi<{ ticket: RgTicket; emailed: boolean; emailError: string | null; sms?: boolean; smsError?: string | null; error?: string }>('cash', {
       ...f, amount: Number(amount), admit_now: admitNow,
     })
     setBusy(false)
@@ -77,6 +77,8 @@ export default function CashDeskPage() {
           <div className="flex items-center gap-2 font-bold"><CheckCircle2 size={18} /> Sale saved · {done.ticket.ticket_number}</div>
           <div className="mt-1">{done.ticket.full_name} · LKR {Number(done.ticket.amount).toLocaleString()}{done.ticket.checked_in_at ? ' · admitted now' : ''}</div>
           <div className="mt-1">{done.emailed ? `QR ticket emailed to ${done.ticket.email}.` : `The email failed (${done.emailError}). Open the ticket in the Tickets tab and resend it.`}</div>
+          {done.sms && <div className="mt-1">Ticket link sent by SMS to {done.ticket.whatsapp}.</div>}
+          {!done.sms && done.smsError && <div className="mt-1">SMS not sent: {done.smsError}</div>}
         </div>
       )}
 
