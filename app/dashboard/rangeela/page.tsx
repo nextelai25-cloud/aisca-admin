@@ -139,7 +139,7 @@ export default function RangeelaTicketsPage() {
     pending: stats.pending, approved: stats.approved, checked_in: stats.checkedIn, rejected: stats.rejected, all: stats.total,
   }
 
-  // Possible duplicates: same email, WhatsApp or NIC on more than one live ticket
+  // Possible duplicates: same email, phone or NIC on more than one live ticket
   const dupes = useMemo(() => {
     const live = tickets.filter((t) => t.status !== 'rejected')
     const count = (key: (t: RgTicket) => string) => {
@@ -173,7 +173,7 @@ export default function RangeelaTicketsPage() {
   const nameById = useMemo(() => new Map(tickets.map((t) => [t.id, t])), [tickets])
 
   function exportCSV() {
-    const head = ['Ticket', 'Name', 'Email', 'WhatsApp', 'School', 'A/L batch', 'NIC', 'Method', 'Amount', 'Status', 'Approved by', 'Emailed', 'Checked in', 'Checked in by', 'Receipt', 'Submitted']
+    const head = ['Ticket', 'Name', 'Email', 'Phone', 'School', 'A/L batch', 'NIC', 'Method', 'Amount', 'Status', 'Approved by', 'Emailed', 'Checked in', 'Checked in by', 'Receipt', 'Submitted']
     const cell = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
     const lines = [head.join(','), ...filtered.map((t) => [
       t.ticket_number, t.full_name, t.email, t.whatsapp, t.school, t.al_batch, t.nic, t.payment_method, t.amount, t.status,
@@ -353,7 +353,7 @@ export default function RangeelaTicketsPage() {
               <div className="rounded-2xl bg-white/80 border border-white divide-y divide-[#1B1320]/[0.06] text-[14px]">
                 <Row icon={User} label="Name" value={selected.full_name} />
                 <Row icon={Mail} label="Email" value={selected.email} />
-                <Row icon={Phone} label="WhatsApp" value={<a className="text-[#16A34A] font-semibold" href={`https://wa.me/${selected.whatsapp.replace(/\D/g, '').replace(/^0/, '94')}`} target="_blank" rel="noreferrer">{selected.whatsapp}</a>} />
+                <Row icon={Phone} label="Phone" value={<a className="text-[#16A34A] font-semibold" href={`tel:${selected.whatsapp.replace(/[^\d+]/g, '')}`}>{selected.whatsapp}</a>} />
                 <Row icon={School} label="School" value={`${selected.school} · ${selected.al_batch}`} />
                 <Row icon={Ticket} label="NIC" value={<span className="font-mono">{selected.nic}</span>} />
                 <Row icon={selected.payment_method === 'cash' ? Banknote : Landmark} label="Payment" value={`LKR ${Number(selected.amount).toLocaleString()} · ${selected.payment_method === 'cash' ? 'Cash' : 'Bank transfer'}`} />
@@ -382,7 +382,7 @@ export default function RangeelaTicketsPage() {
                       </a>
                     )
                   ) : <p className="text-[13px] text-[#6B5E68]">No receipt.</p>}
-                  <p className="text-[12px] text-[#6B5E68] mt-2">Check it shows LKR 1,200 paid to Sampath Bank 1069 6100 6902 before approving.</p>
+                  <p className="text-[12px] text-[#6B5E68] mt-2">Check it shows LKR {Number(selected.amount).toLocaleString()} paid to Sampath Bank 1069 6100 6902 before approving.</p>
                 </div>
               )}
 

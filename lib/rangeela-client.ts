@@ -58,6 +58,8 @@ export interface RgMe {
 
 export const AL_BATCHES = ['2025', '2026', '2027', '2028', 'Other']
 
+export { RG_PRICING, rgOnlinePrice } from './rangeela-pricing'
+
 export const fmtTime = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString('en-LK', { timeZone: 'Asia/Colombo', dateStyle: 'medium', timeStyle: 'short' }) : ''
 

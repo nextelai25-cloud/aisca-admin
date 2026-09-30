@@ -3,9 +3,18 @@
 import React, { useEffect, useState } from 'react'
 import { Banknote, CheckCircle2, AlertTriangle } from 'lucide-react'
 import RangeelaTabs, { RangeelaGlassStyles } from '../RangeelaTabs'
-import { rgApi, AL_BATCHES, type RgMe, type RgTicket } from '@/lib/rangeela-client'
+import { rgApi, AL_BATCHES, RG_PRICING, rgOnlinePrice, type RgMe, type RgTicket } from '@/lib/rangeela-client'
 
 const NIC_RE = /^(\d{9}[VX]|\d{12})$/
+
+/** 0094 / 94 / 7XXXXXXXX formats become 07XXXXXXXX. */
+function toMobile(raw: string) {
+  let d = raw.replace(/\D/g, '')
+  if (d.startsWith('0094')) d = d.slice(2)
+  if (d.length === 11 && d.startsWith('94')) d = '0' + d.slice(2)
+  if (d.length === 9 && d.startsWith('7')) d = '0' + d
+  return d
+}
 
 const empty = { full_name: '', email: '', email_confirm: '', whatsapp: '', school: '', al_batch: '', nic: '', notes: '' }
 
@@ -13,12 +22,15 @@ export default function CashDeskPage() {
   const [me, setMe] = useState<RgMe | null>(null)
   const [meError, setMeError] = useState('')
   const [f, setF] = useState({ ...empty })
-  const [amount, setAmount] = useState('1200')
+  const [amount, setAmount] = useState('')
   const [admitNow, setAdmitNow] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState<{ ticket: RgTicket; emailed: boolean; emailError: string | null; sms?: boolean; smsError?: string | null } | null>(null)
   const [today, setToday] = useState<{ count: number; total: number }>({ count: 0, total: 0 })
+
+  // Default cash amount is the online price for today (set in the browser, not at build time).
+  useEffect(() => { setAmount(String(rgOnlinePrice())) }, [])
 
   useEffect(() => {
     rgApi<{ me: RgMe; error?: string }>('me').then((r) => (r.ok ? setMe(r.data.me) : setMeError(r.data?.error || 'Not allowed')))
@@ -30,6 +42,7 @@ export default function CashDeskPage() {
     e.preventDefault()
     setError('')
     if (f.email.trim().toLowerCase() !== f.email_confirm.trim().toLowerCase()) { setError('The two emails do not match. Read the email back to the student.'); return }
+    if (!/^07\d{8}$/.test(toMobile(f.whatsapp))) { setError('Enter a valid mobile number, like 077 123 4567. The ticket SMS goes to it.'); return }
     if (!NIC_RE.test(f.nic.toUpperCase().replace(/[^A-Z0-9]/g, ''))) { setError('Enter a valid NIC number (12 digits, or 9 digits followed by V or X).'); return }
     if (!f.al_batch) { setError('Choose the A/L batch.'); return }
     if (!confirm(`Record a cash sale of LKR ${Number(amount).toLocaleString()} for ${f.full_name || 'this student'}? The QR ticket will be emailed straight away.`)) return
@@ -42,7 +55,7 @@ export default function CashDeskPage() {
     setDone(r.data)
     setToday((t) => ({ count: t.count + 1, total: t.total + Number(r.data.ticket.amount) }))
     setF({ ...empty })
-    setAmount('1200')
+    setAmount(String(rgOnlinePrice()))
     setAdmitNow(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -100,7 +113,7 @@ export default function CashDeskPage() {
             <input className={input} required type="email" autoCapitalize="off" autoCorrect="off" value={f.email_confirm} onChange={(e) => set('email_confirm', e.target.value)} />
           </div>
           <div>
-            <label className={label}>WhatsApp number</label>
+            <label className={label}>Phone number (ticket SMS goes here)</label>
             <input className={input} required type="tel" value={f.whatsapp} onChange={(e) => set('whatsapp', e.target.value)} placeholder="07X XXX XXXX" />
           </div>
           <div>
@@ -128,8 +141,8 @@ export default function CashDeskPage() {
           </div>
         </div>
         <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/70 border border-white text-sm text-[#1B1320] cursor-pointer">
-          <input type="checkbox" checked={admitNow} onChange={(e) => setAdmitNow(e.target.checked)} className="mt-0.5 w-5 h-5" />
-          <span><b>Selling at the gate?</b> Tick this to admit them right now. Their QR will then show as already used.</span>
+          <input type="checkbox" checked={admitNow} onChange={(e) => { setAdmitNow(e.target.checked); setAmount(String(e.target.checked ? RG_PRICING.gate : rgOnlinePrice())) }} className="mt-0.5 w-5 h-5" />
+          <span><b>Selling at the gate?</b> Tick this to admit them right now. The gate price is LKR {RG_PRICING.gate.toLocaleString()}. Their QR will then show as already used.</span>
         </label>
         <button type="submit" disabled={busy} className="rg-btn rg-btn-dark w-full" style={{ height: 54, fontSize: 15 }}>
           {busy ? 'Saving...' : `Save sale and email ticket · LKR ${Number(amount || 0).toLocaleString()}`}

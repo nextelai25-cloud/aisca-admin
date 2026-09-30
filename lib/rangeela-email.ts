@@ -10,7 +10,7 @@ import { QR_PREFIX } from './rangeela-server'
 export const RG = {
   dateShort: '17th October',
   dateLabel: 'Saturday, 17th October 2026',
-  time: '3.00 PM onwards',
+  time: '2.00 PM onwards',
   venue: 'Hyde Park Grounds',
   whatsappGroup: 'https://chat.whatsapp.com/HklcPlrIl3P6tKJsWDbxu8',
   helpWhatsapp: '94778132137',
@@ -116,7 +116,7 @@ export async function sendTicketEmail(t: TicketEmailInput): Promise<{ ok: boolea
           <tr>
             <td width="33%" style="padding:10px 4px;text-align:center;background:#FFF1E6;border-radius:12px;"><p style="margin:0;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#A0826B;font-family:${FONT};">Date</p><p style="margin:4px 0 0;font-size:14px;font-weight:bold;color:#E0561B;font-family:${FONT};">${RG.dateShort}</p></td>
             <td width="4"></td>
-            <td width="33%" style="padding:10px 4px;text-align:center;background:#FFEAF5;border-radius:12px;"><p style="margin:0;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#A07A95;font-family:${FONT};">Time</p><p style="margin:4px 0 0;font-size:14px;font-weight:bold;color:#E6007E;font-family:${FONT};">3.00 PM onwards</p></td>
+            <td width="33%" style="padding:10px 4px;text-align:center;background:#FFEAF5;border-radius:12px;"><p style="margin:0;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#A07A95;font-family:${FONT};">Time</p><p style="margin:4px 0 0;font-size:14px;font-weight:bold;color:#E6007E;font-family:${FONT};">2.00 PM onwards</p></td>
             <td width="4"></td>
             <td width="33%" style="padding:10px 4px;text-align:center;background:#EEF3FF;border-radius:12px;"><p style="margin:0;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B7FA0;font-family:${FONT};">Venue</p><p style="margin:4px 0 0;font-size:14px;font-weight:bold;color:#2F6BFF;font-family:${FONT};">Hyde Park Grounds</p></td>
           </tr>
