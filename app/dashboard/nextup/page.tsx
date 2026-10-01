@@ -9,6 +9,7 @@ interface App {
   id: string
   application_type: 'self' | 'referral'
   status: string
+  edition?: string
   referrer_name?: string; referrer_phone?: string; referrer_relationship?: string
   referred_founder_name?: string; referred_founder_phone?: string
   full_name?: string; age?: string; school?: string; district?: string; whatsapp?: string; email?: string; social_handle?: string
@@ -20,6 +21,8 @@ interface App {
 }
 
 const STATUSES = ['new', 'shortlisted', 'selected', 'rejected']
+// Rows saved before the `edition` column existed are NEXTUP 01.
+const editionOf = (a: App) => a.edition || '01'
 // PDFs and HEIC/HEIF can't be previewed in an <img>, so show a file tile instead.
 const noPreview = (url: string) => /\.(pdf|heic|heif)$/i.test(url.toLowerCase().split('?')[0])
 
@@ -35,6 +38,7 @@ export default function NextUpPage() {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [editionFilter, setEditionFilter] = useState('all')
   const [page, setPage] = useState(1)
   const perPage = 20
   const [updatingId, setUpdatingId] = useState<string | null>(null)
@@ -79,16 +83,17 @@ export default function NextUpPage() {
     const matchesSearch = hay.includes(q)
     const matchesType = typeFilter === 'all' || a.application_type === typeFilter
     const matchesStatus = statusFilter === 'all' || a.status === statusFilter
-    return matchesSearch && matchesType && matchesStatus
+    const matchesEdition = editionFilter === 'all' || editionOf(a) === editionFilter
+    return matchesSearch && matchesType && matchesStatus && matchesEdition
   })
   const totalPages = Math.ceil(filtered.length / perPage)
   const current = filtered.slice((page - 1) * perPage, page * perPage)
 
   function exportCSV() {
     if (!filtered.length) return
-    const headers = ['Type', 'Status', 'Name', 'Category', 'School', 'District', 'WhatsApp', 'Email', 'Venture', 'Description', 'Podcast', 'Referrer', 'Referrer Phone', 'Founder Referred', 'Founder Phone', 'Files', 'Date']
+    const headers = ['Edition', 'Type', 'Status', 'Name', 'Category', 'School', 'District', 'WhatsApp', 'Email', 'Venture', 'Description', 'Podcast', 'Referrer', 'Referrer Phone', 'Founder Referred', 'Founder Phone', 'Files', 'Date']
     const rows = [headers.join(','), ...filtered.map(a => [
-      a.application_type, a.status,
+      `NEXTUP ${editionOf(a)}`, a.application_type, a.status,
       `"${a.full_name || ''}"`, `"${a.age || ''}"`, `"${a.school || ''}"`, `"${a.district || ''}"`,
       `"${a.whatsapp || ''}"`, `"${a.email || ''}"`, `"${a.venture_name || ''}"`, `"${(a.venture_description || '').replace(/"/g, "'")}"`,
       a.willing_podcast ? 'Yes' : '', `"${a.referrer_name || ''}"`, `"${a.referrer_phone || ''}"`,
@@ -134,13 +139,17 @@ export default function NextUpPage() {
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B6B6B]" size={16} />
           <input type="text" placeholder="Search name / school / venture / phone…" value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
             className="w-full pl-11 pr-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111111] placeholder-[#A3A3A3] focus:outline-none focus:border-[#D1D5DB]" />
         </div>
+        <select value={editionFilter} onChange={e => { setEditionFilter(e.target.value); setPage(1) }} className="w-full px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none cursor-pointer">
+          <option value="all">All Editions</option>
+          {Array.from(new Set(['01', '02', ...data.map(editionOf)])).sort().map(ed => <option key={ed} value={ed}>NEXTUP {ed}</option>)}
+        </select>
         <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1) }} className="w-full px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none cursor-pointer">
           <option value="all">All Types</option>
           <option value="self">Applying for self</option>
@@ -159,6 +168,7 @@ export default function NextUpPage() {
             <thead>
               <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
                 <th className="p-4 font-semibold">Applicant</th>
+                <th className="p-4 font-semibold">Edition</th>
                 <th className="p-4 font-semibold">Type</th>
                 <th className="p-4 font-semibold">Venture</th>
                 <th className="p-4 font-semibold">School / District</th>
@@ -169,10 +179,11 @@ export default function NextUpPage() {
             </thead>
             <tbody className="divide-y divide-[#E8E8E8]">
               {current.length === 0 ? (
-                <tr><td colSpan={7} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">No applications found.</td></tr>
+                <tr><td colSpan={8} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">No applications found.</td></tr>
               ) : current.map(a => (
                 <tr key={a.id} onClick={() => setSelected(a)} className="hover:bg-[#FAFAFA] transition-all cursor-pointer">
                   <td className="p-4 font-semibold max-w-[220px]"><span className="truncate block">{displayName(a)}</span></td>
+                  <td className="p-4"><span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border whitespace-nowrap ${editionOf(a) === '01' ? 'border-[#6B6B6B]/30 text-[#6B6B6B] bg-[#F5F5F5]' : 'border-red-500/30 text-red-600 bg-red-50'}`}>NEXTUP {editionOf(a)}</span></td>
                   <td className="p-4"><span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${a.application_type === 'self' ? 'border-[#d4af37]/40 text-[#a9832a] bg-[#FBF7EC]' : 'border-[#6B6B6B]/30 text-[#6B6B6B] bg-[#F5F5F5]'}`}>{a.application_type === 'self' ? 'Applicant' : 'Referral'}</span></td>
                   <td className="p-4 max-w-[200px]"><span className="truncate block">{a.venture_name || '—'}</span></td>
                   <td className="p-4 text-[#6B6B6B]">{a.school ? `${a.school}${a.district ? ` · ${a.district}` : ''}` : '—'}</td>
