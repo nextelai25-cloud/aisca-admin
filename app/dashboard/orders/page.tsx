@@ -15,7 +15,7 @@ interface Order {
   receipt_url: string | null; receipt_filename: string | null; notes: string | null
   payment_status: 'pending' | 'verified' | 'rejected'
   order_status: string
-  ledger_posted: boolean; ledger_entry_id: number | null
+  ledger_posted: boolean; ledger_entry_id: string | null
   created_at: string
 }
 
