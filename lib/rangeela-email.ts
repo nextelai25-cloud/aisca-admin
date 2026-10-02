@@ -11,7 +11,7 @@ export const RG = {
   dateShort: '17th October',
   dateLabel: 'Saturday, 17th October 2026',
   time: '2.00 PM onwards',
-  venue: 'Hyde Park Grounds',
+  venue: 'Nawinna Grounds',
   whatsappGroup: 'https://chat.whatsapp.com/HklcPlrIl3P6tKJsWDbxu8',
   helpWhatsapp: '94778132137',
   helpWhatsappLabel: '077 813 2137',
@@ -118,7 +118,7 @@ export async function sendTicketEmail(t: TicketEmailInput): Promise<{ ok: boolea
             <td width="4"></td>
             <td width="33%" style="padding:10px 4px;text-align:center;background:#FFEAF5;border-radius:12px;"><p style="margin:0;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#A07A95;font-family:${FONT};">Time</p><p style="margin:4px 0 0;font-size:14px;font-weight:bold;color:#E6007E;font-family:${FONT};">2.00 PM onwards</p></td>
             <td width="4"></td>
-            <td width="33%" style="padding:10px 4px;text-align:center;background:#EEF3FF;border-radius:12px;"><p style="margin:0;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B7FA0;font-family:${FONT};">Venue</p><p style="margin:4px 0 0;font-size:14px;font-weight:bold;color:#2F6BFF;font-family:${FONT};">Hyde Park Grounds</p></td>
+            <td width="33%" style="padding:10px 4px;text-align:center;background:#EEF3FF;border-radius:12px;"><p style="margin:0;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#6B7FA0;font-family:${FONT};">Venue</p><p style="margin:4px 0 0;font-size:14px;font-weight:bold;color:#2F6BFF;font-family:${FONT};">Nawinna Grounds</p></td>
           </tr>
         </table>
       </td></tr>
@@ -159,7 +159,7 @@ export async function sendTicketEmail(t: TicketEmailInput): Promise<{ ok: boolea
       from: fromAddress(),
       to: t.to,
       subject: `Your RANGEELA '26 ticket is here! (${t.ticketNumber})`,
-      html: shell(inner, `Your QR ticket for 17th October at Hyde Park Grounds. Show it at the entrance.`),
+      html: shell(inner, `Your QR ticket for 17th October at Nawinna Grounds. Show it at the entrance.`),
       attachments: [{ filename: `RANGEELA26-${t.ticketNumber}-QR.png`, content: qrPng.toString('base64'), contentType: 'image/png', contentId: 'rangeela-qr' }],
     })
     if (error) return { ok: false, error: error.message || JSON.stringify(error) }

@@ -52,7 +52,7 @@ export async function sendSms(to: string, msg: string): Promise<{ ok: boolean; s
 /** The "here is your ticket" SMS. Kept under 160 characters for normal names. */
 export function ticketSmsText(name: string, ticketNumber: string, token: string): string {
   const first = (name || '').trim().split(/\s+/)[0]?.slice(0, 12) || 'there'
-  return `Hi ${first}, your RANGEELA '26 ticket ${ticketNumber} is confirmed! See you 17 Oct, 2 PM at Hyde Park. Your ticket: aisca.lk/r/${token}`
+  return `Hi ${first}, your RANGEELA '26 ticket ${ticketNumber} is confirmed! See you 17 Oct, 2 PM at Nawinna. Your ticket: aisca.lk/r/${token}`
 }
 
 /** Sends the ticket SMS and returns the fields to store on the ticket row. */
