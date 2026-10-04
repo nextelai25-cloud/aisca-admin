@@ -10,7 +10,6 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  Legend
 } from 'recharts'
 import { 
   Users, 
@@ -53,6 +52,7 @@ export default function OverviewPage() {
   })
   
   const [chartData, setChartData] = useState<any[]>([])
+  const [growthMetric, setGrowthMetric] = useState<'Page Views' | 'Associate Registrations'>('Page Views')
   const [activities, setActivities] = useState<any[]>([])
   const [recentAssociates, setRecentAssociates] = useState<any[]>([])
 
@@ -83,7 +83,7 @@ export default function OverviewPage() {
         setLoading(true)
 
         // 1. Fetch Fund Status from Secure API Route
-        let fundBadge = 'Error'
+        let fundBadge = 'Unavailable'
         let fundBalance = null
         try {
           const { data: { session } } = await supabase.auth.getSession()
@@ -121,43 +121,26 @@ export default function OverviewPage() {
           approvedAssociates: approvedAssociates || 0
         })
 
-        // 5. Chart Data: Organization Growth (Members + Traffic over 6 months)
-        // For demonstration, we'll fetch historical members and traffic
+        // 5. Chart Data: Organization Growth — exact monthly counts for the last 6 months (incl. this one)
         const now = new Date()
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        const last6Months: any[] = []
-        for (let i = 5; i >= 0; i--) {
-          const d = new Date()
-          d.setMonth(now.getMonth() - i)
-          last6Months.push({
-            label: `${monthNames[d.getMonth()]}`,
-            month: d.getMonth(),
-            year: d.getFullYear(),
-            "Associate Registrations": 0,
-            "Page Views": 0
+        const last6Months = await Promise.all(
+          Array.from({ length: 6 }, (_, idx) => 5 - idx).map(async i => {
+            const start = new Date(now.getFullYear(), now.getMonth() - i, 1)
+            const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 1)
+            const [{ count: regs }, { count: views }] = await Promise.all([
+              supabase.from('associate_members').select('*', { count: 'exact', head: true })
+                .gte('created_at', start.toISOString()).lt('created_at', end.toISOString()),
+              supabase.from('site_analytics').select('*', { count: 'exact', head: true })
+                .gte('visited_at', start.toISOString()).lt('visited_at', end.toISOString())
+            ])
+            return {
+              label: monthNames[start.getMonth()],
+              "Associate Registrations": regs || 0,
+              "Page Views": views || 0
+            }
           })
-        }
-
-        const sixMonthsAgo = new Date()
-        sixMonthsAgo.setMonth(now.getMonth() - 6)
-
-        // Group associate registrations
-        const { data: recentAssocReg } = await supabase.from('associate_members').select('created_at').gte('created_at', sixMonthsAgo.toISOString())
-        recentAssocReg?.forEach(a => {
-          const d = new Date(a.created_at)
-          const target = last6Months.find(x => x.month === d.getMonth() && x.year === d.getFullYear())
-          if (target) target["Associate Registrations"]++
-        })
-
-        // Group traffic
-        const { data: recentTraffic } = await supabase.from('site_analytics').select('visited_at').gte('visited_at', sixMonthsAgo.toISOString())
-        recentTraffic?.forEach(v => {
-          if (v.visited_at) {
-            const d = new Date(v.visited_at)
-            const target = last6Months.find(x => x.month === d.getMonth() && x.year === d.getFullYear())
-            if (target) target["Page Views"]++
-          }
-        })
+        )
 
         setChartData(last6Months)
 
@@ -252,7 +235,7 @@ export default function OverviewPage() {
               </h2>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: stats.fundBadge === 'Healthy' ? '#22C55E' : stats.fundBadge === 'Tight' ? '#F59E0B' : '#EF4444' }} />
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: stats.fundBadge === 'Healthy' ? '#22C55E' : stats.fundBadge === 'Tight' ? '#F59E0B' : stats.fundBadge === 'Critical' ? '#EF4444' : '#C7C7CC' }} />
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>
                   {stats.fundBadge}
                 </h2>
@@ -307,22 +290,41 @@ export default function OverviewPage() {
         {/* Organization Growth Chart */}
         <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>Organization Growth</h2>
-            <div style={{ padding: '8px 12px', background: '#F5F5F7', borderRadius: '999px', fontSize: '13px', fontWeight: '600', color: '#6E6E73' }}>
-              Past 6 Months
+            <div>
+              <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>Organization Growth</h2>
+              <p style={{ fontSize: '13px', color: '#6E6E73', margin: '4px 0 0' }}>
+                {chartData.reduce((sum, d) => sum + (d[growthMetric] || 0), 0).toLocaleString()} {growthMetric === 'Page Views' ? 'page views' : 'registrations'} · past 6 months
+              </p>
+            </div>
+            <div role="tablist" aria-label="Growth metric" style={{ display: 'flex', padding: '2px', background: '#F5F5F7', borderRadius: '10px' }}>
+              {(['Page Views', 'Associate Registrations'] as const).map(m => (
+                <button
+                  key={m}
+                  role="tab"
+                  aria-selected={growthMetric === m}
+                  onClick={() => setGrowthMetric(m)}
+                  style={{
+                    padding: '4px 12px', border: 'none', borderRadius: '8px', cursor: 'pointer',
+                    fontSize: '13px', fontWeight: growthMetric === m ? '600' : '500',
+                    background: growthMetric === m ? '#FFFFFF' : 'transparent',
+                    color: growthMetric === m ? '#1D1D1F' : '#6E6E73',
+                    boxShadow: growthMetric === m ? '0 1px 2px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.04)' : 'none',
+                    transition: 'var(--transition-control)'
+                  }}
+                >
+                  {m === 'Page Views' ? 'Page views' : 'Registrations'}
+                </button>
+              ))}
             </div>
           </div>
           <div style={{ flex: 1, minHeight: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2F2F7" />
+              <LineChart data={chartData} margin={{ top: 10, right: 12, left: -12, bottom: 0 }}>
+                <CartesianGrid vertical={false} stroke="#F2F2F7" />
                 <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6E6E73' }} dy={10} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6E6E73' }} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6E6E73' }} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#FBFBFD' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '13px', paddingTop: '20px' }} />
-                <Line yAxisId="left" type="monotone" dataKey="Associate Registrations" stroke="#1D1D1F" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                <Line yAxisId="right" type="monotone" dataKey="Page Views" stroke="#d4af37" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                <YAxis axisLine={false} tickLine={false} allowDecimals={false} tick={{ fontSize: 11, fill: '#6E6E73' }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#E5E5EA' }} />
+                <Line type="monotone" dataKey={growthMetric} stroke={growthMetric === 'Page Views' ? '#9A7B1F' : '#1D1D1F'} strokeWidth={2} dot={{ r: 3, strokeWidth: 2, fill: '#FFFFFF' }} activeDot={{ r: 5 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -355,7 +357,7 @@ export default function OverviewPage() {
                   <span style={{ 
                     padding: '4px 12px', borderRadius: '999px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase',
                     background: assoc.status === 'approved' ? 'rgba(34, 197, 94, 0.1)' : assoc.status === 'rejected' ? 'rgba(239, 68, 68, 0.1)' : '#F5F5F7',
-                    color: assoc.status === 'approved' ? '#22C55E' : assoc.status === 'rejected' ? '#EF4444' : '#6E6E73'
+                    color: assoc.status === 'approved' ? '#15803D' : assoc.status === 'rejected' ? '#D70015' : '#6E6E73'
                   }}>
                     {assoc.status}
                   </span>

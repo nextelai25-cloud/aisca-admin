@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { fetchAll } from '@/lib/fetch-all'
 import { 
   LineChart, 
   Line, 
@@ -80,16 +81,15 @@ export default function AnalyticsPage() {
           .from('site_analytics')
           .select('*', { count: 'exact', head: true })
  
+        // All rows, paged past Supabase's 1,000-row limit
+        const allRows = await fetchAll<any>(supabase, 'site_analytics', 'id, session_id, country, city, page, device, referrer, visited_at')
+
         // 2. Unique sessions
-        const { data: sessionData } = await supabase
-          .from('site_analytics')
-          .select('session_id')
+        const sessionData = allRows
         const unique = new Set(sessionData?.map(s => s.session_id) || []).size
  
         // 3. Geographic info
-        const { data: geoData } = await supabase
-          .from('site_analytics')
-          .select('country, city')
+        const geoData = allRows
         const countriesCount = new Set(geoData?.map(g => g.country).filter(Boolean) || []).size
         const citiesCount = new Set(geoData?.map(g => `${g.city}, ${g.country}`).filter(Boolean) || []).size
  
@@ -104,11 +104,7 @@ export default function AnalyticsPage() {
         const thirtyDaysAgo = new Date()
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
         
-        const { data: recentViews } = await supabase
-          .from('site_analytics')
-          .select('visited_at')
-          .gte('visited_at', thirtyDaysAgo.toISOString())
-          .order('visited_at', { ascending: true })
+        const recentViews = allRows.filter(r => r.visited_at && new Date(r.visited_at) >= thirtyDaysAgo)
  
         // Group by date
         const dateCounts: Record<string, number> = {}
@@ -116,13 +112,13 @@ export default function AnalyticsPage() {
         for (let i = 29; i >= 0; i--) {
           const d = new Date()
           d.setDate(now.getDate() - i)
-          const dateString = d.toISOString().split('T')[0]
+          const dateString = d.toLocaleDateString('en-CA')
           dateCounts[dateString] = 0
         }
  
         recentViews?.forEach(v => {
           if (v.visited_at) {
-            const date = v.visited_at.split('T')[0]
+            const date = new Date(v.visited_at).toLocaleDateString('en-CA')
             if (dateCounts[date] !== undefined) {
               dateCounts[date] += 1
             }
@@ -138,9 +134,7 @@ export default function AnalyticsPage() {
         setTimelineData(chartData)
  
         // 5. Top pages
-        const { data: pageRows } = await supabase
-          .from('site_analytics')
-          .select('page')
+        const pageRows = allRows
         const pageCounts: Record<string, number> = {}
         pageRows?.forEach(r => { 
           const p = r.page || 'Unknown'
@@ -153,18 +147,13 @@ export default function AnalyticsPage() {
         setTopPagesData(topPages)
  
         // 6. Devices
-        const { data: deviceRows } = await supabase
-          .from('site_analytics')
-          .select('device')
+        const deviceRows = allRows
         const deviceCounts: Record<string, number> = {}
         deviceRows?.forEach(r => { if(r.device) deviceCounts[r.device] = (deviceCounts[r.device] || 0) + 1 })
         setDeviceDataChart(Object.entries(deviceCounts).map(([name, value]) => ({ name: name.toUpperCase(), value })))
  
         // 7. Referrers
-        const { data: refRows } = await supabase
-          .from('site_analytics')
-          .select('referrer')
-          .not('referrer', 'is', null)
+        const refRows = allRows.filter(r => r.referrer)
         const refCounts: Record<string, number> = {}
         refRows?.forEach(r => { if(r.referrer) refCounts[r.referrer] = (refCounts[r.referrer] || 0) + 1 })
         const totalRef = refRows?.length || 1

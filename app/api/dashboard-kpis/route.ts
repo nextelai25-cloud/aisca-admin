@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { fetchAll } from '@/lib/fetch-all'
 
 export async function GET(request: Request) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceRoleKey) {
+      console.error('Fund API Error: SUPABASE_SERVICE_ROLE_KEY is not set')
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
+    }
+    // Server-only client. The caller's identity is verified below before any data is read.
+    const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } })
 
     // 1. Get token from Authorization header
     const authHeader = request.headers.get('authorization')
@@ -15,38 +21,33 @@ export async function GET(request: Request) {
     const token = authHeader.split(' ')[1]
 
     // 2. Authenticate user using the token
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    const { data: { user }, error: authError } = await admin.auth.getUser(token)
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // 3. Fetch user role securely from admin_users
-    const { data: adminUser } = await supabase
+    // 3. Resolve role: admin_users first, then the role stored on the auth account
+    const { data: adminUser } = await admin
       .from('admin_users')
       .select('role')
-      .eq('email', user.email)
-      .single()
-      
-    if (!adminUser) {
+      .ilike('email', user.email || '')
+      .maybeSingle()
+
+    const userRole: string | undefined = adminUser?.role || user.user_metadata?.role
+    if (!userRole) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
-
-    const userRole = adminUser.role // e.g. 'chairman', 'cfo', 'marketing_manager'
     const isExecutive = ['chairman', 'cfo'].includes(userRole)
 
-    // 4. Calculate Fund Balance entirely on the server
-    // (Using the user's token context so RLS applies if present)
-    const { data: ledger } = await supabase
-      .from('finance_ledger')
-      .select('type, amount')
-      .eq('adjusted', false)
-      
+    // 4. Fund balance from every unadjusted ledger entry (paged past the 1,000-row limit)
+    const ledger = await fetchAll<{ type: string; amount: number }>(
+      admin, 'finance_ledger', 'id, type, amount', q => q.eq('adjusted', false)
+    )
+
     let balance = 0
-    if (ledger) {
-      ledger.forEach(entry => {
-        if (entry.type === 'income') balance += Number(entry.amount)
-        if (entry.type === 'expense') balance -= Number(entry.amount)
-      })
+    for (const entry of ledger) {
+      if (entry.type === 'income') balance += Number(entry.amount)
+      if (entry.type === 'expense') balance -= Number(entry.amount)
     }
 
     // 5. Determine badge status
