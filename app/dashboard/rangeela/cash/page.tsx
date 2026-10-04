@@ -60,14 +60,14 @@ export default function CashDeskPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  if (meError) return <div className="rg-page"><RangeelaGlassStyles /><div className="rg-glass p-6 text-sm text-red-600">{meError}</div></div>
+  if (meError) return <div className="rg-page"><RangeelaGlassStyles /><div className="rg-glass p-6 text-body text-red-600">{meError}</div></div>
   if (me && !me.can.cash) return (
     <div className="rg-page space-y-4"><RangeelaTabs me={me} subtitle="Cash desk" />
-      <div className="rg-glass p-6 text-sm text-[#6B5E68]">Only the cash desk account (and the chairman) can record cash sales.</div></div>
+      <div className="rg-glass p-6 text-body text-[#6B5E68]">Only the cash desk account (and the chairman) can record cash sales.</div></div>
   )
 
   const input = 'rg-input'
-  const label = 'rg-label block mb-1.5'
+  const label = 'rg-label block mb-2'
 
   return (
     <div className="rg-page space-y-4 max-w-2xl mx-auto">
@@ -76,17 +76,17 @@ export default function CashDeskPage() {
       <div className="grid grid-cols-2 gap-3">
         <div className="rg-glass p-4">
           <div className="rg-label">Sales on this screen</div>
-          <div className="text-2xl font-extrabold text-[#1B1320] mt-1">{today.count}</div>
+          <div className="text-large-title font-bold text-[#1B1320] mt-1">{today.count}</div>
         </div>
         <div className="rg-glass p-4 text-white" style={{ background: 'linear-gradient(135deg, rgba(36,22,40,0.92), rgba(88,40,110,0.88))', borderColor: 'rgba(255,255,255,0.25)' }}>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-white/60">Cash to hand over</div>
-          <div className="text-2xl font-bold mt-1">LKR {today.total.toLocaleString()}</div>
+          <div className="text-caption font-bold uppercase tracking-[0.04em] text-white/60">Cash to hand over</div>
+          <div className="text-large-title font-bold mt-1">LKR {today.total.toLocaleString()}</div>
         </div>
       </div>
-      <p className="text-[12px] text-[#6B5E68] px-1">These counters reset when the page reloads. The full cash total per account is on the Tickets tab.</p>
+      <p className="text-body text-[#6B5E68] px-1">These counters reset when the page reloads. The full cash total per account is on the Tickets tab.</p>
 
       {done && (
-        <div className={`p-4 rounded-[22px] border text-sm ${done.emailed ? 'bg-green-50 border-green-200 text-green-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+        <div className={`p-4 rounded-[22px] border text-body ${done.emailed ? 'bg-green-50 border-green-200 text-green-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
           <div className="flex items-center gap-2 font-bold"><CheckCircle2 size={18} /> Sale saved · {done.ticket.ticket_number}</div>
           <div className="mt-1">{done.ticket.full_name} · LKR {Number(done.ticket.amount).toLocaleString()}{done.ticket.checked_in_at ? ' · admitted now' : ''}</div>
           <div className="mt-1">{done.emailed ? `QR ticket emailed to ${done.ticket.email}.` : `The email failed (${done.emailError}). Open the ticket in the Tickets tab and resend it.`}</div>
@@ -95,10 +95,10 @@ export default function CashDeskPage() {
         </div>
       )}
 
-      {error && <div className="flex gap-2 items-start p-4 rounded-[22px] bg-red-50 border border-red-200 text-red-700 text-sm"><AlertTriangle size={18} className="shrink-0" /> {error}</div>}
+      {error && <div className="flex gap-2 items-start p-4 rounded-[22px] bg-red-50 border border-red-200 text-red-700 text-body"><AlertTriangle size={18} className="shrink-0" /> {error}</div>}
 
       <form onSubmit={submit} className="rg-glass p-4 sm:p-5 space-y-4">
-        <div className="flex items-center gap-2 text-base font-extrabold text-[#1B1320]"><Banknote size={19} /> New cash sale</div>
+        <div className="flex items-center gap-2 text-headline font-bold text-[#1B1320]"><Banknote size={19} /> New cash sale</div>
         <div>
           <label className={label}>Full name</label>
           <input className={input} required value={f.full_name} onChange={(e) => set('full_name', e.target.value)} placeholder="As on NIC" autoComplete="off" />
@@ -140,8 +140,8 @@ export default function CashDeskPage() {
             <input className={input} value={f.notes} onChange={(e) => set('notes', e.target.value)} placeholder="e.g. paid at school visit" />
           </div>
         </div>
-        <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/70 border border-white text-sm text-[#1B1320] cursor-pointer">
-          <input type="checkbox" checked={admitNow} onChange={(e) => { setAdmitNow(e.target.checked); setAmount(String(e.target.checked ? RG_PRICING.gate : rgOnlinePrice())) }} className="mt-0.5 w-5 h-5" />
+        <label className="flex items-start gap-3 p-4 rounded-2xl bg-white/70 border border-white text-body text-[#1B1320] cursor-pointer">
+          <input type="checkbox" checked={admitNow} onChange={(e) => { setAdmitNow(e.target.checked); setAmount(String(e.target.checked ? RG_PRICING.gate : rgOnlinePrice())) }} className="mt-1 w-5 h-5" />
           <span><b>Selling at the gate?</b> Tick this to admit them right now. The gate price is LKR {RG_PRICING.gate.toLocaleString()}. Their QR will then show as already used.</span>
         </label>
         <button type="submit" disabled={busy} className="rg-btn rg-btn-dark w-full" style={{ height: 54, fontSize: 15 }}>

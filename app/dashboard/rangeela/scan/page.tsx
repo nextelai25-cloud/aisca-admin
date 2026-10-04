@@ -143,10 +143,10 @@ export default function ScanPage() {
     check(v)
   }
 
-  if (meError) return <div className="rg-page"><RangeelaGlassStyles /><div className="rg-glass p-6 text-sm text-red-600">{meError}</div></div>
+  if (meError) return <div className="rg-page"><RangeelaGlassStyles /><div className="rg-glass p-6 text-body text-red-600">{meError}</div></div>
   if (me && !me.can.scan) return (
     <div className="rg-page space-y-4"><RangeelaTabs me={me} subtitle="Entrance scanner" />
-      <div className="rg-glass p-6 text-sm text-[#6B5E68]">Your account cannot scan tickets.</div></div>
+      <div className="rg-glass p-6 text-body text-[#6B5E68]">Your account cannot scan tickets.</div></div>
   )
 
   const look = last ? LOOK[last.result] : null
@@ -156,8 +156,8 @@ export default function ScanPage() {
       <RangeelaTabs me={me} subtitle="Scan each QR at the entrance. A ticket can be admitted only once." />
 
       <div className="rg-glass flex items-center justify-between px-5 py-3">
-        <span className="text-[13px] font-semibold text-[#6B5E68]">Admitted on this device</span>
-        <span className="text-2xl font-bold text-green-600">{admittedCount}</span>
+        <span className="text-body font-semibold text-[#6B5E68]">Admitted on this device</span>
+        <span className="text-large-title font-bold text-green-600">{admittedCount}</span>
       </div>
 
       <div className="relative rounded-[28px] overflow-hidden bg-[#140d18] aspect-square" style={{ boxShadow: '0 20px 50px -20px rgba(40,10,60,0.55), inset 0 0 0 1px rgba(255,255,255,0.12)' }}>
@@ -167,41 +167,41 @@ export default function ScanPage() {
         {!running && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
             <ScanLine size={46} className="text-white/60" />
-            <button onClick={start} className="inline-flex items-center gap-2 px-7 py-4 rounded-full bg-white text-[#1B1320] font-bold text-base shadow-lg active:scale-95 transition-transform">
+            <button onClick={start} className="inline-flex items-center gap-2 px-7 py-4 rounded-full bg-white text-[#1B1320] font-bold text-headline shadow-lg active:scale-95 transition-transform">
               <Camera size={18} /> Start scanning
             </button>
-            {camError && <p className="text-xs text-red-300 max-w-xs">{camError}</p>}
+            {camError && <p className="text-body text-red-300 max-w-xs">{camError}</p>}
           </div>
         )}
 
         {running && !last && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="w-2/3 aspect-square rounded-3xl border-4 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
-            {checking && <div className="absolute bottom-6 px-4 py-2 rounded-full bg-black/70 text-white text-xs font-semibold">Checking...</div>}
+            {checking && <div className="absolute bottom-6 px-4 py-2 rounded-full bg-black/70 text-white text-body font-semibold">Checking...</div>}
           </div>
         )}
 
         {last && look && (
           <button onClick={next} className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-white" style={{ background: look.bg }}>
             <look.icon size={64} strokeWidth={2.5} />
-            <div className="text-3xl font-black mt-3 tracking-tight">{look.title}</div>
+            <div className="text-large-title font-bold mt-3 tracking-tight">{look.title}</div>
             {last.ticket ? (
               <div className="mt-4 space-y-1">
-                <div className="text-2xl font-bold">{last.ticket.full_name}</div>
-                <div className="text-sm opacity-90">{last.ticket.school} · {last.ticket.al_batch}</div>
-                <div className="text-sm opacity-90 font-mono">{last.ticket.ticket_number} · NIC {last.ticket.nic}</div>
+                <div className="text-large-title font-bold">{last.ticket.full_name}</div>
+                <div className="text-body opacity-90">{last.ticket.school} · {last.ticket.al_batch}</div>
+                <div className="text-body opacity-90 font-mono">{last.ticket.ticket_number} · NIC {last.ticket.nic}</div>
                 {last.result === 'already_used' && last.ticket.checked_in_at && (
-                  <div className="mt-3 px-4 py-2 rounded-xl bg-black/25 text-sm font-semibold">
+                  <div className="mt-3 px-4 py-2 rounded-xl bg-black/25 text-body font-semibold">
                     First scanned {fmtTime(last.ticket.checked_in_at)}<br />by {last.ticket.checked_in_by}
                   </div>
                 )}
-                {last.result === 'admitted' && <div className="mt-3 text-sm opacity-90">Check their NIC matches.</div>}
+                {last.result === 'admitted' && <div className="mt-3 text-body opacity-90">Check their NIC matches.</div>}
               </div>
             ) : (
-              <div className="mt-3 text-sm opacity-90">{last.message}</div>
+              <div className="mt-3 text-body opacity-90">{last.message}</div>
             )}
-            {last.result !== 'admitted' && last.message && last.ticket && <div className="mt-2 text-sm opacity-90">{last.message}</div>}
-            <div className="mt-6 px-5 py-2.5 rounded-full bg-white/20 text-sm font-bold">Tap to scan next</div>
+            {last.result !== 'admitted' && last.message && last.ticket && <div className="mt-2 text-body opacity-90">{last.message}</div>}
+            <div className="mt-6 px-5 py-3 rounded-full bg-white/20 text-body font-bold">Tap to scan next</div>
           </button>
         )}
       </div>
@@ -214,7 +214,7 @@ export default function ScanPage() {
 
       <form onSubmit={submitManual} className="rg-glass p-4 space-y-2">
         <div className="rg-label flex items-center gap-2"><Keyboard size={13} /> Phone died or QR will not scan?</div>
-        <p className="text-[13px] text-[#6B5E68]">Type the ticket number from their email (for example RG26-12345) and check their NIC carefully.</p>
+        <p className="text-body text-[#6B5E68]">Type the ticket number from their email (for example RG26-12345) and check their NIC carefully.</p>
         <div className="flex gap-2">
           <input value={manual} onChange={(e) => setManual(e.target.value.toUpperCase())} placeholder="RG26-12345" inputMode="text"
             className="rg-input flex-1 font-mono" autoCapitalize="characters" autoCorrect="off" />

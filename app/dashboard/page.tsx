@@ -28,11 +28,11 @@ import Link from 'next/link'
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', padding: '12px', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-        <p style={{ fontSize: '12px', color: '#6B6B6B', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>{label}</p>
+      <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', padding: '12px', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+        <p style={{ fontSize: '13px', color: '#6E6E73', fontWeight: '600', marginBottom: '8px', textTransform: 'capitalize' }}>{label}</p>
         {payload.map((entry: any, index: number) => (
-          <p key={index} style={{ fontSize: '14px', fontWeight: 'bold', color: entry.color, margin: '4px 0' }}>
-            {entry.name}: <span style={{ color: '#111111' }}>{entry.value.toLocaleString()}</span>
+          <p key={index} style={{ fontSize: '13px', fontWeight: 'bold', color: entry.color, margin: '4px 0' }}>
+            {entry.name}: <span style={{ color: '#1D1D1F' }}>{entry.value.toLocaleString()}</span>
           </p>
         ))}
       </div>
@@ -208,7 +208,7 @@ export default function OverviewPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
-        <div style={{ width: '32px', height: '32px', borderTop: '2px solid #111111', borderRight: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <div style={{ width: '32px', height: '32px', borderTop: '2px solid #1D1D1F', borderRight: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         <style jsx>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -220,12 +220,12 @@ export default function OverviewPage() {
   }
 
   return (
-    <div className="dashboard-page" style={{ display: 'flex', flexDirection: 'column', gap: '32px', padding: '32px', maxWidth: '1600px', margin: '0 auto' }}>
+    <div className="dashboard-page" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       
-      <div className="admin-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #E8E8E8', paddingBottom: '24px' }}>
+      <div className="admin-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #E5E5EA', paddingBottom: '24px' }}>
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '800', letterSpacing: '-0.02em', color: '#111111', margin: '0 0 8px 0' }}>Dashboard</h1>
-          <p style={{ color: '#6B6B6B', fontSize: '14px', margin: 0 }}>Overview of AISCA organization metrics and activity.</p>
+          <h1 style={{ fontSize: '28px', fontWeight: '700', letterSpacing: '-0.02em', color: '#1D1D1F', margin: '0 0 8px 0' }}>Dashboard</h1>
+          <p style={{ color: '#6E6E73', fontSize: '13px', margin: 0 }}>Overview of AISCA organization metrics and activity.</p>
         </div>
       </div>
 
@@ -233,27 +233,27 @@ export default function OverviewPage() {
       <div className="dashboard-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
         
         {/* Card 1: Fund Status */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Wallet size={20} color="#111111" />
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Wallet size={20} color="#1D1D1F" />
             </div>
             {stats.fundBalance !== null && (
-              <span style={{ fontSize: '12px', fontWeight: '600', color: '#22C55E', background: 'rgba(34, 197, 94, 0.1)', padding: '4px 8px', borderRadius: '20px' }}>
+              <span style={{ fontSize: '13px', fontWeight: '600', color: '#15803D', background: 'rgba(34, 197, 94, 0.1)', padding: '4px 8px', borderRadius: '999px' }}>
                 Executive View
               </span>
             )}
           </div>
           <div>
-            <p style={{ fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Fund Status</p>
+            <p style={{ fontSize: '13px', fontWeight: '600', color: '#6E6E73', marginBottom: '8px' }}>Fund Status</p>
             {stats.fundBalance !== null ? (
-              <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#111111', margin: 0 }}>
+              <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>
                 LKR {stats.fundBalance.toLocaleString()}
               </h2>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: stats.fundBadge === 'Healthy' ? '#22C55E' : stats.fundBadge === 'Tight' ? '#F59E0B' : '#EF4444' }} />
-                <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#111111', margin: 0 }}>
+                <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>
                   {stats.fundBadge}
                 </h2>
               </div>
@@ -262,39 +262,39 @@ export default function OverviewPage() {
         </div>
 
         {/* Card 2: Total Members */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Users size={20} color="#111111" />
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Users size={20} color="#1D1D1F" />
           </div>
           <div>
-            <p style={{ fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Total Members</p>
-            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#111111', margin: 0 }}>
+            <p style={{ fontSize: '13px', fontWeight: '600', color: '#6E6E73', marginBottom: '8px' }}>Total Members</p>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>
               {stats.totalMembers.toLocaleString()}
             </h2>
           </div>
         </div>
 
         {/* Card 3: Website Visitors (Page Views) */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Eye size={20} color="#111111" />
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Eye size={20} color="#1D1D1F" />
           </div>
           <div>
-            <p style={{ fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Total Page Views</p>
-            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#111111', margin: 0 }}>
+            <p style={{ fontSize: '13px', fontWeight: '600', color: '#6E6E73', marginBottom: '8px' }}>Total Page Views</p>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>
               {stats.totalPageViews.toLocaleString()}
             </h2>
           </div>
         </div>
 
         {/* Card 4: Approved Associates */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Shield size={20} color="#111111" />
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F5F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Shield size={20} color="#1D1D1F" />
           </div>
           <div>
-            <p style={{ fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Approved Associates</p>
-            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#111111', margin: 0 }}>
+            <p style={{ fontSize: '13px', fontWeight: '600', color: '#6E6E73', marginBottom: '8px' }}>Approved Associates</p>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>
               {stats.approvedAssociates.toLocaleString()}
             </h2>
           </div>
@@ -305,23 +305,23 @@ export default function OverviewPage() {
       <div className="dashboard-charts-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
         
         {/* Organization Growth Chart */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111111', margin: 0 }}>Organization Growth</h2>
-            <div style={{ padding: '6px 12px', background: '#F5F5F5', borderRadius: '20px', fontSize: '12px', fontWeight: '600', color: '#6B6B6B' }}>
+            <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>Organization Growth</h2>
+            <div style={{ padding: '8px 12px', background: '#F5F5F7', borderRadius: '999px', fontSize: '13px', fontWeight: '600', color: '#6E6E73' }}>
               Past 6 Months
             </div>
           </div>
           <div style={{ flex: 1, minHeight: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0F0F0" />
-                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#A3A3A3' }} dy={10} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#A3A3A3' }} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#A3A3A3' }} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#F9F9F9' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
-                <Line yAxisId="left" type="monotone" dataKey="Associate Registrations" stroke="#111111" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2F2F7" />
+                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6E6E73' }} dy={10} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6E6E73' }} />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6E6E73' }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#FBFBFD' }} />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '13px', paddingTop: '20px' }} />
+                <Line yAxisId="left" type="monotone" dataKey="Associate Registrations" stroke="#1D1D1F" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
                 <Line yAxisId="right" type="monotone" dataKey="Page Views" stroke="#d4af37" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
@@ -329,33 +329,33 @@ export default function OverviewPage() {
         </div>
 
         {/* Recent Associates */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111111', margin: 0 }}>Recent Associates</h2>
-            <Link href="/dashboard/associates" style={{ fontSize: '13px', color: '#6B6B6B', textDecoration: 'none', fontWeight: '500' }}>View All</Link>
+            <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>Recent Associates</h2>
+            <Link href="/dashboard/associates" style={{ fontSize: '13px', color: '#6E6E73', textDecoration: 'none', fontWeight: '500' }}>View All</Link>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
             {recentAssociates.length === 0 ? (
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A3A3A3', fontSize: '13px' }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6E6E73', fontSize: '13px' }}>
                 No recent associate registrations.
               </div>
             ) : (
               recentAssociates.map(assoc => (
-                <div key={assoc.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: '1px solid #F5F5F5' }}>
+                <div key={assoc.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: '1px solid #F5F5F7' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#F9F9F9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <User size={16} color="#6B6B6B" />
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#FBFBFD', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <User size={16} color="#6E6E73" />
                     </div>
                     <div>
-                      <p style={{ fontSize: '14px', fontWeight: '600', color: '#111111', margin: '0 0 2px 0' }}>{assoc.full_name}</p>
-                      <p style={{ fontSize: '12px', color: '#A3A3A3', margin: 0 }}>{new Date(assoc.created_at).toLocaleDateString()}</p>
+                      <p style={{ fontSize: '13px', fontWeight: '600', color: '#1D1D1F', margin: '0 0 2px 0' }}>{assoc.full_name}</p>
+                      <p style={{ fontSize: '13px', color: '#6E6E73', margin: 0 }}>{new Date(assoc.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <span style={{ 
-                    padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase',
-                    background: assoc.status === 'approved' ? 'rgba(34, 197, 94, 0.1)' : assoc.status === 'rejected' ? 'rgba(239, 68, 68, 0.1)' : '#F5F5F5',
-                    color: assoc.status === 'approved' ? '#22C55E' : assoc.status === 'rejected' ? '#EF4444' : '#6B6B6B'
+                    padding: '4px 12px', borderRadius: '999px', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase',
+                    background: assoc.status === 'approved' ? 'rgba(34, 197, 94, 0.1)' : assoc.status === 'rejected' ? 'rgba(239, 68, 68, 0.1)' : '#F5F5F7',
+                    color: assoc.status === 'approved' ? '#22C55E' : assoc.status === 'rejected' ? '#EF4444' : '#6E6E73'
                   }}>
                     {assoc.status}
                   </span>
@@ -368,33 +368,33 @@ export default function OverviewPage() {
       </div>
 
       {/* Full Width Activity Feed */}
-      <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', padding: '24px' }}>
+      <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#111111', margin: 0 }}>System Activity Log</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#6B6B6B' }}>
+          <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>System Activity Log</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#6E6E73' }}>
             <Activity size={16} /> Live Feed
           </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
           {activities.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#A3A3A3', fontSize: '14px' }}>
+            <div style={{ padding: '40px', textAlign: 'center', color: '#6E6E73', fontSize: '13px' }}>
               No recent activity recorded.
             </div>
           ) : (
             activities.map((act, index) => (
-              <div key={index} style={{ display: 'flex', gap: '20px', padding: '16px 0', borderBottom: index < activities.length - 1 ? '1px solid #F5F5F5' : 'none' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F9F9F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {act.type === 'associate' ? <User size={18} color="#111111" /> :
-                   act.type === 'school' ? <TrendingUp size={18} color="#111111" /> :
-                   <Shield size={18} color="#111111" />}
+              <div key={index} style={{ display: 'flex', gap: '20px', padding: '16px 0', borderBottom: index < activities.length - 1 ? '1px solid #F5F5F7' : 'none' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#FBFBFD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {act.type === 'associate' ? <User size={18} color="#1D1D1F" /> :
+                   act.type === 'school' ? <TrendingUp size={18} color="#1D1D1F" /> :
+                   <Shield size={18} color="#1D1D1F" />}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                    <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#111111', margin: 0 }}>{act.title}</h4>
-                    <span style={{ fontSize: '12px', color: '#A3A3A3' }}>{formatActivityTime(act.timestamp)}</span>
+                    <h4 style={{ fontSize: '13px', fontWeight: '600', color: '#1D1D1F', margin: 0 }}>{act.title}</h4>
+                    <span style={{ fontSize: '13px', color: '#6E6E73' }}>{formatActivityTime(act.timestamp)}</span>
                   </div>
-                  <p style={{ fontSize: '14px', color: '#6B6B6B', margin: 0, lineHeight: '1.5' }}>{act.description}</p>
+                  <p style={{ fontSize: '13px', color: '#6E6E73', margin: 0, lineHeight: '1.5' }}>{act.description}</p>
                 </div>
               </div>
             ))

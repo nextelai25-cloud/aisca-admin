@@ -384,10 +384,10 @@ export default function ReportsTab() {
     <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
       
       {/* Date Range Selector */}
-      <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '24px', display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center' }}>
+      <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px', display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center' }}>
         <div style={{ flex: 1, minWidth: '200px' }}>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', marginBottom: '8px' }}>Reporting Period</label>
-          <select value={periodType} onChange={e => setPeriodType(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #E8E8E8', fontSize: '14px', outline: 'none' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#6E6E73', marginBottom: '8px' }}>Reporting Period</label>
+          <select value={periodType} onChange={e => setPeriodType(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #E5E5EA', fontSize: '13px', outline: 'none' }}>
             <option value="month">Current Month</option>
             <option value="quarter">Current Quarter</option>
             <option value="year">Current Year (YTD)</option>
@@ -396,48 +396,48 @@ export default function ReportsTab() {
         </div>
         
         <div style={{ flex: 1, minWidth: '150px' }}>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', marginBottom: '8px' }}>Start Date</label>
-          <input type="date" value={startDate} disabled={periodType !== 'custom'} onChange={e => setStartDate(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #E8E8E8', fontSize: '14px', outline: 'none', background: periodType !== 'custom' ? '#F5F5F5' : '#FFF' }} />
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#6E6E73', marginBottom: '8px' }}>Start Date</label>
+          <input type="date" value={startDate} disabled={periodType !== 'custom'} onChange={e => setStartDate(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #E5E5EA', fontSize: '13px', outline: 'none', background: periodType !== 'custom' ? '#F5F5F7' : '#FFF' }} />
         </div>
 
         <div style={{ flex: 1, minWidth: '150px' }}>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#6B6B6B', textTransform: 'uppercase', marginBottom: '8px' }}>End Date</label>
-          <input type="date" value={endDate} disabled={periodType !== 'custom'} onChange={e => setEndDate(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #E8E8E8', fontSize: '14px', outline: 'none', background: periodType !== 'custom' ? '#F5F5F5' : '#FFF' }} />
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#6E6E73', marginBottom: '8px' }}>End Date</label>
+          <input type="date" value={endDate} disabled={periodType !== 'custom'} onChange={e => setEndDate(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #E5E5EA', fontSize: '13px', outline: 'none', background: periodType !== 'custom' ? '#F5F5F7' : '#FFF' }} />
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
         {/* Financial Statements Card (PDF) */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '32px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-            <FileText size={24} color="#111111" />
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '32px' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#F5F5F7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+            <FileText size={24} color="#1D1D1F" />
           </div>
-          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111111', margin: '0 0 8px 0' }}>Official SLFRS Statements</h3>
-          <p style={{ fontSize: '14px', color: '#6B6B6B', margin: '0 0 24px 0', lineHeight: '1.5' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1D1D1F', margin: '0 0 8px 0' }}>Official SLFRS Statements</h3>
+          <p style={{ fontSize: '13px', color: '#6E6E73', margin: '0 0 24px 0', lineHeight: '1.5' }}>
             Generate the complete 5-part financial statements (Position, Activities, Cash Flows, Fund Balances, Notes) as a formatted PDF.
           </p>
           <button 
             onClick={handleExportPDF}
             disabled={loading}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '8px', border: 'none', background: '#111111', color: '#FFFFFF', fontSize: '14px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '10px', border: 'none', background: '#1D1D1F', color: '#FFFFFF', fontSize: '13px', fontWeight: '600', cursor: 'pointer', transition: 'var(--transition-control)' }}
           >
             <Printer size={16} /> Generate Official PDF
           </button>
         </div>
 
         {/* Transaction Export Card (Excel) */}
-        <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '32px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-            <Download size={24} color="#111111" />
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '32px' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#F5F5F7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+            <Download size={24} color="#1D1D1F" />
           </div>
-          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111111', margin: '0 0 8px 0' }}>Excel Financial Model</h3>
-          <p style={{ fontSize: '14px', color: '#6B6B6B', margin: '0 0 24px 0', lineHeight: '1.5' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1D1D1F', margin: '0 0 8px 0' }}>Excel Financial Model</h3>
+          <p style={{ fontSize: '13px', color: '#6E6E73', margin: '0 0 24px 0', lineHeight: '1.5' }}>
             Export a full workbook containing all 5 statements separated into individual sheets, plus a raw transactions ledger dump.
           </p>
           <button 
             onClick={handleExportExcel}
             disabled={loading}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '8px', border: '1px solid #E8E8E8', background: '#FFFFFF', color: '#111111', fontSize: '14px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '10px', border: '1px solid #E5E5EA', background: '#FFFFFF', color: '#1D1D1F', fontSize: '13px', fontWeight: '600', cursor: 'pointer', transition: 'var(--transition-control)' }}
           >
             <Download size={16} /> Download Excel Workbook
           </button>

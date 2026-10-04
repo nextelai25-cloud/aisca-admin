@@ -114,11 +114,11 @@ export default function NextUpPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-wider uppercase text-[#111111] flex items-center gap-2"><Rocket size={20} className="text-[#d4af37]" /> NextUp Applications</h1>
-          <p className="text-xs text-[#6B6B6B] tracking-wide uppercase mt-1">AISCA × Business Advisor Junior — young founder submissions</p>
+          <h1 className="text-large-title font-bold tracking-tight text-[#1D1D1F] flex items-center gap-2"><Rocket size={20} className="text-[#8A6D1C]" /> NextUp Applications</h1>
+          <p className="text-body text-[#6E6E73] mt-1">AISCA × Business Advisor Junior — young founder submissions</p>
         </div>
         <button onClick={exportCSV} disabled={!filtered.length}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl text-xs font-semibold uppercase tracking-wider text-[#111111] hover:bg-[#E8E8E8] disabled:opacity-40 transition-all">
+          className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#F5F5F7] border border-[#E5E5EA] rounded-control text-body font-semibold capitalize text-[#1D1D1F] hover:bg-[#E5E5EA] disabled:opacity-40 transition">
           <Download size={14} /><span>Export CSV ({filtered.length})</span>
         </button>
       </div>
@@ -126,14 +126,14 @@ export default function NextUpPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total', value: stats.total, color: '#111111' },
-          { label: 'Applications', value: stats.self, color: '#111111' },
-          { label: 'Referrals', value: stats.referral, color: '#111111' },
+          { label: 'Total', value: stats.total, color: '#1D1D1F' },
+          { label: 'Applications', value: stats.self, color: '#1D1D1F' },
+          { label: 'Referrals', value: stats.referral, color: '#1D1D1F' },
           { label: 'Selected', value: stats.selected, color: '#16a34a' },
         ].map(s => (
-          <div key={s.label} className="rounded-2xl p-5 bg-white border border-[#E8E8E8]">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B6B]">{s.label}</div>
-            <div className="text-3xl font-bold mt-2" style={{ color: s.color }}>{s.value}</div>
+          <div key={s.label} className="rounded-card p-5 bg-white border border-[#E5E5EA]">
+            <div className="text-caption font-bold uppercase tracking-[0.04em] text-[#6E6E73]">{s.label}</div>
+            <div className="text-large-title font-bold mt-2" style={{ color: s.color }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -141,32 +141,32 @@ export default function NextUpPage() {
       {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B6B6B]" size={16} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6E6E73]" size={16} />
           <input type="text" placeholder="Search name / school / venture / phone…" value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
-            className="w-full pl-11 pr-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111111] placeholder-[#A3A3A3] focus:outline-none focus:border-[#D1D5DB]" />
+            className="w-full pl-11 pr-4 py-3 bg-white border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] placeholder-[#86868B] focus:outline-none focus:border-[#6E6E73]" />
         </div>
-        <select value={editionFilter} onChange={e => { setEditionFilter(e.target.value); setPage(1) }} className="w-full px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none cursor-pointer">
+        <select value={editionFilter} onChange={e => { setEditionFilter(e.target.value); setPage(1) }} className="w-full px-4 py-3 bg-white border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none cursor-pointer">
           <option value="all">All Editions</option>
           {Array.from(new Set(['01', '02', ...data.map(editionOf)])).sort().map(ed => <option key={ed} value={ed}>NEXTUP {ed}</option>)}
         </select>
-        <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1) }} className="w-full px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none cursor-pointer">
+        <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1) }} className="w-full px-4 py-3 bg-white border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none cursor-pointer">
           <option value="all">All Types</option>
           <option value="self">Applying for self</option>
           <option value="referral">Referrals</option>
         </select>
-        <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} className="w-full px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none cursor-pointer">
+        <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} className="w-full px-4 py-3 bg-white border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none cursor-pointer">
           <option value="all">All Statuses</option>
           {STATUSES.map(s => <option key={s} value={s}>{s[0].toUpperCase() + s.slice(1)}</option>)}
         </select>
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white border border-[#E5E5EA] rounded-card overflow-hidden shadow-card">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-xs text-[#111111]">
+          <table className="w-full border-collapse text-left text-body text-[#1D1D1F]">
             <thead>
-              <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
+              <tr className="border-b border-[#E5E5EA] bg-[#FBFBFD] text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                 <th className="p-4 font-semibold">Applicant</th>
                 <th className="p-4 font-semibold">Edition</th>
                 <th className="p-4 font-semibold">Type</th>
@@ -177,30 +177,30 @@ export default function NextUpPage() {
                 <th className="p-4 font-semibold">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E8E8E8]">
+            <tbody className="divide-y divide-[#E5E5EA]">
               {current.length === 0 ? (
-                <tr><td colSpan={8} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">No applications found.</td></tr>
+                <tr><td colSpan={8} className="p-8 text-center text-[#6E6E73] uppercase tracking-[0.04em] text-caption">No applications found.</td></tr>
               ) : current.map(a => (
-                <tr key={a.id} onClick={() => setSelected(a)} className="hover:bg-[#FAFAFA] transition-all cursor-pointer">
+                <tr key={a.id} onClick={() => setSelected(a)} className="hover:bg-[#FBFBFD] transition cursor-pointer">
                   <td className="p-4 font-semibold max-w-[220px]"><span className="truncate block">{displayName(a)}</span></td>
-                  <td className="p-4"><span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border whitespace-nowrap ${editionOf(a) === '01' ? 'border-[#6B6B6B]/30 text-[#6B6B6B] bg-[#F5F5F5]' : 'border-red-500/30 text-red-600 bg-red-50'}`}>NEXTUP {editionOf(a)}</span></td>
-                  <td className="p-4"><span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${a.application_type === 'self' ? 'border-[#d4af37]/40 text-[#a9832a] bg-[#FBF7EC]' : 'border-[#6B6B6B]/30 text-[#6B6B6B] bg-[#F5F5F5]'}`}>{a.application_type === 'self' ? 'Applicant' : 'Referral'}</span></td>
+                  <td className="p-4"><span className={`px-2 py-0.5 rounded-md text-caption font-bold uppercase border whitespace-nowrap ${editionOf(a) === '01' ? 'border-[#6E6E73]/30 text-[#6E6E73] bg-[#F5F5F7]' : 'border-red-500/30 text-red-600 bg-red-50'}`}>NEXTUP {editionOf(a)}</span></td>
+                  <td className="p-4"><span className={`px-2 py-0.5 rounded-md text-caption font-bold uppercase border ${a.application_type === 'self' ? 'border-[#d4af37]/40 text-[#a9832a] bg-[#FBF7EC]' : 'border-[#6E6E73]/30 text-[#6E6E73] bg-[#F5F5F7]'}`}>{a.application_type === 'self' ? 'Applicant' : 'Referral'}</span></td>
                   <td className="p-4 max-w-[200px]"><span className="truncate block">{a.venture_name || '—'}</span></td>
-                  <td className="p-4 text-[#6B6B6B]">{a.school ? `${a.school}${a.district ? ` · ${a.district}` : ''}` : '—'}</td>
-                  <td className="p-4 text-center text-[#6B6B6B]">{(a.uploads || []).length || '—'}</td>
-                  <td className="p-4 text-center"><span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase border ${badgeClass(a.status)}`}>{a.status}</span></td>
-                  <td className="p-4 text-[#6B6B6B]">{new Date(a.created_at).toLocaleDateString('en-LK')}</td>
+                  <td className="p-4 text-[#6E6E73]">{a.school ? `${a.school}${a.district ? ` · ${a.district}` : ''}` : '—'}</td>
+                  <td className="p-4 text-center text-[#6E6E73]">{(a.uploads || []).length || '—'}</td>
+                  <td className="p-4 text-center"><span className={`px-3 py-1 rounded-md text-caption font-bold uppercase border ${badgeClass(a.status)}`}>{a.status}</span></td>
+                  <td className="p-4 text-[#6E6E73]">{new Date(a.created_at).toLocaleDateString('en-LK')}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         {totalPages > 1 && (
-          <div className="px-6 py-4 bg-[#FAFAFA] border-t border-[#E8E8E8] flex items-center justify-between gap-4">
-            <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest">Page {page} of {totalPages} ({filtered.length} total)</span>
+          <div className="px-6 py-4 bg-[#FBFBFD] border-t border-[#E5E5EA] flex items-center justify-between gap-4">
+            <span className="text-caption text-[#6E6E73] uppercase tracking-[0.04em]">Page {page} of {totalPages} ({filtered.length} total)</span>
             <div className="flex items-center gap-2">
-              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] flex items-center justify-center disabled:opacity-30"><ChevronLeft size={16} /></button>
-              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] flex items-center justify-center disabled:opacity-30"><ChevronRight size={16} /></button>
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="w-8 h-8 rounded-control bg-[#F5F5F7] border border-[#E5E5EA] flex items-center justify-center disabled:opacity-30"><ChevronLeft size={16} /></button>
+              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-8 h-8 rounded-control bg-[#F5F5F7] border border-[#E5E5EA] flex items-center justify-center disabled:opacity-30"><ChevronRight size={16} /></button>
             </div>
           </div>
         )}
@@ -210,20 +210,20 @@ export default function NextUpPage() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-end">
           <div onClick={() => setSelected(null)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative w-full max-w-xl h-full bg-white border-l border-[#E8E8E8] p-8 flex flex-col overflow-y-auto z-10">
-            <div className="flex items-center justify-between pb-6 border-b border-[#E8E8E8]">
-              <div className="flex items-center gap-3 text-[#d4af37]"><Rocket size={20} /><span className="text-xs font-extrabold uppercase tracking-widest">Application</span></div>
-              <button onClick={() => setSelected(null)} className="text-[#6B6B6B] hover:text-[#111111]"><X size={18} /></button>
+          <div className="relative w-full max-w-xl h-full bg-white border-l border-[#E5E5EA] p-8 flex flex-col overflow-y-auto z-10">
+            <div className="flex items-center justify-between pb-6 border-b border-[#E5E5EA]">
+              <div className="flex items-center gap-3 text-[#8A6D1C]"><Rocket size={20} /><span className="text-body font-bold ">Application</span></div>
+              <button onClick={() => setSelected(null)} className="text-[#6E6E73] hover:text-[#1D1D1F]"><X size={18} /></button>
             </div>
 
             <div className="space-y-6 pt-6">
               {/* Status control */}
               <div>
-                <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase mb-2">Status</span>
+                <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase mb-2">Status</span>
                 <div className="flex flex-wrap gap-2">
                   {STATUSES.map(s => (
                     <button key={s} onClick={() => setStatus(selected, s)} disabled={updatingId === selected.id}
-                      className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase border transition-all ${selected.status === s ? badgeClass(s) : 'border-[#E8E8E8] text-[#6B6B6B] hover:bg-[#FAFAFA]'}`}>
+                      className={`px-3 py-2 rounded-control text-caption font-bold uppercase border transition ${selected.status === s ? badgeClass(s) : 'border-[#E5E5EA] text-[#6E6E73] hover:bg-[#FBFBFD]'}`}>
                       {s}
                     </button>
                   ))}
@@ -257,18 +257,18 @@ export default function NextUpPage() {
                     <Row label="Willing to do podcast" value={selected.willing_podcast ? 'Yes' : 'No'} />
                   </Section>
                   <Section title="Why NextUp should feature them">
-                    <p className="text-xs text-[#111111]/85 leading-relaxed whitespace-pre-wrap">{selected.story || '—'}</p>
+                    <p className="text-body text-[#1D1D1F]/85 leading-relaxed whitespace-pre-wrap">{selected.story || '—'}</p>
                   </Section>
                   <Section title={`Photos & documents (${(selected.uploads || []).length})`}>
                     {(selected.uploads || []).length === 0 ? (
-                      <p className="text-xs text-[#6B6B6B]">No files uploaded.</p>
+                      <p className="text-body text-[#6E6E73]">No files uploaded.</p>
                     ) : (
                       <div className="grid grid-cols-3 gap-2">
                         {(selected.uploads || []).map((u, i) => (
-                          <a key={i} href={u.url} target="_blank" rel="noopener noreferrer" className="block rounded-lg overflow-hidden border border-[#E8E8E8] aspect-square bg-[#FAFAFA]" title={u.filename}>
+                          <a key={i} href={u.url} target="_blank" rel="noopener noreferrer" className="block rounded-control overflow-hidden border border-[#E5E5EA] aspect-square bg-[#FBFBFD]" title={u.filename}>
                             {noPreview(u.url) ? (
-                              <div className="w-full h-full flex flex-col items-center justify-center gap-1 text-[#6B6B6B] p-2">
-                                <FileText size={22} /><span className="text-[9px] flex items-center gap-1">View file <ExternalLink size={9} /></span>
+                              <div className="w-full h-full flex flex-col items-center justify-center gap-1 text-[#6E6E73] p-2">
+                                <FileText size={22} /><span className="text-caption flex items-center gap-1">View file <ExternalLink size={9} /></span>
                               </div>
                             ) : (
                               <img src={u.url} alt="" className="w-full h-full object-cover" />
@@ -281,7 +281,7 @@ export default function NextUpPage() {
                 </>
               )}
 
-              <p className="text-[10px] text-[#6B6B6B]">Submitted {new Date(selected.created_at).toLocaleString('en-LK')}</p>
+              <p className="text-caption text-[#6E6E73]">Submitted {new Date(selected.created_at).toLocaleString('en-LK')}</p>
             </div>
           </div>
         </div>
@@ -293,8 +293,8 @@ export default function NextUpPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">{title}</span>
-      <div className="border border-[#E8E8E8] rounded-xl p-4 space-y-2">{children}</div>
+      <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">{title}</span>
+      <div className="border border-[#E5E5EA] rounded-control p-4 space-y-2">{children}</div>
     </div>
   )
 }
@@ -302,8 +302,8 @@ function Row({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null
   return (
     <div className="flex flex-col">
-      <span className="text-[10px] text-[#6B6B6B] uppercase tracking-wide">{label}</span>
-      <span className="text-xs text-[#111111] whitespace-pre-wrap">{value}</span>
+      <span className="text-caption text-[#6E6E73] uppercase tracking-[0.04em]">{label}</span>
+      <span className="text-body text-[#1D1D1F] whitespace-pre-wrap">{value}</span>
     </div>
   )
 }

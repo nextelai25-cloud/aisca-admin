@@ -50,7 +50,7 @@ export default function LoginPage() {
   if (checking) {
     return (
       <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px' }}>Checking session...</p>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px' }}>Checking session...</p>
       </div>
     )
   }
@@ -78,7 +78,7 @@ export default function LoginPage() {
             alt="AISCA"
             style={{ width: '100%', maxWidth: '220px', height: 'auto', objectFit: 'contain', margin: '0 auto 16px', display: 'block' }}
           />
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', letterSpacing: '0.15em', margin: 0 }}>
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', letterSpacing: '0.02em', margin: 0 }}>
             BOARD ADMINISTRATION
           </p>
         </div>
@@ -101,7 +101,7 @@ export default function LoginPage() {
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '10px',
                 color: '#ffffff',
-                fontSize: '14px',
+                fontSize: '13px',
                 outline: 'none',
                 boxSizing: 'border-box'
               }}
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '10px',
                 color: '#ffffff',
-                fontSize: '14px',
+                fontSize: '13px',
                 outline: 'none',
                 boxSizing: 'border-box'
               }}
@@ -137,7 +137,7 @@ export default function LoginPage() {
               padding: '12px 16px',
               background: 'rgba(255,50,50,0.08)',
               border: '1px solid rgba(255,50,50,0.2)',
-              borderRadius: '8px',
+              borderRadius: '10px',
               marginBottom: '20px'
             }}>
               <p style={{ color: '#ff6b6b', fontSize: '13px', margin: 0 }}>{error}</p>
@@ -149,16 +149,16 @@ export default function LoginPage() {
             disabled={loading}
             style={{
               width: '100%',
-              padding: '14px',
+              padding: '16px',
               background: loading ? 'rgba(255,255,255,0.1)' : '#ffffff',
               color: loading ? 'rgba(255,255,255,0.4)' : '#000000',
               border: 'none',
               borderRadius: '10px',
-              fontSize: '14px',
+              fontSize: '13px',
               fontWeight: '700',
               cursor: loading ? 'not-allowed' : 'pointer',
-              letterSpacing: '0.05em',
-              transition: 'all 0.2s ease'
+              letterSpacing: '0.02em',
+              transition: 'var(--transition-control)'
             }}
           >
             {loading ? 'Signing in...' : 'Sign In'}

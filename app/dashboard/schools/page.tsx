@@ -228,13 +228,13 @@ export default function SchoolsPage() {
       {/* Page Title & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 admin-page-header">
         <div>
-          <h1 className="text-2xl font-bold tracking-wider uppercase text-[#111111]">Schools Registry</h1>
-          <p className="text-xs text-[#6B6B6B] tracking-wide uppercase mt-1">Audit and approve school Commerce Societies</p>
+          <h1 className="text-large-title font-bold tracking-tight text-[#1D1D1F]">Schools Registry</h1>
+          <p className="text-body text-[#6E6E73] mt-1">Audit and approve school Commerce Societies</p>
         </div>
         <button
           onClick={handleExport}
           disabled={filteredData.length === 0}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl text-xs font-semibold uppercase tracking-wider text-[#111111] hover:bg-[#E8E8E8] disabled:opacity-40 disabled:cursor-not-allowed transition-all admin-export-btn"
+          className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#F5F5F7] border border-[#E5E5EA] rounded-control text-body font-semibold capitalize text-[#1D1D1F] hover:bg-[#E5E5EA] disabled:opacity-40 disabled:cursor-not-allowed transition admin-export-btn"
         >
           <Download size={14} />
           <span>Export CSV ({filteredData.length})</span>
@@ -242,19 +242,19 @@ export default function SchoolsPage() {
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex gap-4 border-b border-[#E8E8E8] pb-2">
+      <div className="flex gap-4 border-b border-[#E5E5EA] pb-2">
         <button
           onClick={() => setActiveTab('registry')}
-          className={`text-xs uppercase font-bold tracking-wider pb-2 px-1 transition-all ${
-            activeTab === 'registry' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-[#6B6B6B] hover:text-[#111111]'
+          className={`text-body capitalize font-bold pb-2 px-1 transition ${
+            activeTab === 'registry' ? 'text-[#8A6D1C] border-b-2 border-[#d4af37]' : 'text-[#6E6E73] hover:text-[#1D1D1F]'
           }`}
         >
           Registry
         </button>
         <button
           onClick={() => { setActiveTab('exports'); fetchExportLogs(); }}
-          className={`text-xs uppercase font-bold tracking-wider pb-2 px-1 transition-all ${
-            activeTab === 'exports' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-[#6B6B6B] hover:text-[#111111]'
+          className={`text-body capitalize font-bold pb-2 px-1 transition ${
+            activeTab === 'exports' ? 'text-[#8A6D1C] border-b-2 border-[#d4af37]' : 'text-[#6E6E73] hover:text-[#1D1D1F]'
           }`}
         >
           Export History
@@ -262,34 +262,34 @@ export default function SchoolsPage() {
       </div>
 
       {activeTab === 'exports' ? (
-        <div className="bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl overflow-hidden shadow-xl p-6">
-          <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wider mb-4">Past Exports History</h3>
+        <div className="bg-[#FFFFFF] border border-[#E5E5EA] rounded-card overflow-hidden shadow-card p-6">
+          <h3 className="text-body font-bold text-[#1D1D1F] mb-4">Past Exports History</h3>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs text-[#111111]">
+            <table className="w-full border-collapse text-left text-body text-[#1D1D1F]">
               <thead>
-                <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
+                <tr className="border-b border-[#E5E5EA] bg-[#FBFBFD] text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                   <th className="p-4 font-semibold">Who (User)</th>
                   <th className="p-4 font-semibold">When (Date)</th>
                   <th className="p-4 font-semibold">Records Exported</th>
                   <th className="p-4 font-semibold">Reason</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8E8E8]">
+              <tbody className="divide-y divide-[#E5E5EA]">
                 {exportLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">
+                    <td colSpan={4} className="p-8 text-center text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                       No export logs recorded.
                     </td>
                   </tr>
                 ) : (
                   exportLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-[#FAFAFA] transition-all">
+                    <tr key={log.id} className="hover:bg-[#FBFBFD] transition">
                       <td className="p-4 font-semibold">{log.performed_by}</td>
-                      <td className="p-4 text-[#6B6B6B]">
+                      <td className="p-4 text-[#6E6E73]">
                         {new Date(log.performed_at).toLocaleString('en-LK')}
                       </td>
-                      <td className="p-4 font-mono font-bold text-[#111111]">{log.target_name}</td>
-                      <td className="p-4 text-[#6B6B6B]">{log.reason}</td>
+                      <td className="p-4 font-mono font-bold text-[#1D1D1F]">{log.target_name}</td>
+                      <td className="p-4 text-[#6E6E73]">{log.reason}</td>
                     </tr>
                   ))
                 )}
@@ -303,13 +303,13 @@ export default function SchoolsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 admin-filters-row">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B6B6B]" size={16} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6E6E73]" size={16} />
           <input
             type="text"
             placeholder="Search school name, society or student president..."
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            className="w-full pl-11 pr-4 py-3 bg-[#FFFFFF] border border-[#E8E8E8] rounded-xl text-xs text-[#111111] placeholder-[#A3A3A3] focus:outline-none focus:border-[#D1D5DB] transition-all"
+            className="w-full pl-11 pr-4 py-3 bg-[#FFFFFF] border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] placeholder-[#86868B] focus:outline-none focus:border-[#6E6E73] transition"
           />
         </div>
 
@@ -317,7 +317,7 @@ export default function SchoolsPage() {
         <select
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#D1D5DB] transition-all cursor-pointer"
+          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none focus:border-[#6E6E73] transition cursor-pointer"
         >
           <option value="all">All Society Statuses</option>
           <option value="pending">Pending Board Review</option>
@@ -329,7 +329,7 @@ export default function SchoolsPage() {
         <select
           value={provinceFilter}
           onChange={e => { setProvinceFilter(e.target.value); setCurrentPage(1); }}
-          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#D1D5DB] transition-all cursor-pointer"
+          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none focus:border-[#6E6E73] transition cursor-pointer"
         >
           <option value="all">All Provinces</option>
           {provinces.map(p => (
@@ -339,11 +339,11 @@ export default function SchoolsPage() {
       </div>
 
       {/* Main Table */}
-      <div className="bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl overflow-hidden shadow-xl admin-table-wrapper">
+      <div className="bg-[#FFFFFF] border border-[#E5E5EA] rounded-card overflow-hidden shadow-card admin-table-wrapper">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-xs text-[#111111]">
+          <table className="w-full border-collapse text-left text-body text-[#1D1D1F]">
             <thead>
-              <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
+              <tr className="border-b border-[#E5E5EA] bg-[#FBFBFD] text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                 <th className="p-4 font-semibold">School Name</th>
                 <th className="p-4 font-semibold">Province & District</th>
                 <th className="p-4 font-semibold">Commerce Society</th>
@@ -354,10 +354,10 @@ export default function SchoolsPage() {
                 <th className="p-4 font-semibold text-center">Board Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E8E8E8]">
+            <tbody className="divide-y divide-[#E5E5EA]">
               {currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">
+                  <td colSpan={8} className="p-8 text-center text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                     No registered schools found matching criteria.
                   </td>
                 </tr>
@@ -365,41 +365,41 @@ export default function SchoolsPage() {
                 currentItems.map((item) => {
                   const isActioning = actioningId === item.id
                   return (
-                    <tr key={item.id} className="hover:bg-[#FAFAFA] transition-all">
+                    <tr key={item.id} className="hover:bg-[#FBFBFD] transition">
                       {/* School Name */}
-                      <td className="p-4 font-semibold text-[#111111]">
+                      <td className="p-4 font-semibold text-[#1D1D1F]">
                         {item.school_name}
                       </td>
 
                       {/* Province & District */}
                       <td className="p-4">
-                        <span className="font-semibold text-[#111111]">{item.district}</span>
-                        <div className="text-[10px] text-[#6B6B6B] mt-0.5">{item.province}</div>
+                        <span className="font-semibold text-[#1D1D1F]">{item.district}</span>
+                        <div className="text-caption text-[#6E6E73] mt-1">{item.province}</div>
                       </td>
 
                       {/* Society Name */}
                       <td className="p-4">
-                        <span className="font-semibold text-[#111111]">{item.commerce_society_name}</span>
-                        <div className="text-[10px] text-[#6B6B6B] mt-0.5">{item.commerce_society_email}</div>
+                        <span className="font-semibold text-[#1D1D1F]">{item.commerce_society_name}</span>
+                        <div className="text-caption text-[#6E6E73] mt-1">{item.commerce_society_email}</div>
                       </td>
 
                       {/* MIC Details */}
                       <td className="p-4">
-                        <span className="font-semibold text-[#111111]">{item.master_in_charge_name}</span>
-                        <div className="text-[10px] text-[#6B6B6B] mt-0.5">Email: {item.master_in_charge_email}</div>
-                        <div className="text-[10px] text-[#6B6B6B]">Phone: {item.master_in_charge_phone}</div>
+                        <span className="font-semibold text-[#1D1D1F]">{item.master_in_charge_name}</span>
+                        <div className="text-caption text-[#6E6E73] mt-1">Email: {item.master_in_charge_email}</div>
+                        <div className="text-caption text-[#6E6E73]">Phone: {item.master_in_charge_phone}</div>
                       </td>
 
                       {/* President Details */}
                       <td className="p-4">
-                        <span className="font-semibold text-[#111111]">{item.student_president_name}</span>
-                        <div className="text-[10px] text-[#6B6B6B] mt-0.5">Email: {item.student_president_email}</div>
-                        <div className="text-[10px] text-[#6B6B6B]">Phone: {item.student_president_phone}</div>
+                        <span className="font-semibold text-[#1D1D1F]">{item.student_president_name}</span>
+                        <div className="text-caption text-[#6E6E73] mt-1">Email: {item.student_president_email}</div>
+                        <div className="text-caption text-[#6E6E73]">Phone: {item.student_president_phone}</div>
                       </td>
 
                       {/* Status */}
                       <td className="p-4">
-                        <span className={`inline-flex px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase border ${
+                        <span className={`inline-flex px-2 py-0.5 rounded-md text-caption font-bold tracking-[0.04em] uppercase border ${
                           item.status === 'approved' 
                             ? 'bg-green-500/10 border-green-500/30 text-green-400' 
                             : item.status === 'rejected'
@@ -411,7 +411,7 @@ export default function SchoolsPage() {
                       </td>
 
                       {/* Created At */}
-                      <td className="p-4 text-[#6B6B6B]">
+                      <td className="p-4 text-[#6E6E73]">
                         {new Date(item.created_at).toLocaleDateString('en-LK')}
                       </td>
 
@@ -427,7 +427,7 @@ export default function SchoolsPage() {
                               <button
                                 onClick={() => handleUpdateStatus(item.id, 'approved')}
                                 title="Approve School"
-                                className="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500/20 flex items-center justify-center transition-all"
+                                className="w-8 h-8 rounded-control bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500/20 flex items-center justify-center transition"
                               >
                                 <Check size={14} />
                               </button>
@@ -436,7 +436,7 @@ export default function SchoolsPage() {
                               <button
                                 onClick={() => handleUpdateStatus(item.id, 'rejected')}
                                 title="Reject School"
-                                className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-all"
+                                className="w-8 h-8 rounded-control bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition"
                               >
                                 <X size={14} />
                               </button>
@@ -445,9 +445,9 @@ export default function SchoolsPage() {
                               <button
                                 onClick={() => handleDelete(item.id, item.school_name)}
                                 style={{
-                                  padding: '6px 12px', background: 'transparent',
+                                  padding: '8px 12px', background: 'transparent',
                                   border: '1px solid rgba(255,0,0,0.3)', borderRadius: '6px',
-                                  color: 'rgba(255,80,80,0.8)', cursor: 'pointer', fontSize: '12px'
+                                  color: 'rgba(255,80,80,0.8)', cursor: 'pointer', fontSize: '13px'
                                 }}
                               >
                                 Delete
@@ -455,7 +455,7 @@ export default function SchoolsPage() {
                             ) : (
                               <button
                                 onClick={() => handleRequestAccess('schools')}
-                                style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #E8E8E8', borderRadius: '6px', color: '#6B6B6B', cursor: 'pointer', fontSize: '11px' }}
+                                style={{ padding: '8px 12px', background: 'transparent', border: '1px solid #E5E5EA', borderRadius: '6px', color: '#6E6E73', cursor: 'pointer', fontSize: '11px' }}
                               >
                                 Request View Access
                               </button>
@@ -473,22 +473,22 @@ export default function SchoolsPage() {
 
         {/* Pagination Row */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 bg-[#FAFAFA] border-t border-[#E8E8E8] flex items-center justify-between gap-4">
-            <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest">
+          <div className="px-6 py-4 bg-[#FBFBFD] border-t border-[#E5E5EA] flex items-center justify-between gap-4">
+            <span className="text-caption text-[#6E6E73] uppercase tracking-[0.04em]">
               Page {currentPage} of {totalPages} ({filteredData.length} total entries)
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] text-[#111111] flex items-center justify-center hover:bg-[#E8E8E8] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="w-8 h-8 rounded-control bg-[#F5F5F7] border border-[#E5E5EA] text-[#1D1D1F] flex items-center justify-center hover:bg-[#E5E5EA] disabled:opacity-30 disabled:cursor-not-allowed transition"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] text-[#111111] flex items-center justify-center hover:bg-[#E8E8E8] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="w-8 h-8 rounded-control bg-[#F5F5F7] border border-[#E5E5EA] text-[#1D1D1F] flex items-center justify-center hover:bg-[#E5E5EA] disabled:opacity-30 disabled:cursor-not-allowed transition"
               >
                 <ChevronRight size={16} />
               </button>

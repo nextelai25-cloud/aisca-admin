@@ -61,13 +61,13 @@ export default function MembersPage() {
   }
 
   return (
-    <div style={{ padding: '32px', color: '#111111' }}>
+    <div style={{ padding: '32px', color: '#1D1D1F' }}>
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', letterSpacing: '0.05em', margin: 0 }}>
+        <h1 style={{ fontSize: '28px', fontWeight: '700', letterSpacing: '-0.02em', margin: 0 }}>
           AISCA MEMBERS DATABASE
         </h1>
-        <p style={{ color: '#6B6B6B', fontSize: '13px', marginTop: '4px' }}>
+        <p style={{ color: '#6E6E73', fontSize: '13px', marginTop: '4px' }}>
           Master registry of all AISCA members across all activities
         </p>
       </div>
@@ -84,13 +84,13 @@ export default function MembersPage() {
         ].map(s => (
           <div key={s.label} style={{
             background: '#FFFFFF',
-            border: '1px solid #E8E8E8',
-            borderRadius: '12px', padding: '16px'
+            border: '1px solid #E5E5EA',
+            borderRadius: '16px', padding: '16px'
           }}>
-            <p style={{ fontSize: '9px', letterSpacing: '0.15em', color: '#6B6B6B', margin: '0 0 8px' }}>
+            <p style={{ fontSize: '11px', letterSpacing: '0.02em', color: '#6E6E73', margin: '0 0 8px' }}>
               {s.label}
             </p>
-            <p style={{ fontSize: '24px', fontWeight: '700', color: '#111111', margin: 0 }}>{s.value}</p>
+            <p style={{ fontSize: '28px', fontWeight: '700', color: '#1D1D1F', margin: 0 }}>{s.value}</p>
           </div>
         ))}
       </div>
@@ -102,19 +102,19 @@ export default function MembersPage() {
           onChange={e => setSearch(e.target.value)}
           placeholder="Search name, email, school, phone, AISCA ID..."
           style={{
-            flex: 1, minWidth: '280px', padding: '10px 16px',
+            flex: 1, minWidth: '280px', padding: '12px 16px',
             background: '#FFFFFF',
-            border: '1px solid #E8E8E8',
-            borderRadius: '8px', color: '#111111', fontSize: '13px', outline: 'none'
+            border: '1px solid #E5E5EA',
+            borderRadius: '10px', color: '#1D1D1F', fontSize: '13px', outline: 'none'
           }}
         />
         <select
           value={batchFilter}
           onChange={e => setBatchFilter(e.target.value)}
           style={{
-            padding: '10px 16px', background: '#FFFFFF',
-            border: '1px solid #E8E8E8',
-            borderRadius: '8px', color: '#111111', fontSize: '13px', cursor: 'pointer'
+            padding: '12px 16px', background: '#FFFFFF',
+            border: '1px solid #E5E5EA',
+            borderRadius: '10px', color: '#1D1D1F', fontSize: '13px', cursor: 'pointer'
           }}
         >
           {batches.map(b => <option key={b} value={b}>{b === 'All' ? 'All Batches' : b}</option>)}
@@ -123,9 +123,9 @@ export default function MembersPage() {
           value={typeFilter}
           onChange={e => setTypeFilter(e.target.value)}
           style={{
-            padding: '10px 16px', background: '#FFFFFF',
-            border: '1px solid #E8E8E8',
-            borderRadius: '8px', color: '#111111', fontSize: '13px', cursor: 'pointer'
+            padding: '12px 16px', background: '#FFFFFF',
+            border: '1px solid #E5E5EA',
+            borderRadius: '10px', color: '#1D1D1F', fontSize: '13px', cursor: 'pointer'
           }}
         >
           {types.map(t => <option key={t} value={t}>{t === 'All' ? 'All Types' : t}</option>)}
@@ -146,9 +146,9 @@ export default function MembersPage() {
             a.click()
           }}
           style={{
-            padding: '10px 20px', background: '#E8E8E8',
-            border: '1px solid #E8E8E8',
-            borderRadius: '8px', color: '#111111', fontSize: '13px',
+            padding: '12px 20px', background: '#E5E5EA',
+            border: '1px solid #E5E5EA',
+            borderRadius: '10px', color: '#1D1D1F', fontSize: '13px',
             cursor: 'pointer', fontWeight: '600'
           }}
         >
@@ -159,54 +159,54 @@ export default function MembersPage() {
       {/* Table */}
       <div className="admin-table-wrapper" style={{
         background: '#FFFFFF',
-        border: '1px solid #E8E8E8',
-        borderRadius: '12px', overflow: 'hidden'
+        border: '1px solid #E5E5EA',
+        borderRadius: '16px', overflow: 'hidden'
       }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ borderBottom: '1px solid #E8E8E8' }}>
+            <tr style={{ borderBottom: '1px solid #E5E5EA' }}>
               {['FULL NAME', 'EMAIL', 'PHONE', 'SCHOOL', 'A/L BATCH', 'ACTION'].map(h => (
                 <th key={h} style={{
                   padding: '12px 16px', textAlign: 'left',
-                  fontSize: '10px', letterSpacing: '0.12em',
-                  color: '#6B6B6B', fontWeight: '600'
+                  fontSize: '11px', letterSpacing: '0.02em',
+                  color: '#6E6E73', fontWeight: '600'
                 }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#6B6B6B' }}>Loading...</td></tr>
+              <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#6E6E73' }}>Loading...</td></tr>
             ) : paginated.map((m, i) => (
               <tr
                 key={m.id}
                 style={{
-                  borderBottom: '1px solid #E8E8E8',
-                  background: i % 2 === 0 ? 'transparent' : '#E8E8E8'
+                  borderBottom: '1px solid #E5E5EA',
+                  background: i % 2 === 0 ? 'transparent' : '#E5E5EA'
                 }}
               >
-                <td style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', color: '#111111' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', fontWeight: '600', color: '#1D1D1F' }}>
                   {m.full_name}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6B6B6B' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6E6E73' }}>
                   {m.email || '—'}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6B6B6B' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6E6E73' }}>
                   {m.phone || '—'}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6B6B6B' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6E6E73' }}>
                   {m.school || '—'}
                 </td>
-                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6B6B6B' }}>
+                <td style={{ padding: '12px 16px', fontSize: '13px', color: '#6E6E73' }}>
                   {m.al_batch || '—'}
                 </td>
                 <td style={{ padding: '12px 16px' }}>
                   <button
                     onClick={() => setSelectedMember(m)}
                     style={{
-                      padding: '5px 12px', background: 'transparent',
-                      border: '1px solid #E8E8E8',
-                      borderRadius: '6px', color: '#111111',
+                      padding: '4px 12px', background: 'transparent',
+                      border: '1px solid #E5E5EA',
+                      borderRadius: '6px', color: '#1D1D1F',
                       cursor: 'pointer', fontSize: '11px'
                     }}
                   >
@@ -221,22 +221,22 @@ export default function MembersPage() {
 
       {/* Pagination */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
-        <p style={{ color: '#6B6B6B', fontSize: '12px' }}>
+        <p style={{ color: '#6E6E73', fontSize: '13px' }}>
           Showing {page * PER_PAGE + 1}–{Math.min((page + 1) * PER_PAGE, filtered.length)} of {filtered.length} members
         </p>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={() => setPage(p => Math.max(0, p - 1))}
             disabled={page === 0}
-            style={{ padding: '6px 16px', background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '6px', color: page === 0 ? '#6B6B6B' : '#fff', cursor: page === 0 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
+            style={{ padding: '8px 16px', background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '6px', color: page === 0 ? '#6E6E73' : '#fff', cursor: page === 0 ? 'not-allowed' : 'pointer', fontSize: '13px' }}
           >← Prev</button>
-          <span style={{ padding: '6px 12px', color: '#6B6B6B', fontSize: '12px' }}>
+          <span style={{ padding: '8px 12px', color: '#6E6E73', fontSize: '13px' }}>
             {page + 1} / {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            style={{ padding: '6px 16px', background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '6px', color: page >= totalPages - 1 ? '#6B6B6B' : '#fff', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer', fontSize: '12px' }}
+            style={{ padding: '8px 16px', background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '6px', color: page >= totalPages - 1 ? '#6E6E73' : '#fff', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer', fontSize: '13px' }}
           >Next →</button>
         </div>
       </div>
@@ -250,15 +250,15 @@ export default function MembersPage() {
           <div
             className="admin-modal-inner"
             onClick={e => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: '680px', background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '16px', overflow: 'hidden' }}
+            style={{ width: '100%', maxWidth: '680px', background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', overflow: 'hidden' }}
           >
             {/* Modal header */}
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #E8E8E8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #E5E5EA', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h3 style={{ color: '#111111', fontSize: '18px', fontWeight: '700', margin: 0 }}>{selectedMember.full_name}</h3>
-                <p style={{ color: '#6B6B6B', fontSize: '12px', margin: '4px 0 0', fontFamily: 'monospace' }}>{selectedMember.aisca_id}</p>
+                <h3 style={{ color: '#1D1D1F', fontSize: '15px', fontWeight: '700', margin: 0 }}>{selectedMember.full_name}</h3>
+                <p style={{ color: '#6E6E73', fontSize: '13px', margin: '4px 0 0', fontFamily: 'monospace' }}>{selectedMember.aisca_id}</p>
               </div>
-              <button onClick={() => setSelectedMember(null)} style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '8px', color: '#111111', width: '36px', height: '36px', cursor: 'pointer', fontSize: '18px' }}>×</button>
+              <button onClick={() => setSelectedMember(null)} style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '10px', color: '#1D1D1F', width: '36px', height: '36px', cursor: 'pointer', fontSize: '15px' }}>×</button>
             </div>
 
             {/* Modal body */}
@@ -280,15 +280,15 @@ export default function MembersPage() {
                 { label: 'Participation Score', value: selectedMember.participation_score },
               ].map(f => (
                 <div key={f.label}>
-                  <p style={{ fontSize: '10px', color: '#6B6B6B', letterSpacing: '0.1em', margin: '0 0 4px' }}>{f.label.toUpperCase()}</p>
-                  <p style={{ fontSize: '14px', color: '#111111', margin: 0 }}>{f.value || '—'}</p>
+                  <p style={{ fontSize: '11px', color: '#6E6E73', letterSpacing: '0.1em', margin: '0 0 4px' }}>{f.label.toUpperCase()}</p>
+                  <p style={{ fontSize: '13px', color: '#1D1D1F', margin: 0 }}>{f.value || '—'}</p>
                 </div>
               ))}
             </div>
 
             {/* Activities */}
             <div style={{ padding: '0 24px 24px' }}>
-              <p style={{ fontSize: '10px', color: '#6B6B6B', letterSpacing: '0.1em', margin: '0 0 12px' }}>ACTIVITIES PARTICIPATED</p>
+              <p style={{ fontSize: '11px', color: '#6E6E73', letterSpacing: '0.1em', margin: '0 0 12px' }}>ACTIVITIES PARTICIPATED</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {[
                   { label: 'Forum', value: selectedMember.appeared_in_forum },
@@ -299,15 +299,15 @@ export default function MembersPage() {
                   { label: 'Official Database', value: selectedMember.appeared_in_official_database },
                 ].map(a => (
                   <span key={a.label} style={{
-                    padding: '4px 10px', borderRadius: '6px', fontSize: '11px',
-                    border: `1px solid ${a.value ? 'rgba(74,222,128,0.3)' : '#E8E8E8'}`,
-                    color: a.value ? '#4ade80' : '#6B6B6B',
+                    padding: '4px 12px', borderRadius: '6px', fontSize: '11px',
+                    border: `1px solid ${a.value ? 'rgba(74,222,128,0.3)' : '#E5E5EA'}`,
+                    color: a.value ? '#4ade80' : '#6E6E73',
                     background: a.value ? 'rgba(74,222,128,0.08)' : 'transparent'
                   }}>{a.label}</span>
                 ))}
               </div>
               {selectedMember.member_type_detail && (
-                <p style={{ fontSize: '12px', color: '#6B6B6B', marginTop: '12px' }}>
+                <p style={{ fontSize: '13px', color: '#6E6E73', marginTop: '12px' }}>
                   {selectedMember.member_type_detail}
                 </p>
               )}

@@ -162,8 +162,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: '#6B6B6B', fontSize: '14px' }}>Loading...</p>
+      <div style={{ minHeight: '100vh', background: '#F5F5F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#6E6E73', fontSize: '13px' }}>Loading...</p>
       </div>
     )
   }
@@ -178,30 +178,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const currentPageName = navItems.find(i => pathname === i.path || (pathname.startsWith(i.path) && i.path !== '/dashboard'))?.name || 'Dashboard'
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#F5F5F5', color: '#111111' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#F5F5F7', color: '#1D1D1F' }}>
       
       <style jsx global>{`
         .nav-link:hover {
-          background: #F5F5F5 !important;
+          background: #F5F5F7 !important;
         }
         .nav-link.active {
-          background: #111111 !important;
+          background: #1D1D1F !important;
           color: #ffffff !important;
         }
         .logout-btn:hover {
-          background: #F5F5F5 !important;
+          background: #F5F5F7 !important;
         }
         @media (max-width: 767px) {
           .admin-search { display: none !important; }
-          .admin-page-title { font-size: 17px !important; }
+          .admin-page-title { font-size: 15px !important; }
           .admin-header-right { gap: 12px !important; }
-          .admin-main { padding: 14px !important; }
+          .admin-main { padding: 16px !important; }
         }
         @media (max-width: 1024px) {
           .mobile-close-btn { display: flex !important; }
           .admin-sidebar {
             left: -220px;
-            transition: left 0.3s ease;
+            transition: left 0.3s var(--ease-sheet);
           }
           .admin-sidebar.open {
             left: 0 !important;
@@ -222,7 +222,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           left: 0,
           height: '100vh',
           background: '#FFFFFF',
-          borderRight: '1px solid #E8E8E8',
+          borderRight: '1px solid #E5E5EA',
           zIndex: 999,
           display: 'flex',
           flexDirection: 'column'
@@ -233,7 +233,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button 
             onClick={() => setSidebarOpen(false)}
             className="mobile-close-btn"
-            style={{ display: 'none', background: 'none', border: 'none', color: '#111111' }}
+            style={{ display: 'none', background: 'none', border: 'none', color: '#1D1D1F' }}
           >
             <X size={20} />
           </button>
@@ -251,11 +251,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className={`nav-link ${isActive ? 'active' : ''}`}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '12px', padding: '0 12px', height: '40px',
-                  borderRadius: '8px', 
-                  background: isActive ? '#111111' : '#FFFFFF',
-                  color: isActive ? '#ffffff' : '#6B6B6B',
-                  fontSize: '14px', fontWeight: '500', textDecoration: 'none',
-                  transition: 'all 0.15s ease'
+                  borderRadius: '10px', 
+                  background: isActive ? '#1D1D1F' : '#FFFFFF',
+                  color: isActive ? '#ffffff' : '#6E6E73',
+                  fontSize: '13px', fontWeight: '500', textDecoration: 'none',
+                  transition: 'var(--transition-control)'
                 }}
               >
                 <Icon size={18} />
@@ -265,7 +265,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
-        <div style={{ padding: '12px', borderTop: '1px solid #E8E8E8', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ padding: '12px', borderTop: '1px solid #E5E5EA', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {bottomNavItems.filter(item => profile && canAccess(profile.role as AdminRole, item.section)).map(item => {
             const isActive = pathname === item.path
             const Icon = item.icon
@@ -276,11 +276,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className={`nav-link ${isActive ? 'active' : ''}`}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '12px', padding: '0 12px', height: '40px',
-                  borderRadius: '8px', 
-                  background: isActive ? '#111111' : '#FFFFFF',
-                  color: isActive ? '#ffffff' : '#6B6B6B',
-                  fontSize: '14px', fontWeight: '500', textDecoration: 'none',
-                  transition: 'all 0.15s ease'
+                  borderRadius: '10px', 
+                  background: isActive ? '#1D1D1F' : '#FFFFFF',
+                  color: isActive ? '#ffffff' : '#6E6E73',
+                  fontSize: '13px', fontWeight: '500', textDecoration: 'none',
+                  transition: 'var(--transition-control)'
                 }}
               >
                 <Icon size={18} />
@@ -293,8 +293,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             className="logout-btn"
             style={{
               width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '0 12px', height: '40px',
-              borderRadius: '8px', background: 'transparent', border: 'none', color: '#EF4444',
-              fontSize: '14px', fontWeight: '500', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s ease'
+              borderRadius: '10px', background: 'transparent', border: 'none', color: '#D70015',
+              fontSize: '13px', fontWeight: '500', cursor: 'pointer', textAlign: 'left', transition: 'var(--transition-control)'
             }}
           >
             <LogOut size={18} />
@@ -308,22 +308,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         
         {/* Top Header Bar */}
         <header style={{
-          height: '64px', background: 'rgba(255,255,255,0.86)', WebkitBackdropFilter: 'blur(18px) saturate(170%)', backdropFilter: 'blur(18px) saturate(170%)', borderBottom: '1px solid #E8E8E8',
+          height: '64px', background: 'rgba(255,255,255,0.86)', WebkitBackdropFilter: 'blur(18px) saturate(170%)', backdropFilter: 'blur(18px) saturate(170%)', borderBottom: '1px solid #E5E5EA',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '0 24px',
           position: 'sticky', top: 0, zIndex: 90
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
             <button className="mobile-close-btn" aria-label="Open menu" onClick={() => setSidebarOpen(true)} style={{ display: 'none', background: 'none', border: 'none', padding: '8px', margin: '-8px', minHeight: 0 }}>
-              <Menu size={24} color="#111111" />
+              <Menu size={24} color="#1D1D1F" />
             </button>
-            <h1 className="admin-page-title" style={{ fontSize: '20px', fontWeight: '600', color: '#111111', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{currentPageName}</h1>
+            <h1 className="admin-page-title" style={{ fontSize: '15px', fontWeight: '600', letterSpacing: '-0.01em', color: '#1D1D1F', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{currentPageName}</h1>
           </div>
 
           <div className="admin-header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px', flexShrink: 0 }}>
             {/* Search Bar */}
             <div className="admin-search" style={{ position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', background: '#F5F5F5', borderRadius: '8px', padding: '0 12px', width: '280px', height: '36px' }}>
-                <Search size={16} color="#6B6B6B" />
+              <div style={{ display: 'flex', alignItems: 'center', background: '#F5F5F7', borderRadius: '10px', padding: '0 12px', width: '280px', height: '36px' }}>
+                <Search size={16} color="#6E6E73" />
                 <input 
                   type="text" 
                   placeholder="Search..." 
@@ -331,42 +331,42 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setShowSearch(true)}
                   onBlur={() => setTimeout(() => setShowSearch(false), 200)}
-                  style={{ background: 'transparent', border: 'none', outline: 'none', marginLeft: '8px', fontSize: '14px', width: '100%', color: '#111111' }}
+                  style={{ background: 'transparent', border: 'none', outline: 'none', marginLeft: '8px', fontSize: '13px', width: '100%', color: '#1D1D1F' }}
                 />
               </div>
               
               {showSearch && searchQuery.length >= 2 && (
-                <div style={{ position: 'absolute', top: '44px', left: 0, width: '100%', background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', padding: '8px 0', zIndex: 100, maxHeight: '400px', overflowY: 'auto' }}>
+                <div style={{ position: 'absolute', top: '44px', left: 0, width: '100%', background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', padding: '8px 0', zIndex: 100, maxHeight: '400px', overflowY: 'auto' }}>
                   {searchResults.members.length === 0 && searchResults.associates.length === 0 && searchResults.finance.length === 0 ? (
-                    <div style={{ padding: '8px 16px', fontSize: '13px', color: '#6B6B6B' }}>No results found</div>
+                    <div style={{ padding: '8px 16px', fontSize: '13px', color: '#6E6E73' }}>No results found</div>
                   ) : (
                     <>
                       {searchResults.members.length > 0 && (
                         <div style={{ marginBottom: '8px' }}>
-                          <div style={{ padding: '4px 16px', fontSize: '11px', textTransform: 'uppercase', color: '#6B6B6B', fontWeight: '600' }}>Members</div>
+                          <div style={{ padding: '4px 16px', fontSize: '11px', textTransform: 'uppercase', color: '#6E6E73', fontWeight: '600' }}>Members</div>
                           {searchResults.members.map(m => (
-                            <Link key={m.id} href={`/dashboard/members`} style={{ display: 'block', padding: '8px 16px', fontSize: '13px', color: '#111111', textDecoration: 'none' }} className="nav-link">
-                              {m.full_name} <span style={{ color: '#6B6B6B', fontSize: '11px' }}>({m.membership_number})</span>
+                            <Link key={m.id} href={`/dashboard/members`} style={{ display: 'block', padding: '8px 16px', fontSize: '13px', color: '#1D1D1F', textDecoration: 'none' }} className="nav-link">
+                              {m.full_name} <span style={{ color: '#6E6E73', fontSize: '11px' }}>({m.membership_number})</span>
                             </Link>
                           ))}
                         </div>
                       )}
                       {searchResults.associates.length > 0 && (
                         <div style={{ marginBottom: '8px' }}>
-                          <div style={{ padding: '4px 16px', fontSize: '11px', textTransform: 'uppercase', color: '#6B6B6B', fontWeight: '600' }}>Associates</div>
+                          <div style={{ padding: '4px 16px', fontSize: '11px', textTransform: 'uppercase', color: '#6E6E73', fontWeight: '600' }}>Associates</div>
                           {searchResults.associates.map(a => (
-                            <Link key={a.id} href={`/dashboard/associates`} style={{ display: 'block', padding: '8px 16px', fontSize: '13px', color: '#111111', textDecoration: 'none' }} className="nav-link">
-                              {a.full_name} <span style={{ color: '#6B6B6B', fontSize: '11px' }}>({a.school})</span>
+                            <Link key={a.id} href={`/dashboard/associates`} style={{ display: 'block', padding: '8px 16px', fontSize: '13px', color: '#1D1D1F', textDecoration: 'none' }} className="nav-link">
+                              {a.full_name} <span style={{ color: '#6E6E73', fontSize: '11px' }}>({a.school})</span>
                             </Link>
                           ))}
                         </div>
                       )}
                       {searchResults.finance.length > 0 && (
                         <div>
-                          <div style={{ padding: '4px 16px', fontSize: '11px', textTransform: 'uppercase', color: '#6B6B6B', fontWeight: '600' }}>Finance</div>
+                          <div style={{ padding: '4px 16px', fontSize: '11px', textTransform: 'uppercase', color: '#6E6E73', fontWeight: '600' }}>Finance</div>
                           {searchResults.finance.map(f => (
-                            <Link key={f.id} href={`/dashboard/finance`} style={{ display: 'block', padding: '8px 16px', fontSize: '13px', color: '#111111', textDecoration: 'none' }} className="nav-link">
-                              {f.description} <span style={{ color: '#6B6B6B', fontSize: '11px' }}>({f.amount})</span>
+                            <Link key={f.id} href={`/dashboard/finance`} style={{ display: 'block', padding: '8px 16px', fontSize: '13px', color: '#1D1D1F', textDecoration: 'none' }} className="nav-link">
+                              {f.description} <span style={{ color: '#6E6E73', fontSize: '11px' }}>({f.amount})</span>
                             </Link>
                           ))}
                         </div>
@@ -381,25 +381,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div style={{ position: 'relative' }}>
               <button 
                 onClick={() => setShowNotifications(!showNotifications)}
-                style={{ background: '#F5F5F5', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative' }}
+                style={{ background: '#F5F5F7', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative' }}
               >
-                <Bell size={18} color="#6B6B6B" />
+                <Bell size={18} color="#6E6E73" />
                 {notifications.length > 0 && (
-                  <span style={{ position: 'absolute', top: 0, right: 0, background: '#EF4444', color: '#111111', fontSize: '10px', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                  <span style={{ position: 'absolute', top: 0, right: 0, background: '#D70015', color: '#FFFFFF', fontSize: '11px', minWidth: '16px', height: '16px', padding: '0 4px', borderRadius: '999px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                     {notifications.length}
                   </span>
                 )}
               </button>
               
               {showNotifications && (
-                <div style={{ position: 'absolute', top: '44px', right: 0, width: '300px', background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', zIndex: 100, overflow: 'hidden' }}>
-                  <div style={{ padding: '16px', borderBottom: '1px solid #E8E8E8', fontWeight: '600', fontSize: '14px' }}>Notifications</div>
+                <div style={{ position: 'absolute', top: '44px', right: 0, width: '300px', background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', zIndex: 100, overflow: 'hidden' }}>
+                  <div style={{ padding: '16px', borderBottom: '1px solid #E5E5EA', fontWeight: '600', fontSize: '13px' }}>Notifications</div>
                   <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                     {notifications.length === 0 ? (
-                      <div style={{ padding: '24px', textAlign: 'center', color: '#6B6B6B', fontSize: '13px' }}>No new notifications</div>
+                      <div style={{ padding: '24px', textAlign: 'center', color: '#6E6E73', fontSize: '13px' }}>No new notifications</div>
                     ) : (
                       notifications.map((n, i) => (
-                        <Link key={i} href={n.link} onClick={() => setShowNotifications(false)} style={{ display: 'block', padding: '16px', borderBottom: '1px solid #F5F5F5', textDecoration: 'none', color: '#111111', fontSize: '13px' }} className="nav-link">
+                        <Link key={i} href={n.link} onClick={() => setShowNotifications(false)} style={{ display: 'block', padding: '16px', borderBottom: '1px solid #F5F5F7', textDecoration: 'none', color: '#1D1D1F', fontSize: '13px' }} className="nav-link">
                           {n.text}
                         </Link>
                       ))
@@ -412,10 +412,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* User Avatar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div className="hidden md:block text-right">
-                <div style={{ fontSize: '13px', fontWeight: '600', color: '#111111' }}>{profile?.name}</div>
-                <div style={{ fontSize: '11px', color: '#6B6B6B', textTransform: 'capitalize' }}>{profile ? formatRole(profile.role) : ''}</div>
+                <div style={{ fontSize: '13px', fontWeight: '600', color: '#1D1D1F' }}>{profile?.name}</div>
+                <div style={{ fontSize: '11px', color: '#6E6E73', textTransform: 'capitalize' }}>{profile ? formatRole(profile.role) : ''}</div>
               </div>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#111111', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '600' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#1D1D1F', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600' }}>
                 {profile?.name?.substring(0, 2).toUpperCase() || 'AD'}
               </div>
             </div>

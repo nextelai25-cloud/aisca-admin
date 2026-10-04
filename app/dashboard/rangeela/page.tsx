@@ -195,7 +195,7 @@ export default function RangeelaTicketsPage() {
       <RangeelaTabs me={me} subtitle="Ticket requests, payment approvals and entrance check in" />
 
       {loadError && (
-        <div className="rg-glass flex gap-2 items-start p-4 text-red-700 text-sm"><AlertTriangle size={18} className="shrink-0" /> {loadError}</div>
+        <div className="rg-glass flex gap-2 items-start p-4 text-red-700 text-body"><AlertTriangle size={18} className="shrink-0" /> {loadError}</div>
       )}
 
       {/* Stats */}
@@ -204,11 +204,11 @@ export default function RangeelaTicketsPage() {
         <Stat label="Issued" value={stats.approved} icon={Ticket} tone="#16A34A" sub={`${stats.total} requests`} onClick={() => setStatusFilter('approved')} />
         <Stat label="Checked in" value={stats.checkedIn} icon={DoorOpen} tone="#7B2FF7" sub={stats.approved ? `${Math.round((stats.checkedIn / stats.approved) * 100)}% of issued` : undefined} onClick={() => setStatusFilter('checked_in')} />
         <div className="rg-glass p-4 text-white" style={{ background: 'linear-gradient(135deg, rgba(36,22,40,0.92), rgba(88,40,110,0.88))', borderColor: 'rgba(255,255,255,0.25)' }}>
-          <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/60">Ticket income</div>
-          <div className="text-2xl font-extrabold mt-1.5">LKR {(stats.bankTotal + stats.cashTotal).toLocaleString()}</div>
-          <div className="text-[11px] text-white/65 mt-1 space-y-0.5">
-            <div className="flex items-center gap-1.5"><Landmark size={12} /> Bank {stats.bankCount} · LKR {stats.bankTotal.toLocaleString()}</div>
-            <div className="flex items-center gap-1.5"><Banknote size={12} /> Cash {stats.cashCount} · LKR {stats.cashTotal.toLocaleString()}</div>
+          <div className="text-caption font-bold uppercase tracking-[0.14em] text-white/60">Ticket income</div>
+          <div className="text-large-title font-bold mt-2">LKR {(stats.bankTotal + stats.cashTotal).toLocaleString()}</div>
+          <div className="text-caption text-white/65 mt-1 space-y-1">
+            <div className="flex items-center gap-2"><Landmark size={12} /> Bank {stats.bankCount} · LKR {stats.bankTotal.toLocaleString()}</div>
+            <div className="flex items-center gap-2"><Banknote size={12} /> Cash {stats.cashCount} · LKR {stats.cashTotal.toLocaleString()}</div>
           </div>
         </div>
       </div>
@@ -218,7 +218,7 @@ export default function RangeelaTicketsPage() {
           <div className="rg-label mb-2">Cash collected by account</div>
           <div className="flex flex-wrap gap-2">
             {Object.entries(stats.cashBy).map(([k, v]) => (
-              <span key={k} className="px-3 py-1.5 rounded-full bg-white/70 text-xs text-[#1B1320]"><b>{k}</b> · {v.count} · LKR {v.total.toLocaleString()}</span>
+              <span key={k} className="px-3 py-2 rounded-full bg-white/70 text-body text-[#1B1320]"><b>{k}</b> · {v.count} · LKR {v.total.toLocaleString()}</span>
             ))}
           </div>
         </div>
@@ -242,17 +242,17 @@ export default function RangeelaTicketsPage() {
             </span>
           )}
         </div>
-        <div className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-0.5" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-1" style={{ scrollbarWidth: 'none' }}>
           {FILTERS.map((fl) => (
             <button key={fl.key} onClick={() => setStatusFilter(fl.key)}
-              className={`shrink-0 h-9 px-3.5 rounded-full text-[13px] font-bold border transition-all ${statusFilter === fl.key ? 'bg-[#1B1320] text-white border-[#1B1320]' : 'bg-white/70 text-[#3A2E38] border-white'}`}>
+              className={`shrink-0 h-9 px-4 rounded-full text-body font-bold border transition ${statusFilter === fl.key ? 'bg-[#1B1320] text-white border-[#1B1320]' : 'bg-white/70 text-[#3A2E38] border-white'}`}>
               {fl.label} <span className={statusFilter === fl.key ? 'text-white/70' : 'text-[#9A8D97]'}>{counts[fl.key]}</span>
             </button>
           ))}
           <span className="w-px bg-[#1B1320]/10 shrink-0 mx-1" />
           {[['all', 'Bank + cash'], ['bank', 'Bank'], ['cash', 'Cash']].map(([k, l]) => (
             <button key={k} onClick={() => setMethodFilter(k)}
-              className={`shrink-0 h-9 px-3.5 rounded-full text-[13px] font-bold border transition-all ${methodFilter === k ? 'bg-[#7B2FF7] text-white border-[#7B2FF7]' : 'bg-white/70 text-[#3A2E38] border-white'}`}>
+              className={`shrink-0 h-9 px-4 rounded-full text-body font-bold border transition ${methodFilter === k ? 'bg-[#7B2FF7] text-white border-[#7B2FF7]' : 'bg-white/70 text-[#3A2E38] border-white'}`}>
               {l}
             </button>
           ))}
@@ -262,23 +262,23 @@ export default function RangeelaTicketsPage() {
       {/* Ticket list (cards, work on any screen) */}
       <div className="rg-glass overflow-hidden">
         {rows.length === 0 ? (
-          <div className="p-10 text-center text-sm text-[#6B5E68]">Nothing here yet.</div>
+          <div className="p-10 text-center text-body text-[#6B5E68]">Nothing here yet.</div>
         ) : (
           <ul className="divide-y divide-[#1B1320]/[0.06]">
             {rows.map((t) => (
               <li key={t.id}>
-                <button onClick={() => open(t)} className="w-full text-left px-4 py-3.5 flex items-center gap-3 hover:bg-white/50 active:bg-white/70 transition-colors">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-sm font-extrabold"
+                <button onClick={() => open(t)} className="w-full text-left px-4 py-4 flex items-center gap-3 hover:bg-white/50 active:bg-white/70 transition-colors">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-body font-bold"
                     style={{ background: t.status === 'approved' ? (t.checked_in_at ? '#7B2FF7' : '#16A34A') : t.status === 'rejected' ? '#DC2626' : '#F59E0B' }}>
                     {t.full_name.trim().charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-bold text-[15px] text-[#1B1320] truncate">{t.full_name}</span>
+                      <span className="font-bold text-headline text-[#1B1320] truncate">{t.full_name}</span>
                       {t.payment_method === 'cash' && <Banknote size={14} className="text-[#6B5E68] shrink-0" />}
                     </div>
                     <div className="text-[12.5px] text-[#6B5E68] truncate">{t.school} · {t.al_batch}</div>
-                    <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
                       <span className="font-mono text-[11.5px] font-bold text-[#7B2FF7]">{t.ticket_number}</span>
                       <span className={`rg-chip ${t.status}`}>{t.status === 'pending' ? 'To approve' : t.status}</span>
                       {t.checked_in_at && <span className="rg-chip in">Checked in</span>}
@@ -309,7 +309,7 @@ export default function RangeelaTicketsPage() {
               const t = s.ticket_id ? nameById.get(s.ticket_id) : undefined
               const cls = s.result === 'admitted' ? 'approved' : s.result === 'already_used' ? 'rejected' : 'pending'
               return (
-                <div key={s.id} className="py-2.5 flex items-center gap-3 text-[13px]">
+                <div key={s.id} className="py-3 flex items-center gap-3 text-body">
                   <span className={`rg-chip ${cls} shrink-0`}>{s.result.replace('_', ' ')}</span>
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-[#1B1320] truncate">{t ? t.full_name : s.code}</div>
@@ -328,29 +328,29 @@ export default function RangeelaTicketsPage() {
           <div onClick={() => setSelected(null)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
           <div className="relative w-full sm:max-w-lg max-h-[92vh] sm:max-h-none sm:h-full flex flex-col rounded-t-[28px] sm:rounded-none overflow-hidden"
             style={{ background: 'rgba(252,249,252,0.94)', WebkitBackdropFilter: 'blur(30px) saturate(180%)', backdropFilter: 'blur(30px) saturate(180%)', boxShadow: '0 -20px 60px -20px rgba(0,0,0,0.35)' }}>
-            <div className="sm:hidden flex justify-center pt-2.5"><span className="w-10 h-1.5 rounded-full bg-[#1B1320]/15" /></div>
+            <div className="sm:hidden flex justify-center pt-3"><span className="w-10 h-1.5 rounded-full bg-[#1B1320]/15" /></div>
             <div className="flex items-start justify-between gap-4 px-5 pt-3 sm:pt-6 pb-3">
               <div className="min-w-0">
-                <div className="font-mono text-lg font-extrabold text-[#7B2FF7]">{selected.ticket_number}</div>
-                <div className="text-[12px] text-[#6B5E68]">Submitted {fmtTime(selected.created_at)}{selected.source === 'cash_desk' ? ` · cash desk` : ''}</div>
+                <div className="font-mono text-headline font-bold text-[#7B2FF7]">{selected.ticket_number}</div>
+                <div className="text-body text-[#6B5E68]">Submitted {fmtTime(selected.created_at)}{selected.source === 'cash_desk' ? ` · cash desk` : ''}</div>
               </div>
               <button onClick={() => setSelected(null)} aria-label="Close" className="w-9 h-9 rounded-full bg-[#1B1320]/[0.06] flex items-center justify-center text-[#1B1320] shrink-0"><X size={18} /></button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-4" style={{ overscrollBehavior: 'contain' }}>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 <span className={`rg-chip ${selected.status}`}>{selected.status === 'pending' ? 'Waiting for approval' : selected.status}</span>
                 {selected.checked_in_at && <span className="rg-chip in">Checked in {fmtTime(selected.checked_in_at)}</span>}
                 {dupes.has(selected.id) && <span className="rg-chip warn">Possible duplicate</span>}
               </div>
 
               {notice && (
-                <div className={`flex gap-2 items-start p-3 rounded-2xl text-[13px] ${notice.kind === 'ok' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-700'}`}>
-                  {notice.kind === 'ok' ? <CheckCircle2 size={16} className="shrink-0 mt-0.5" /> : <AlertTriangle size={16} className="shrink-0 mt-0.5" />} {notice.text}
+                <div className={`flex gap-2 items-start p-3 rounded-2xl text-body ${notice.kind === 'ok' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+                  {notice.kind === 'ok' ? <CheckCircle2 size={16} className="shrink-0 mt-1" /> : <AlertTriangle size={16} className="shrink-0 mt-1" />} {notice.text}
                 </div>
               )}
 
-              <div className="rounded-2xl bg-white/80 border border-white divide-y divide-[#1B1320]/[0.06] text-[14px]">
+              <div className="rounded-2xl bg-white/80 border border-white divide-y divide-[#1B1320]/[0.06] text-body">
                 <Row icon={User} label="Name" value={selected.full_name} />
                 <Row icon={Mail} label="Email" value={selected.email} />
                 <Row icon={Phone} label="Phone" value={<a className="text-[#16A34A] font-semibold" href={`tel:${selected.whatsapp.replace(/[^\d+]/g, '')}`}>{selected.whatsapp}</a>} />
@@ -367,7 +367,7 @@ export default function RangeelaTicketsPage() {
               </div>
 
               {selected.email_error && selected.status === 'approved' && (
-                <div className="p-3 rounded-2xl bg-red-50 border border-red-200 text-[13px] text-red-700">Last email attempt failed: {selected.email_error}</div>
+                <div className="p-3 rounded-2xl bg-red-50 border border-red-200 text-body text-red-700">Last email attempt failed: {selected.email_error}</div>
               )}
 
               {selected.payment_method === 'bank' && (
@@ -381,13 +381,13 @@ export default function RangeelaTicketsPage() {
                         <img src={selected.receipt_url} alt="Bank receipt" className="w-full max-h-[420px] object-contain rounded-2xl border border-white bg-white" />
                       </a>
                     )
-                  ) : <p className="text-[13px] text-[#6B5E68]">No receipt.</p>}
-                  <p className="text-[12px] text-[#6B5E68] mt-2">Check it shows LKR {Number(selected.amount).toLocaleString()} paid to Sampath Bank 1069 6100 6902 before approving.</p>
+                  ) : <p className="text-body text-[#6B5E68]">No receipt.</p>}
+                  <p className="text-body text-[#6B5E68] mt-2">Check it shows LKR {Number(selected.amount).toLocaleString()} paid to Sampath Bank 1069 6100 6902 before approving.</p>
                 </div>
               )}
 
               {me?.can.edit && (
-                <div className="rounded-2xl bg-white/80 border border-white p-3.5 space-y-2">
+                <div className="rounded-2xl bg-white/80 border border-white p-4 space-y-2">
                   <div className="rg-label">Wrong email? Fix it here</div>
                   <input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} type="email" autoCapitalize="off" autoCorrect="off" className="rg-input" />
                   <button onClick={() => resend(selected)} disabled={busy} className="rg-btn rg-btn-dark w-full">
@@ -397,11 +397,11 @@ export default function RangeelaTicketsPage() {
               )}
 
               {me?.can.approve && selected.status !== 'rejected' && (selected.status === 'pending' || me.can.revoke) && !selected.checked_in_at && showReject && (
-                <div className="rounded-2xl border border-red-200 bg-red-50/70 p-3.5 space-y-3">
+                <div className="rounded-2xl border border-red-200 bg-red-50/70 p-4 space-y-3">
                   <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} rows={3} maxLength={500}
                     placeholder="Short note for the student, e.g. The receipt is unclear, or the amount does not match."
-                    className="w-full p-3 rounded-xl border border-[#1B1320]/10 text-[15px] text-[#1B1320] bg-white focus:outline-none" />
-                  <label className="flex items-center gap-2 text-[13px] text-[#1B1320]"><input type="checkbox" className="w-4 h-4" checked={rejectNotify} onChange={(e) => setRejectNotify(e.target.checked)} /> Email the student about this</label>
+                    className="w-full p-3 rounded-xl border border-[#1B1320]/10 text-headline text-[#1B1320] bg-white focus:outline-none" />
+                  <label className="flex items-center gap-2 text-body text-[#1B1320]"><input type="checkbox" className="w-4 h-4" checked={rejectNotify} onChange={(e) => setRejectNotify(e.target.checked)} /> Email the student about this</label>
                   <div className="flex gap-2">
                     <button onClick={() => reject(selected)} disabled={busy} className="rg-btn flex-1 bg-red-600 text-white">{selected.status === 'approved' ? 'Cancel ticket' : 'Reject request'}</button>
                     <button onClick={() => setShowReject(false)} className="rg-btn rg-btn-ghost">Back</button>
@@ -412,7 +412,7 @@ export default function RangeelaTicketsPage() {
 
             {/* Sticky action bar */}
             {me?.can.approve && !showReject && (selected.status !== 'approved' || (me.can.revoke && !selected.checked_in_at)) && (
-              <div className="px-5 pt-3 border-t border-[#1B1320]/[0.06] flex gap-2" style={{ paddingBottom: 'calc(14px + env(safe-area-inset-bottom))' }}>
+              <div className="px-5 pt-3 border-t border-[#1B1320]/[0.06] flex gap-2" style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom))' }}>
                 {selected.status !== 'approved' && (
                   <button onClick={() => approve(selected)} disabled={busy} className="rg-btn rg-btn-green flex-1">
                     <CheckCircle2 size={17} /> {busy ? 'Working...' : 'Approve and email ticket'}
@@ -448,17 +448,17 @@ function Stat({ label, value, sub, icon: Icon, tone, onClick }: { label: string;
         <span className="rg-label truncate">{label}</span>
         <span className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ background: `${tone}1A`, color: tone }}><Icon size={15} /></span>
       </div>
-      <div className="text-3xl font-extrabold mt-1.5" style={{ color: tone }}>{value}</div>
-      {sub && <div className="text-[11.5px] text-[#6B5E68] mt-0.5 truncate">{sub}</div>}
+      <div className="text-large-title font-bold mt-2" style={{ color: tone }}>{value}</div>
+      {sub && <div className="text-[11.5px] text-[#6B5E68] mt-1 truncate">{sub}</div>}
     </button>
   )
 }
 
 function Row({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3 px-3.5 py-2.5">
-      <Icon size={15} className="text-[#6B5E68] mt-0.5 shrink-0" />
-      <span className="text-[11px] uppercase tracking-wider text-[#6B5E68] w-[76px] shrink-0 mt-0.5">{label}</span>
+    <div className="flex items-start gap-3 px-4 py-3">
+      <Icon size={15} className="text-[#6B5E68] mt-1 shrink-0" />
+      <span className="text-caption uppercase tracking-[0.04em] text-[#6B5E68] w-[76px] shrink-0 mt-1">{label}</span>
       <span className="text-[#1B1320] break-words min-w-0 flex-1">{value}</span>
     </div>
   )

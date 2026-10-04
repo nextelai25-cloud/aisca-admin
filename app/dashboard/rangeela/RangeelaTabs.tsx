@@ -72,30 +72,30 @@ export function RangeelaGlassStyles() {
 
         .rg-head { overflow: hidden; }
         .rg-head-bar { height: 4px; }
-        .rg-head-row { display: flex; align-items: center; gap: 14px; padding: 14px 18px; }
+        .rg-head-row { display: flex; align-items: center; gap: 16px; padding: 16px 16px; }
         .rg-head-logo { width: 92px !important; height: auto !important; flex-shrink: 0; }
         .rg-head-text { flex: 1; min-width: 0; }
-        .rg-head-title { font-size: 18px; font-weight: 800; color: #1B1320; letter-spacing: -0.01em; }
-        .rg-head-sub { font-size: 12.5px; color: #6B5E68; margin-top: 2px; line-height: 1.4; }
+        .rg-head-title { font-size: 20px; font-weight: 700; color: #1B1320; letter-spacing: -0.01em; }
+        .rg-head-sub { font-size: 13px; color: #6B5E68; margin-top: 2px; line-height: 1.4; }
         .rg-head-me { text-align: right; flex-shrink: 0; }
-        .rg-head-me-name { font-size: 12.5px; font-weight: 700; color: #1B1320; }
-        .rg-head-me-role { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: #6B5E68; margin-top: 2px; }
+        .rg-head-me-name { font-size: 13px; font-weight: 700; color: #1B1320; }
+        .rg-head-me-role { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6B5E68; margin-top: 2px; }
 
-        .rg-seg { display: flex; padding: 5px; gap: 4px; border-radius: 999px; }
-        .rg-seg-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 42px; border-radius: 999px; font-size: 14px; font-weight: 700; color: #3A2E38; text-decoration: none; transition: background .2s, color .2s; white-space: nowrap; }
+        .rg-seg { display: flex; padding: 4px; gap: 4px; border-radius: 999px; }
+        .rg-seg-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 42px; border-radius: 999px; font-size: 13px; font-weight: 700; color: #3A2E38; text-decoration: none; transition: background .2s, color .2s; white-space: nowrap; }
         .rg-seg-btn.is-on { background: #1B1320; color: #fff; box-shadow: 0 6px 16px -8px rgba(27,19,32,0.7); }
 
-        .rg-label { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; color: #6B5E68; }
-        .rg-input { width: 100%; height: 48px; padding: 0 14px; border-radius: 14px; border: 1px solid rgba(27,19,32,0.12); background: rgba(255,255,255,0.8); font-size: 16px; color: #1B1320; outline: none; }
+        .rg-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #6B5E68; }
+        .rg-input { width: 100%; height: 48px; padding: 0 16px; border-radius: 14px; border: 1px solid rgba(27,19,32,0.12); background: rgba(255,255,255,0.8); font-size: 16px; color: #1B1320; outline: none; }
         .rg-input:focus { border-color: #7B2FF7; box-shadow: 0 0 0 4px rgba(123,47,247,0.14); background: #fff; }
-        .rg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 18px; border-radius: 14px; font-size: 14px; font-weight: 700; border: none; cursor: pointer; transition: transform .12s, opacity .2s; }
+        .rg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 16px; border-radius: 14px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: transform .12s, opacity .2s; }
         .rg-btn:active { transform: scale(.98); }
         .rg-btn:disabled { opacity: .5; cursor: default; }
         .rg-btn-dark { background: #1B1320; color: #fff; }
         .rg-btn-green { background: #16A34A; color: #fff; box-shadow: 0 8px 18px -10px rgba(22,163,74,0.9); }
         .rg-btn-ghost { background: rgba(255,255,255,0.75); color: #1B1320; border: 1px solid rgba(27,19,32,0.1); }
         .rg-btn-danger { background: rgba(255,255,255,0.75); color: #DC2626; border: 1px solid rgba(220,38,38,0.25); }
-        .rg-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; border: 1px solid transparent; }
+        .rg-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; border: 1px solid transparent; }
         .rg-chip.pending { background: #FFF4DB; color: #B45309; border-color: #FCD9A0; }
         .rg-chip.approved { background: #E6F8EC; color: #15803D; border-color: #BBE8CA; }
         .rg-chip.rejected { background: #FDECEC; color: #DC2626; border-color: #F8C4C4; }
@@ -103,7 +103,7 @@ export function RangeelaGlassStyles() {
         .rg-chip.warn { background: #FFF1E6; color: #C2410C; border-color: #FFD2B3; }
 
         @media (max-width: 640px) {
-          .rg-head-row { padding: 12px 14px; gap: 12px; }
+          .rg-head-row { padding: 12px 16px; gap: 12px; }
           .rg-head-logo { width: 70px !important; }
           .rg-head-me { display: none; }
           .rg-head-title { font-size: 16px; }

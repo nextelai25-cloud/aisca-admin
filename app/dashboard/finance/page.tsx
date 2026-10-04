@@ -23,12 +23,12 @@ export default function FinancePage() {
     <div className="space-y-6 animate-fade-in" style={{ padding: '0 24px' }}>
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-wider uppercase text-[#111111]">Finance Command Center</h1>
-        <p className="text-xs text-[#6B6B6B] tracking-wide uppercase mt-1">Comprehensive Financial Management & Reporting</p>
+        <h1 className="text-large-title font-bold tracking-tight text-[#1D1D1F]">Finance Command Center</h1>
+        <p className="text-body text-[#6E6E73] mt-1">Comprehensive Financial Management & Reporting</p>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex flex-wrap gap-2 pb-4 border-b border-[#E8E8E8]">
+      <div className="flex flex-wrap gap-2 pb-4 border-b border-[#E5E5EA]">
         {tabs.map(tab => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -37,13 +37,13 @@ export default function FinancePage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{
-                display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', borderRadius: '8px',
-                fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'all 0.2s',
-                background: isActive ? '#111111' : 'transparent',
-                color: isActive ? '#FFFFFF' : '#6B6B6B',
-                border: isActive ? '1px solid #111111' : '1px solid transparent'
+                display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', borderRadius: '10px',
+                fontSize: '13px', fontWeight: 'bold', textTransform: 'capitalize', transition: 'var(--transition-control)',
+                background: isActive ? '#1D1D1F' : 'transparent',
+                color: isActive ? '#FFFFFF' : '#6E6E73',
+                border: isActive ? '1px solid #1D1D1F' : '1px solid transparent'
               }}
-              onMouseEnter={(e) => !isActive && (e.currentTarget.style.background = '#F5F5F5')}
+              onMouseEnter={(e) => !isActive && (e.currentTarget.style.background = '#F5F5F7')}
               onMouseLeave={(e) => !isActive && (e.currentTarget.style.background = 'transparent')}
             >
               <Icon size={16} />

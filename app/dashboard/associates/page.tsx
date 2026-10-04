@@ -281,8 +281,8 @@ export default function AssociatesPage() {
       {/* Page Title & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 admin-page-header">
         <div>
-          <h1 className="text-2xl font-bold tracking-wider uppercase text-[#111111]">Associates Registry</h1>
-          <p className="text-xs text-[#6B6B6B] tracking-wide uppercase mt-1">Review and manage individual onboardings</p>
+          <h1 className="text-large-title font-bold tracking-tight text-[#1D1D1F]">Associates Registry</h1>
+          <p className="text-body text-[#6E6E73] mt-1">Review and manage individual onboardings</p>
         </div>
         <div className="flex items-center gap-3">
           {selectedIds.size > 0 && (
@@ -290,14 +290,14 @@ export default function AssociatesPage() {
               <button
                 onClick={() => handleBulkStatus('approved')}
                 disabled={actioningId === 'bulk'}
-                className="px-3 py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl text-xs font-semibold uppercase hover:bg-green-500/20 transition-all"
+                className="px-3 py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-control text-body font-semibold capitalize hover:bg-green-500/20 transition"
               >
                 Approve ({selectedIds.size})
               </button>
               <button
                 onClick={() => handleBulkStatus('rejected')}
                 disabled={actioningId === 'bulk'}
-                className="px-3 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs font-semibold uppercase hover:bg-red-500/20 transition-all"
+                className="px-3 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-control text-body font-semibold capitalize hover:bg-red-500/20 transition"
               >
                 Reject ({selectedIds.size})
               </button>
@@ -306,7 +306,7 @@ export default function AssociatesPage() {
           <button
             onClick={handleExport}
             disabled={filteredData.length === 0}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl text-xs font-semibold uppercase tracking-wider text-[#111111] hover:bg-[#E8E8E8] disabled:opacity-40 disabled:cursor-not-allowed transition-all admin-export-btn"
+            className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#F5F5F7] border border-[#E5E5EA] rounded-control text-body font-semibold capitalize text-[#1D1D1F] hover:bg-[#E5E5EA] disabled:opacity-40 disabled:cursor-not-allowed transition admin-export-btn"
           >
             <Download size={14} />
             <span>Export CSV ({filteredData.length})</span>
@@ -315,19 +315,19 @@ export default function AssociatesPage() {
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex gap-4 border-b border-[#E8E8E8] pb-2">
+      <div className="flex gap-4 border-b border-[#E5E5EA] pb-2">
         <button
           onClick={() => setActiveTab('registry')}
-          className={`text-xs uppercase font-bold tracking-wider pb-2 px-1 transition-all ${
-            activeTab === 'registry' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-[#6B6B6B] hover:text-[#111111]'
+          className={`text-body capitalize font-bold pb-2 px-1 transition ${
+            activeTab === 'registry' ? 'text-[#8A6D1C] border-b-2 border-[#d4af37]' : 'text-[#6E6E73] hover:text-[#1D1D1F]'
           }`}
         >
           Registry
         </button>
         <button
           onClick={() => { setActiveTab('exports'); fetchExportLogs(); }}
-          className={`text-xs uppercase font-bold tracking-wider pb-2 px-1 transition-all ${
-            activeTab === 'exports' ? 'text-[#d4af37] border-b-2 border-[#d4af37]' : 'text-[#6B6B6B] hover:text-[#111111]'
+          className={`text-body capitalize font-bold pb-2 px-1 transition ${
+            activeTab === 'exports' ? 'text-[#8A6D1C] border-b-2 border-[#d4af37]' : 'text-[#6E6E73] hover:text-[#1D1D1F]'
           }`}
         >
           Export History
@@ -335,34 +335,34 @@ export default function AssociatesPage() {
       </div>
 
       {activeTab === 'exports' ? (
-        <div className="bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl overflow-hidden shadow-xl p-6">
-          <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wider mb-4">Past Exports History</h3>
+        <div className="bg-[#FFFFFF] border border-[#E5E5EA] rounded-card overflow-hidden shadow-card p-6">
+          <h3 className="text-body font-bold text-[#1D1D1F] mb-4">Past Exports History</h3>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs text-[#111111]">
+            <table className="w-full border-collapse text-left text-body text-[#1D1D1F]">
               <thead>
-                <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
+                <tr className="border-b border-[#E5E5EA] bg-[#FBFBFD] text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                   <th className="p-4 font-semibold">Who (User)</th>
                   <th className="p-4 font-semibold">When (Date)</th>
                   <th className="p-4 font-semibold">Records Exported</th>
                   <th className="p-4 font-semibold">Reason</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8E8E8]">
+              <tbody className="divide-y divide-[#E5E5EA]">
                 {exportLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">
+                    <td colSpan={4} className="p-8 text-center text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                       No export logs recorded.
                     </td>
                   </tr>
                 ) : (
                   exportLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-[#FAFAFA] transition-all">
+                    <tr key={log.id} className="hover:bg-[#FBFBFD] transition">
                       <td className="p-4 font-semibold">{log.performed_by}</td>
-                      <td className="p-4 text-[#6B6B6B]">
+                      <td className="p-4 text-[#6E6E73]">
                         {new Date(log.performed_at).toLocaleString('en-LK')}
                       </td>
-                      <td className="p-4 font-mono font-bold text-[#111111]">{log.target_name}</td>
-                      <td className="p-4 text-[#6B6B6B]">{log.reason}</td>
+                      <td className="p-4 font-mono font-bold text-[#1D1D1F]">{log.target_name}</td>
+                      <td className="p-4 text-[#6E6E73]">{log.reason}</td>
                     </tr>
                   ))
                 )}
@@ -376,13 +376,13 @@ export default function AssociatesPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 admin-filters-row">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B6B6B]" size={16} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6E6E73]" size={16} />
           <input
             type="text"
             placeholder="Search name, school or membership no..."
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            className="w-full pl-11 pr-4 py-3 bg-[#FFFFFF] border border-[#E8E8E8] rounded-xl text-xs text-[#111111] placeholder-[#A3A3A3] focus:outline-none focus:border-[#D1D5DB] transition-all"
+            className="w-full pl-11 pr-4 py-3 bg-[#FFFFFF] border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] placeholder-[#86868B] focus:outline-none focus:border-[#6E6E73] transition"
           />
         </div>
 
@@ -390,7 +390,7 @@ export default function AssociatesPage() {
         <select
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#D1D5DB] transition-all cursor-pointer"
+          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none focus:border-[#6E6E73] transition cursor-pointer"
         >
           <option value="all">All Onboarding Statuses</option>
           <option value="pending">Pending Review</option>
@@ -402,7 +402,7 @@ export default function AssociatesPage() {
         <select
           value={provinceFilter}
           onChange={e => { setProvinceFilter(e.target.value); setCurrentPage(1); }}
-          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E8E8E8] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#D1D5DB] transition-all cursor-pointer"
+          className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none focus:border-[#6E6E73] transition cursor-pointer"
         >
           <option value="all">All Provinces</option>
           {provinces.map(p => (
@@ -412,17 +412,17 @@ export default function AssociatesPage() {
       </div>
 
       {/* Main Table */}
-      <div className="bg-[#FFFFFF] border border-[#E8E8E8] rounded-2xl overflow-hidden shadow-xl admin-table-wrapper">
+      <div className="bg-[#FFFFFF] border border-[#E5E5EA] rounded-card overflow-hidden shadow-card admin-table-wrapper">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-xs text-[#111111]">
+          <table className="w-full border-collapse text-left text-body text-[#1D1D1F]">
             <thead>
-              <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
+              <tr className="border-b border-[#E5E5EA] bg-[#FBFBFD] text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                 <th className="p-4 w-10">
                   <input 
                     type="checkbox" 
                     checked={selectedIds.size === currentItems.length && currentItems.length > 0}
                     onChange={toggleAll}
-                    className="w-3.5 h-3.5 rounded border-gray-600 bg-transparent text-[#d4af37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded-md border-gray-600 bg-transparent text-[#8A6D1C] focus:ring-0 focus:ring-offset-0 cursor-pointer"
                   />
                 </th>
                 <th className="p-4 font-semibold">Membership No</th>
@@ -432,10 +432,10 @@ export default function AssociatesPage() {
                 <th className="p-4 font-semibold text-center">Board Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E8E8E8]">
+            <tbody className="divide-y divide-[#E5E5EA]">
               {currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">
+                  <td colSpan={9} className="p-8 text-center text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                     No onboarded members found matching criteria.
                   </td>
                 </tr>
@@ -443,38 +443,38 @@ export default function AssociatesPage() {
                 currentItems.map((item) => {
                   const isActioning = actioningId === item.id
                   return (
-                    <tr key={item.id} className="hover:bg-[#FAFAFA] transition-all">
+                    <tr key={item.id} className="hover:bg-[#FBFBFD] transition">
                       <td className="p-4">
                         <input 
                           type="checkbox" 
                           checked={selectedIds.has(item.id)}
                           onChange={() => toggleSelection(item.id)}
-                          className="w-3.5 h-3.5 rounded border-gray-600 bg-transparent text-[#d4af37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                          className="w-3.5 h-3.5 rounded-md border-gray-600 bg-transparent text-[#8A6D1C] focus:ring-0 focus:ring-offset-0 cursor-pointer"
                         />
                       </td>
 
                       {/* Membership No */}
-                      <td className="p-4 font-mono font-bold text-[#6B6B6B]">
+                      <td className="p-4 font-mono font-bold text-[#6E6E73]">
                         {item.membership_number}
                       </td>
 
                       {/* Name */}
                       <td className="p-4 font-semibold">
                         {item.full_name}
-                        <div className="text-[10px] text-[#6B6B6B] font-normal mt-0.5">{item.email}</div>
+                        <div className="text-caption text-[#6E6E73] font-normal mt-1">{item.email}</div>
                       </td>
 
                       {/* School Details */}
                       <td className="p-4">
-                        <span className="font-semibold text-[#111111]">{item.school}</span>
-                        <div className="text-[10px] text-[#6B6B6B] mt-0.5">
+                        <span className="font-semibold text-[#1D1D1F]">{item.school}</span>
+                        <div className="text-caption text-[#6E6E73] mt-1">
                           {item.district}, {item.province}
                         </div>
                       </td>
 
                       {/* Status */}
                       <td className="p-4">
-                        <span className={`inline-flex px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase border ${
+                        <span className={`inline-flex px-2 py-0.5 rounded-md text-caption font-bold tracking-[0.04em] uppercase border ${
                           item.status === 'approved' 
                             ? 'bg-green-500/10 border-green-500/30 text-green-400' 
                             : item.status === 'rejected'
@@ -490,7 +490,7 @@ export default function AssociatesPage() {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => setSelectedAssociate(item)}
-                            className="px-3 py-1.5 bg-[#F5F5F5] hover:bg-[#E8E8E8] border border-[#E8E8E8] rounded-lg text-[10px] font-semibold text-[#111111] uppercase tracking-wider transition-all"
+                            className="px-3 py-2 bg-[#F5F5F7] hover:bg-[#E5E5EA] border border-[#E5E5EA] rounded-control text-caption font-semibold text-[#1D1D1F] uppercase tracking-[0.04em] transition"
                           >
                             View Details
                           </button>
@@ -498,9 +498,9 @@ export default function AssociatesPage() {
                             <button
                               onClick={() => handleDelete(item.id, item.full_name)}
                               style={{
-                                padding: '6px 12px', background: 'transparent',
+                                padding: '8px 12px', background: 'transparent',
                                 border: '1px solid rgba(255,0,0,0.3)', borderRadius: '6px',
-                                color: 'rgba(255,80,80,0.8)', cursor: 'pointer', fontSize: '12px'
+                                color: 'rgba(255,80,80,0.8)', cursor: 'pointer', fontSize: '13px'
                               }}
                             >
                               Delete
@@ -508,7 +508,7 @@ export default function AssociatesPage() {
                           ) : (
                             <button
                               onClick={() => handleRequestAccess('associates')}
-                              style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #E8E8E8', borderRadius: '6px', color: '#6B6B6B', cursor: 'pointer', fontSize: '11px' }}
+                              style={{ padding: '8px 12px', background: 'transparent', border: '1px solid #E5E5EA', borderRadius: '6px', color: '#6E6E73', cursor: 'pointer', fontSize: '11px' }}
                             >
                               Request View Access
                             </button>
@@ -525,22 +525,22 @@ export default function AssociatesPage() {
 
         {/* Pagination Row */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 bg-[#FAFAFA] border-t border-[#E8E8E8] flex items-center justify-between gap-4">
-            <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest">
+          <div className="px-6 py-4 bg-[#FBFBFD] border-t border-[#E5E5EA] flex items-center justify-between gap-4">
+            <span className="text-caption text-[#6E6E73] uppercase tracking-[0.04em]">
               Page {currentPage} of {totalPages} ({filteredData.length} total entries)
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] text-[#111111] flex items-center justify-center hover:bg-[#E8E8E8] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="w-8 h-8 rounded-control bg-[#F5F5F7] border border-[#E5E5EA] text-[#1D1D1F] flex items-center justify-center hover:bg-[#E5E5EA] disabled:opacity-30 disabled:cursor-not-allowed transition"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] text-[#111111] flex items-center justify-center hover:bg-[#E8E8E8] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="w-8 h-8 rounded-control bg-[#F5F5F7] border border-[#E5E5EA] text-[#1D1D1F] flex items-center justify-center hover:bg-[#E5E5EA] disabled:opacity-30 disabled:cursor-not-allowed transition"
               >
                 <ChevronRight size={16} />
               </button>
@@ -558,16 +558,16 @@ export default function AssociatesPage() {
             onClick={() => setSelectedAssociate(null)}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
           />
-          <div className="relative w-full max-w-lg h-full bg-[#FFFFFF] border-l border-[#E8E8E8] p-8 flex flex-col justify-between overflow-y-auto z-10 admin-modal-inner">
+          <div className="relative w-full max-w-lg h-full bg-[#FFFFFF] border-l border-[#E5E5EA] p-8 flex flex-col justify-between overflow-y-auto z-10 admin-modal-inner">
             <div className="space-y-8">
-              <div className="flex items-center justify-between pb-6 border-b border-[#E8E8E8]">
-                <div className="flex items-center gap-3 text-[#d4af37]">
+              <div className="flex items-center justify-between pb-6 border-b border-[#E5E5EA]">
+                <div className="flex items-center gap-3 text-[#8A6D1C]">
                   <User size={20} />
-                  <span className="text-xs font-extrabold uppercase tracking-widest">Full Details</span>
+                  <span className="text-body font-bold ">Full Details</span>
                 </div>
                 <button
                   onClick={() => setSelectedAssociate(null)}
-                  className="text-[#6B6B6B] hover:text-[#111111] transition-all"
+                  className="text-[#6E6E73] hover:text-[#1D1D1F] transition"
                 >
                   <X size={18} />
                 </button>
@@ -575,47 +575,47 @@ export default function AssociatesPage() {
 
               <div className="space-y-6 admin-modal-grid">
                 <div>
-                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Membership No</span>
-                  <div className="text-xl font-bold text-[#d4af37] mt-1 font-mono">{selectedAssociate.membership_number}</div>
+                  <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Membership No</span>
+                  <div className="text-title font-bold text-[#8A6D1C] mt-1 font-mono">{selectedAssociate.membership_number}</div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Personal Info</span>
-                  <div className="flex flex-col gap-2 text-xs text-[#111111] bg-white/[0.02] border border-[#E8E8E8] px-4 py-3 rounded-xl">
+                <div className="space-y-2">
+                  <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Personal Info</span>
+                  <div className="flex flex-col gap-2 text-body text-[#1D1D1F] bg-white/[0.02] border border-[#E5E5EA] px-4 py-3 rounded-control">
                     <span className="font-semibold">{selectedAssociate.full_name}</span>
-                    <span className="text-[#6B6B6B]">Email: {selectedAssociate.email}</span>
-                    <span className="text-[#6B6B6B]">WhatsApp: {selectedAssociate.whatsapp}</span>
+                    <span className="text-[#6E6E73]">Email: {selectedAssociate.email}</span>
+                    <span className="text-[#6E6E73]">WhatsApp: {selectedAssociate.whatsapp}</span>
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Academic Details</span>
-                  <div className="flex flex-col gap-2 text-xs text-[#111111] bg-white/[0.02] border border-[#E8E8E8] px-4 py-3 rounded-xl">
-                    <div className="flex items-center gap-2"><School size={14} className="text-[#6B6B6B]"/> {selectedAssociate.school}</div>
-                    <span className="text-[#6B6B6B]">Stream: {selectedAssociate.commerce_stream ? 'Commerce' : 'Non-Commerce'}</span>
+                <div className="space-y-2">
+                  <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Academic Details</span>
+                  <div className="flex flex-col gap-2 text-body text-[#1D1D1F] bg-white/[0.02] border border-[#E5E5EA] px-4 py-3 rounded-control">
+                    <div className="flex items-center gap-2"><School size={14} className="text-[#6E6E73]"/> {selectedAssociate.school}</div>
+                    <span className="text-[#6E6E73]">Stream: {selectedAssociate.commerce_stream ? 'Commerce' : 'Non-Commerce'}</span>
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Location</span>
-                  <div className="flex flex-col gap-2 text-xs text-[#111111] bg-white/[0.02] border border-[#E8E8E8] px-4 py-3 rounded-xl">
-                    <div className="flex items-center gap-2"><MapPin size={14} className="text-[#6B6B6B]"/> {selectedAssociate.district}, {selectedAssociate.province}</div>
+                <div className="space-y-2">
+                  <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Location</span>
+                  <div className="flex flex-col gap-2 text-body text-[#1D1D1F] bg-white/[0.02] border border-[#E5E5EA] px-4 py-3 rounded-control">
+                    <div className="flex items-center gap-2"><MapPin size={14} className="text-[#6E6E73]"/> {selectedAssociate.district}, {selectedAssociate.province}</div>
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Identity & Role</span>
-                  <div className="flex flex-col gap-2 text-xs text-[#111111] bg-white/[0.02] border border-[#E8E8E8] px-4 py-3 rounded-xl">
-                    <span className="text-[#111111]">{selectedAssociate.who_are_you}</span>
-                    <span className="text-[#6B6B6B]">Willing to volunteer: {selectedAssociate.actively_participate ? 'Yes' : 'No'}</span>
+                <div className="space-y-2">
+                  <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Identity & Role</span>
+                  <div className="flex flex-col gap-2 text-body text-[#1D1D1F] bg-white/[0.02] border border-[#E5E5EA] px-4 py-3 rounded-control">
+                    <span className="text-[#1D1D1F]">{selectedAssociate.who_are_you}</span>
+                    <span className="text-[#6E6E73]">Willing to volunteer: {selectedAssociate.actively_participate ? 'Yes' : 'No'}</span>
                   </div>
                 </div>
 
-                <div className="space-y-1.5 flex gap-4 pt-4 border-t border-[#E8E8E8]">
+                <div className="space-y-2 flex gap-4 pt-4 border-t border-[#E5E5EA]">
                   {selectedAssociate.status !== 'approved' && (
                     <button
                       onClick={() => { handleUpdateStatus(selectedAssociate.id, 'approved'); setSelectedAssociate((prev: any) => ({...prev, status: 'approved'})); }}
-                      className="flex-1 py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-green-500/20 transition-all text-center"
+                      className="flex-1 py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-control text-caption font-bold uppercase tracking-[0.04em] hover:bg-green-500/20 transition text-center"
                     >
                       Approve
                     </button>
@@ -623,7 +623,7 @@ export default function AssociatesPage() {
                   {selectedAssociate.status !== 'rejected' && (
                     <button
                       onClick={() => { handleUpdateStatus(selectedAssociate.id, 'rejected'); setSelectedAssociate((prev: any) => ({...prev, status: 'rejected'})); }}
-                      className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-red-500/20 transition-all text-center"
+                      className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-control text-caption font-bold uppercase tracking-[0.04em] hover:bg-red-500/20 transition text-center"
                     >
                       Reject
                     </button>
@@ -631,7 +631,7 @@ export default function AssociatesPage() {
                   {selectedAssociate.status === 'pending' && (
                     <button
                       onClick={() => handleSendReminder(selectedAssociate.email)}
-                      className="flex-1 flex items-center justify-center gap-2 py-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500/20 transition-all"
+                      className="flex-1 flex items-center justify-center gap-2 py-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-control text-caption font-bold uppercase tracking-[0.04em] hover:bg-blue-500/20 transition"
                     >
                       <Mail size={14} /> Send Reminder
                     </button>

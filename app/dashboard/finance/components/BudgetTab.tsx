@@ -33,7 +33,7 @@ export default function BudgetTab() {
   }, [])
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center', color: '#6B6B6B', fontSize: '14px' }}>Loading budget data...</div>
+    return <div style={{ padding: '40px', textAlign: 'center', color: '#6E6E73', fontSize: '13px' }}>Loading budget data...</div>
   }
 
   return (
@@ -41,19 +41,19 @@ export default function BudgetTab() {
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111111', margin: '0 0 4px 0' }}>Annual Budget Tracking ({new Date().getFullYear()})</h3>
-          <p style={{ fontSize: '13px', color: '#6B6B6B', margin: 0 }}>Monitor expense categories against allocated budgets.</p>
+          <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1D1D1F', margin: '0 0 4px 0' }}>Annual Budget Tracking ({new Date().getFullYear()})</h3>
+          <p style={{ fontSize: '13px', color: '#6E6E73', margin: 0 }}>Monitor expense categories against allocated budgets.</p>
         </div>
-        <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', borderRadius: '8px', border: 'none', background: '#111111', color: '#FFFFFF', fontSize: '13px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}>
+        <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', borderRadius: '10px', border: 'none', background: '#1D1D1F', color: '#FFFFFF', fontSize: '13px', fontWeight: '600', cursor: 'pointer', transition: 'var(--transition-control)' }}>
           <Plus size={16} /> Set Budget Limit
         </button>
       </div>
 
-      <div style={{ background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: '12px', padding: '24px' }}>
+      <div style={{ background: '#FFFFFF', border: '1px solid #E5E5EA', borderRadius: '16px', padding: '24px' }}>
         {budgets.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#6B6B6B' }}>
-            <PiggyBank size={48} color="#E8E8E8" style={{ margin: '0 auto 16px auto' }} />
-            <p style={{ fontSize: '14px', fontWeight: '500' }}>No budget limits configured for {new Date().getFullYear()}.</p>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#6E6E73' }}>
+            <PiggyBank size={48} color="#E5E5EA" style={{ margin: '0 auto 16px auto' }} />
+            <p style={{ fontSize: '13px', fontWeight: '500' }}>No budget limits configured for {new Date().getFullYear()}.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -67,17 +67,17 @@ export default function BudgetTab() {
                 <div key={b.id}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
                     <div>
-                      <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#111111', margin: '0 0 4px 0' }}>{b.category}</h4>
-                      <p style={{ fontSize: '12px', color: '#6B6B6B', margin: 0 }}>LKR {spent.toLocaleString()} spent of LKR {limit.toLocaleString()}</p>
+                      <h4 style={{ fontSize: '13px', fontWeight: '600', color: '#1D1D1F', margin: '0 0 4px 0' }}>{b.category}</h4>
+                      <p style={{ fontSize: '13px', color: '#6E6E73', margin: 0 }}>LKR {spent.toLocaleString()} spent of LKR {limit.toLocaleString()}</p>
                     </div>
-                    <span style={{ fontSize: '12px', fontWeight: '700', color: isOver ? '#EF4444' : '#111111' }}>
+                    <span style={{ fontSize: '13px', fontWeight: '700', color: isOver ? '#EF4444' : '#1D1D1F' }}>
                       {percent.toFixed(1)}%
                     </span>
                   </div>
-                  <div style={{ width: '100%', height: '8px', background: '#F5F5F5', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: `${percent}%`, height: '100%', background: isOver ? '#EF4444' : '#111111', borderRadius: '4px' }} />
+                  <div style={{ width: '100%', height: '8px', background: '#F5F5F7', borderRadius: '6px', overflow: 'hidden' }}>
+                    <div style={{ width: `${percent}%`, height: '100%', background: isOver ? '#EF4444' : '#1D1D1F', borderRadius: '6px' }} />
                   </div>
-                  {isOver && <p style={{ fontSize: '11px', color: '#EF4444', margin: '8px 0 0 0', fontWeight: '500' }}>Budget limit exceeded by LKR {(spent - limit).toLocaleString()}</p>}
+                  {isOver && <p style={{ fontSize: '11px', color: '#D70015', margin: '8px 0 0 0', fontWeight: '500' }}>Budget limit exceeded by LKR {(spent - limit).toLocaleString()}</p>}
                 </div>
               )
             })}

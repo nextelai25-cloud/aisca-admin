@@ -30,10 +30,10 @@ import {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#F9F9F9] border border-[#E8E8E8] p-3 rounded-lg shadow-xl text-xs">
-        <p className="text-[10px] tracking-wider text-[#6B6B6B] uppercase mb-1">{label}</p>
-        <p className="font-bold text-[#111111]">
-          {payload[0].name}: <span className="text-[#d4af37]">{payload[0].value.toLocaleString()}</span>
+      <div className="bg-[#FBFBFD] border border-[#E5E5EA] p-3 rounded-control shadow-card text-body">
+        <p className="text-caption tracking-[0.04em] text-[#6E6E73] uppercase mb-1">{label}</p>
+        <p className="font-bold text-[#1D1D1F]">
+          {payload[0].name}: <span className="text-[#8A6D1C]">{payload[0].value.toLocaleString()}</span>
         </p>
       </div>
     )
@@ -216,53 +216,53 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       {/* Page Title */}
       <div>
-        <h1 className="text-2xl font-bold tracking-wider uppercase text-[#111111]">Marketing Analytics</h1>
-        <p className="text-xs text-[#6B6B6B] tracking-wide uppercase mt-1">Privacy-preserving website usage telemetry</p>
+        <h1 className="text-large-title font-bold tracking-tight text-[#1D1D1F]">Marketing Analytics</h1>
+        <p className="text-body text-[#6E6E73] mt-1">Privacy-preserving website usage telemetry</p>
       </div>
 
       {/* Analytics stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 analytics-stats-grid">
         {/* Total Page Views */}
-        <div className="bg-[#FFFFFF] border border-[#E8E8E8] p-6 rounded-2xl flex items-center gap-5 shadow-xl">
-          <div className="w-12 h-12 bg-[#F5F5F5] rounded-xl flex items-center justify-center text-[#d4af37]">
+        <div className="bg-[#FFFFFF] border border-[#E5E5EA] p-6 rounded-card flex items-center gap-5 shadow-card">
+          <div className="w-12 h-12 bg-[#F5F5F7] rounded-control flex items-center justify-center text-[#8A6D1C]">
             <Eye size={20} />
           </div>
           <div>
-            <span className="text-[10px] tracking-wider text-[#6B6B6B] uppercase">Total Page Views</span>
-            <h3 className="text-xl font-bold text-[#111111] mt-1">{metrics.pageViews.toLocaleString()}</h3>
+            <span className="text-caption tracking-[0.04em] text-[#6E6E73] uppercase">Total Page Views</span>
+            <h3 className="text-large-title font-semibold tabular-nums text-[#1D1D1F] mt-1">{metrics.pageViews.toLocaleString()}</h3>
           </div>
         </div>
 
         {/* Unique Sessions */}
-        <div className="bg-[#FFFFFF] border border-[#E8E8E8] p-6 rounded-2xl flex items-center gap-5 shadow-xl">
-          <div className="w-12 h-12 bg-[#F5F5F5] rounded-xl flex items-center justify-center text-blue-400">
+        <div className="bg-[#FFFFFF] border border-[#E5E5EA] p-6 rounded-card flex items-center gap-5 shadow-card">
+          <div className="w-12 h-12 bg-[#F5F5F7] rounded-control flex items-center justify-center text-blue-400">
             <Fingerprint size={20} />
           </div>
           <div>
-            <span className="text-[10px] tracking-wider text-[#6B6B6B] uppercase">Unique Sessions</span>
-            <h3 className="text-xl font-bold text-[#111111] mt-1">{metrics.uniqueSessions.toLocaleString()}</h3>
+            <span className="text-caption tracking-[0.04em] text-[#6E6E73] uppercase">Unique Sessions</span>
+            <h3 className="text-large-title font-semibold tabular-nums text-[#1D1D1F] mt-1">{metrics.uniqueSessions.toLocaleString()}</h3>
           </div>
         </div>
 
         {/* Countries */}
-        <div className="bg-[#FFFFFF] border border-[#E8E8E8] p-6 rounded-2xl flex items-center gap-5 shadow-xl">
-          <div className="w-12 h-12 bg-[#F5F5F5] rounded-xl flex items-center justify-center text-green-400">
+        <div className="bg-[#FFFFFF] border border-[#E5E5EA] p-6 rounded-card flex items-center gap-5 shadow-card">
+          <div className="w-12 h-12 bg-[#F5F5F7] rounded-control flex items-center justify-center text-green-400">
             <Globe size={20} />
           </div>
           <div>
-            <span className="text-[10px] tracking-wider text-[#6B6B6B] uppercase">Audience Countries</span>
-            <h3 className="text-xl font-bold text-[#111111] mt-1">{metrics.countriesCount.toLocaleString()}</h3>
+            <span className="text-caption tracking-[0.04em] text-[#6E6E73] uppercase">Audience Countries</span>
+            <h3 className="text-large-title font-semibold tabular-nums text-[#1D1D1F] mt-1">{metrics.countriesCount.toLocaleString()}</h3>
           </div>
         </div>
 
         {/* Cities */}
-        <div className="bg-[#FFFFFF] border border-[#E8E8E8] p-6 rounded-2xl flex items-center gap-5 shadow-xl">
-          <div className="w-12 h-12 bg-[#F5F5F5] rounded-xl flex items-center justify-center text-purple-400">
+        <div className="bg-[#FFFFFF] border border-[#E5E5EA] p-6 rounded-card flex items-center gap-5 shadow-card">
+          <div className="w-12 h-12 bg-[#F5F5F7] rounded-control flex items-center justify-center text-purple-400">
             <MapPin size={20} />
           </div>
           <div>
-            <span className="text-[10px] tracking-wider text-[#6B6B6B] uppercase">Audience Cities</span>
-            <h3 className="text-xl font-bold text-[#111111] mt-1">{metrics.citiesCount.toLocaleString()}</h3>
+            <span className="text-caption tracking-[0.04em] text-[#6E6E73] uppercase">Audience Cities</span>
+            <h3 className="text-large-title font-semibold tabular-nums text-[#1D1D1F] mt-1">{metrics.citiesCount.toLocaleString()}</h3>
           </div>
         </div>
       </div>
@@ -270,18 +270,18 @@ export default function AnalyticsPage() {
       {/* Primary Graphs Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 analytics-charts-grid">
         {/* Timeline Chart */}
-        <div className="lg:col-span-2 bg-[#FFFFFF] border border-[#E8E8E8] p-6 rounded-2xl shadow-xl">
+        <div className="lg:col-span-2 bg-[#FFFFFF] border border-[#E5E5EA] p-6 rounded-card shadow-card">
           <div className="mb-4">
-            <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider">Traffic Velocity</h4>
-            <span className="text-[10px] text-[#6B6B6B] uppercase tracking-wide">Dynamic page hits timeline (Last 30 days)</span>
+            <h4 className="text-body font-bold text-[#1D1D1F] ">Traffic Velocity</h4>
+            <span className="text-caption text-[#6E6E73] uppercase tracking-[0.04em]">Dynamic page hits timeline (Last 30 days)</span>
           </div>
           <div className="h-[260px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={timelineData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#FFFFFF" />
-                <XAxis dataKey="date" stroke="#6B6B6B" fontSize={10} tickLine={false} />
-                <YAxis stroke="#6B6B6B" fontSize={10} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#F5F5F5' }} />
+                <XAxis dataKey="date" stroke="#6E6E73" fontSize={10} tickLine={false} />
+                <YAxis stroke="#6E6E73" fontSize={10} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#F5F5F7' }} />
                 <Line 
                   type="monotone" 
                   dataKey="Page Views" 
@@ -295,10 +295,10 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Device breakdown PieChart */}
-        <div className="bg-[#FFFFFF] border border-[#E8E8E8] p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+        <div className="bg-[#FFFFFF] border border-[#E5E5EA] p-6 rounded-card shadow-card flex flex-col justify-between">
           <div className="mb-4">
-            <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider">Firms / Form Factor</h4>
-            <span className="text-[10px] text-[#6B6B6B] uppercase tracking-wide">Audience device distributions</span>
+            <h4 className="text-body font-bold text-[#1D1D1F] ">Firms / Form Factor</h4>
+            <span className="text-caption text-[#6E6E73] uppercase tracking-[0.04em]">Audience device distributions</span>
           </div>
           <div className="h-[180px] w-full relative">
             <ResponsiveContainer width="100%" height="100%">
@@ -322,11 +322,11 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Legend */}
-          <div className="mt-4 pt-4 border-t border-[#E8E8E8] flex justify-center gap-6">
+          <div className="mt-4 pt-4 border-t border-[#E5E5EA] flex justify-center gap-6">
             {deviceDataChart.map((d, index) => (
               <div key={d.name} className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }}></div>
-                <span className="text-[10px] font-bold text-[#6B6B6B] uppercase tracking-wider">
+                <span className="text-caption font-bold text-[#6E6E73] uppercase tracking-[0.04em]">
                   {d.name}: {d.value}
                 </span>
               </div>
@@ -338,17 +338,17 @@ export default function AnalyticsPage() {
       {/* Pages and Referrers breakdown Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 analytics-bottom-grid">
         {/* Top Pages Horizontal Bar chart */}
-        <div className="lg:col-span-1 bg-[#FFFFFF] border border-[#E8E8E8] p-6 rounded-2xl shadow-xl">
+        <div className="lg:col-span-1 bg-[#FFFFFF] border border-[#E5E5EA] p-6 rounded-card shadow-card">
           <div className="mb-4">
-            <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider">Top Pages</h4>
-            <span className="text-[10px] text-[#6B6B6B] uppercase tracking-wide">Most frequently hit route URLs</span>
+            <h4 className="text-body font-bold text-[#1D1D1F] ">Top Pages</h4>
+            <span className="text-caption text-[#6E6E73] uppercase tracking-[0.04em]">Most frequently hit route URLs</span>
           </div>
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={topPagesData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#FFFFFF" />
-                <XAxis type="number" stroke="#6B6B6B" fontSize={10} tickLine={false} />
-                <YAxis dataKey="page" type="category" stroke="#6B6B6B" fontSize={9} tickLine={false} width={80} />
+                <XAxis type="number" stroke="#6E6E73" fontSize={10} tickLine={false} />
+                <YAxis dataKey="page" type="category" stroke="#6E6E73" fontSize={9} tickLine={false} width={80} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="Views" fill="#d4af37" radius={[0, 4, 4, 0]} maxBarSize={16} />
               </BarChart>
@@ -357,29 +357,29 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Traffic Referrers Table */}
-        <div className="bg-[#FFFFFF] border border-[#E8E8E8] p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+        <div className="bg-[#FFFFFF] border border-[#E5E5EA] p-6 rounded-card shadow-card flex flex-col justify-between">
           <div>
             <div className="mb-4">
-              <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider flex items-center gap-2">
-                <Compass size={14} className="text-[#d4af37]" />
+              <h4 className="text-body font-bold text-[#1D1D1F] capitalize flex items-center gap-2">
+                <Compass size={14} className="text-[#8A6D1C]" />
                 <span>Traffic Referrers</span>
               </h4>
             </div>
             <div className="overflow-y-auto max-h-[220px]">
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-left text-body">
                 <thead>
-                  <tr className="border-b border-[#E8E8E8] text-[#6B6B6B] text-[9px] uppercase tracking-widest">
+                  <tr className="border-b border-[#E5E5EA] text-[#6E6E73] text-caption uppercase tracking-[0.04em]">
                     <th className="pb-2 font-semibold">Origin / Referrer</th>
                     <th className="pb-2 text-right font-semibold">Views</th>
                     <th className="pb-2 text-right font-semibold">Share</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E8E8E8]">
+                <tbody className="divide-y divide-[#E5E5EA]">
                   {referrersList.map((ref) => (
-                    <tr key={ref.name} className="hover:bg-[#FAFAFA]">
-                      <td className="py-2 text-[#111111] font-semibold">{ref.name}</td>
-                      <td className="py-2 text-right text-[#111111] font-bold">{ref.count}</td>
-                      <td className="py-2 text-right text-[#6B6B6B] font-bold">{ref.percent}%</td>
+                    <tr key={ref.name} className="hover:bg-[#FBFBFD]">
+                      <td className="py-2 text-[#1D1D1F] font-semibold">{ref.name}</td>
+                      <td className="py-2 text-right text-[#1D1D1F] font-bold">{ref.count}</td>
+                      <td className="py-2 text-right text-[#6E6E73] font-bold">{ref.percent}%</td>
                     </tr>
                   ))}
                 </tbody>
@@ -389,34 +389,34 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Geographic footprint Table */}
-        <div className="bg-[#FFFFFF] border border-[#E8E8E8] p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+        <div className="bg-[#FFFFFF] border border-[#E5E5EA] p-6 rounded-card shadow-card flex flex-col justify-between">
           <div>
             <div className="mb-4">
-              <h4 className="text-sm font-bold text-[#111111] uppercase tracking-wider flex items-center gap-2">
-                <Laptop size={14} className="text-[#d4af37]" />
+              <h4 className="text-body font-bold text-[#1D1D1F] capitalize flex items-center gap-2">
+                <Laptop size={14} className="text-[#8A6D1C]" />
                 <span>Geographic Footprint</span>
               </h4>
             </div>
             <div className="overflow-y-auto max-h-[220px]">
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-left text-body">
                 <thead>
-                  <tr className="border-b border-[#E8E8E8] text-[#6B6B6B] text-[9px] uppercase tracking-widest">
+                  <tr className="border-b border-[#E5E5EA] text-[#6E6E73] text-caption uppercase tracking-[0.04em]">
                     <th className="pb-2 font-semibold">Location (City, Country)</th>
                     <th className="pb-2 text-right font-semibold">Visits</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E8E8E8]">
+                <tbody className="divide-y divide-[#E5E5EA]">
                   {geoList.length === 0 ? (
                     <tr>
-                      <td colSpan={2} className="py-4 text-center text-[#6B6B6B] uppercase tracking-wider text-[9px]">
+                      <td colSpan={2} className="py-4 text-center text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                         No geo-logs mapped.
                       </td>
                     </tr>
                   ) : (
                     geoList.map((g) => (
-                      <tr key={g.location} className="hover:bg-[#FAFAFA]">
-                        <td className="py-2 text-[#111111] font-semibold">{g.location}</td>
-                        <td className="py-2 text-right text-[#111111] font-bold">{g.views}</td>
+                      <tr key={g.location} className="hover:bg-[#FBFBFD]">
+                        <td className="py-2 text-[#1D1D1F] font-semibold">{g.location}</td>
+                        <td className="py-2 text-right text-[#1D1D1F] font-bold">{g.views}</td>
                       </tr>
                     ))
                   )}

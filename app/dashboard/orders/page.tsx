@@ -152,49 +152,49 @@ export default function OrdersPage() {
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-wider uppercase text-[#111111]">Merchandise Orders</h1>
-          <p className="text-xs text-[#6B6B6B] tracking-wide uppercase mt-1">Verify payments, view receipts, and track fulfillment</p>
+          <h1 className="text-large-title font-bold tracking-tight text-[#1D1D1F]">Merchandise Orders</h1>
+          <p className="text-body text-[#6E6E73] mt-1">Verify payments, view receipts, and track fulfillment</p>
         </div>
         <button onClick={exportCSV} disabled={filtered.length === 0}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl text-xs font-semibold uppercase tracking-wider text-[#111111] hover:bg-[#E8E8E8] disabled:opacity-40 transition-all">
+          className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#F5F5F7] border border-[#E5E5EA] rounded-control text-body font-semibold capitalize text-[#1D1D1F] hover:bg-[#E5E5EA] disabled:opacity-40 transition">
           <Download size={14} /><span>Export CSV ({filtered.length})</span>
         </button>
       </div>
 
       {/* Merchandise Bank + stats */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="sm:col-span-2 rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(135deg, #111111, #333)' }}>
-          <div className="flex items-center gap-2 text-[#d4af37] text-[10px] font-bold uppercase tracking-widest"><Wallet size={14} /> Merchandise Bank</div>
-          <div className="text-3xl font-bold mt-2">LKR {bankBalance.toLocaleString()}</div>
-          <div className="text-[11px] text-white/50 mt-1">Opening LKR {OPENING_BALANCE.toLocaleString()} + verified sales LKR {verifiedTotal.toLocaleString()}</div>
+        <div className="sm:col-span-2 rounded-card p-5 text-white" style={{ background: 'linear-gradient(135deg, #1D1D1F, #333)' }}>
+          <div className="flex items-center gap-2 text-[#8A6D1C] text-caption font-bold uppercase tracking-[0.04em]"><Wallet size={14} /> Merchandise Bank</div>
+          <div className="text-large-title font-bold mt-2">LKR {bankBalance.toLocaleString()}</div>
+          <div className="text-caption text-white/50 mt-1">Opening LKR {OPENING_BALANCE.toLocaleString()} + verified sales LKR {verifiedTotal.toLocaleString()}</div>
         </div>
-        <div className="rounded-2xl p-5 bg-white border border-[#E8E8E8]">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B6B]">Total Orders</div>
-          <div className="text-3xl font-bold text-[#111] mt-2">{data.length}</div>
+        <div className="rounded-card p-5 bg-white border border-[#E5E5EA]">
+          <div className="text-caption font-bold uppercase tracking-[0.04em] text-[#6E6E73]">Total Orders</div>
+          <div className="text-large-title font-bold text-[#1D1D1F] mt-2">{data.length}</div>
         </div>
-        <div className="rounded-2xl p-5 bg-white border border-[#E8E8E8]">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B6B]">Pending Verify</div>
-          <div className="text-3xl font-bold text-amber-500 mt-2">{pendingCount}</div>
+        <div className="rounded-card p-5 bg-white border border-[#E5E5EA]">
+          <div className="text-caption font-bold uppercase tracking-[0.04em] text-[#6E6E73]">Pending Verify</div>
+          <div className="text-large-title font-bold text-[#C93400] mt-2">{pendingCount}</div>
         </div>
       </div>
 
       {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B6B6B]" size={16} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6E6E73]" size={16} />
           <input type="text" placeholder="Search order / name / school / phone…" value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1) }}
-            className="w-full pl-11 pr-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111] placeholder-[#A3A3A3] focus:outline-none focus:border-[#D1D5DB]" />
+            className="w-full pl-11 pr-4 py-3 bg-white border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] placeholder-[#86868B] focus:outline-none focus:border-[#6E6E73]" />
         </div>
         <select value={paymentFilter} onChange={e => { setPaymentFilter(e.target.value); setCurrentPage(1) }}
-          className="w-full px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111] focus:outline-none cursor-pointer">
+          className="w-full px-4 py-3 bg-white border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none cursor-pointer">
           <option value="all">All Payments</option>
           <option value="pending">Pending Verification</option>
           <option value="verified">Verified</option>
           <option value="rejected">Rejected</option>
         </select>
         <select value={orderFilter} onChange={e => { setOrderFilter(e.target.value); setCurrentPage(1) }}
-          className="w-full px-4 py-3 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111] focus:outline-none cursor-pointer">
+          className="w-full px-4 py-3 bg-white border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none cursor-pointer">
           <option value="all">All Fulfillment</option>
           <option value="pending">Pending</option>
           <option value="processing">Processing</option>
@@ -205,11 +205,11 @@ export default function OrdersPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white border border-[#E5E5EA] rounded-card overflow-hidden shadow-card">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-xs text-[#111]">
+          <table className="w-full border-collapse text-left text-body text-[#1D1D1F]">
             <thead>
-              <tr className="border-b border-[#E8E8E8] bg-[#FAFAFA] text-[#6B6B6B] uppercase tracking-widest text-[9px]">
+              <tr className="border-b border-[#E5E5EA] bg-[#FBFBFD] text-[#6E6E73] uppercase tracking-[0.04em] text-caption">
                 <th className="p-4 font-semibold">Order No</th>
                 <th className="p-4 font-semibold">Items</th>
                 <th className="p-4 font-semibold">Total</th>
@@ -219,40 +219,40 @@ export default function OrdersPage() {
                 <th className="p-4 font-semibold">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E8E8E8]">
+            <tbody className="divide-y divide-[#E5E5EA]">
               {currentItems.length === 0 ? (
-                <tr><td colSpan={7} className="p-8 text-center text-[#6B6B6B] uppercase tracking-widest text-[10px]">No merchandise orders found.</td></tr>
+                <tr><td colSpan={7} className="p-8 text-center text-[#6E6E73] uppercase tracking-[0.04em] text-caption">No merchandise orders found.</td></tr>
               ) : currentItems.map(o => (
-                <tr key={o.id} onClick={() => setSelected(o)} className="hover:bg-[#FAFAFA] transition-all cursor-pointer">
-                  <td className="p-4 font-mono font-bold text-[#d4af37]">{o.order_number}</td>
+                <tr key={o.id} onClick={() => setSelected(o)} className="hover:bg-[#FBFBFD] transition cursor-pointer">
+                  <td className="p-4 font-mono font-bold text-[#8A6D1C]">{o.order_number}</td>
                   <td className="p-4 max-w-[240px]">
-                    <div className="flex items-center gap-2"><ShoppingBag size={12} className="text-[#6B6B6B] shrink-0" /><span className="truncate">{itemsSummary(o.items)}</span></div>
+                    <div className="flex items-center gap-2"><ShoppingBag size={12} className="text-[#6E6E73] shrink-0" /><span className="truncate">{itemsSummary(o.items)}</span></div>
                   </td>
                   <td className="p-4 font-semibold">LKR {Number(o.total_amount).toLocaleString()}</td>
                   <td className="p-4">
                     <span className="font-semibold">{o.customer_name}</span>
-                    <div className="text-[10px] text-[#6B6B6B] mt-0.5">{o.customer_phone}{o.school_name ? ` · ${o.school_name}` : ''}</div>
+                    <div className="text-caption text-[#6E6E73] mt-1">{o.customer_phone}{o.school_name ? ` · ${o.school_name}` : ''}</div>
                   </td>
                   <td className="p-4 text-center" onClick={e => e.stopPropagation()}>
                     {o.receipt_url ? (
-                      <a href={o.receipt_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#d4af37] hover:underline"><ExternalLink size={13} /> View</a>
-                    ) : <span className="text-[#A3A3A3]">—</span>}
+                      <a href={o.receipt_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#8A6D1C] hover:underline"><ExternalLink size={13} /> View</a>
+                    ) : <span className="text-[#6E6E73]">—</span>}
                   </td>
                   <td className="p-4 text-center">
-                    <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase border ${payBadge(o.payment_status)}`}>{o.payment_status}</span>
+                    <span className={`px-3 py-1 rounded-md text-caption font-bold uppercase border ${payBadge(o.payment_status)}`}>{o.payment_status}</span>
                   </td>
-                  <td className="p-4 text-[#6B6B6B]">{new Date(o.created_at).toLocaleDateString('en-LK')}</td>
+                  <td className="p-4 text-[#6E6E73]">{new Date(o.created_at).toLocaleDateString('en-LK')}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         {totalPages > 1 && (
-          <div className="px-6 py-4 bg-[#FAFAFA] border-t border-[#E8E8E8] flex items-center justify-between gap-4">
-            <span className="text-[10px] text-[#6B6B6B] uppercase tracking-widest">Page {currentPage} of {totalPages} ({filtered.length} total)</span>
+          <div className="px-6 py-4 bg-[#FBFBFD] border-t border-[#E5E5EA] flex items-center justify-between gap-4">
+            <span className="text-caption text-[#6E6E73] uppercase tracking-[0.04em]">Page {currentPage} of {totalPages} ({filtered.length} total)</span>
             <div className="flex items-center gap-2">
-              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] flex items-center justify-center disabled:opacity-30"><ChevronLeft size={16} /></button>
-              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="w-8 h-8 rounded-lg bg-[#F5F5F5] border border-[#E8E8E8] flex items-center justify-center disabled:opacity-30"><ChevronRight size={16} /></button>
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="w-8 h-8 rounded-control bg-[#F5F5F7] border border-[#E5E5EA] flex items-center justify-center disabled:opacity-30"><ChevronLeft size={16} /></button>
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="w-8 h-8 rounded-control bg-[#F5F5F7] border border-[#E5E5EA] flex items-center justify-center disabled:opacity-30"><ChevronRight size={16} /></button>
             </div>
           </div>
         )}
@@ -262,87 +262,87 @@ export default function OrdersPage() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-end">
           <div onClick={() => setSelected(null)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative w-full max-w-lg h-full bg-white border-l border-[#E8E8E8] p-8 flex flex-col overflow-y-auto z-10">
-            <div className="flex items-center justify-between pb-6 border-b border-[#E8E8E8]">
-              <div className="flex items-center gap-3 text-[#d4af37]"><ShoppingBag size={20} /><span className="text-xs font-extrabold uppercase tracking-widest">Order Details</span></div>
-              <button onClick={() => setSelected(null)} className="text-[#6B6B6B] hover:text-[#111]"><X size={18} /></button>
+          <div className="relative w-full max-w-lg h-full bg-white border-l border-[#E5E5EA] p-8 flex flex-col overflow-y-auto z-10">
+            <div className="flex items-center justify-between pb-6 border-b border-[#E5E5EA]">
+              <div className="flex items-center gap-3 text-[#8A6D1C]"><ShoppingBag size={20} /><span className="text-body font-bold ">Order Details</span></div>
+              <button onClick={() => setSelected(null)} className="text-[#6E6E73] hover:text-[#1D1D1F]"><X size={18} /></button>
             </div>
 
             <div className="space-y-6 pt-6">
               <div>
-                <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Order Number</span>
-                <div className="text-xl font-bold text-[#d4af37] mt-1">{selected.order_number}</div>
-                <div className="text-[11px] text-[#6B6B6B] mt-1">{new Date(selected.created_at).toLocaleString('en-LK')}</div>
+                <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Order Number</span>
+                <div className="text-title font-bold text-[#8A6D1C] mt-1">{selected.order_number}</div>
+                <div className="text-caption text-[#6E6E73] mt-1">{new Date(selected.created_at).toLocaleString('en-LK')}</div>
               </div>
 
               {/* Items */}
-              <div className="space-y-1.5">
-                <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Items</span>
-                <div className="border border-[#E8E8E8] rounded-xl divide-y divide-[#E8E8E8]">
+              <div className="space-y-2">
+                <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Items</span>
+                <div className="border border-[#E5E5EA] rounded-control divide-y divide-[#E5E5EA]">
                   {(selected.items || []).map((it, i) => (
-                    <div key={i} className="flex justify-between px-4 py-2.5 text-xs">
-                      <span className="text-[#111]">{it.name}{it.size ? ` · ${it.size}` : ''} <span className="text-[#6B6B6B]">×{it.quantity}</span></span>
+                    <div key={i} className="flex justify-between px-4 py-3 text-body">
+                      <span className="text-[#1D1D1F]">{it.name}{it.size ? ` · ${it.size}` : ''} <span className="text-[#6E6E73]">×{it.quantity}</span></span>
                       <span className="font-semibold">LKR {Number(it.line_total).toLocaleString()}</span>
                     </div>
                   ))}
-                  <div className="flex justify-between px-4 py-2 text-[11px] text-[#6B6B6B]"><span>Delivery</span><span>LKR {Number(selected.delivery_fee).toLocaleString()}</span></div>
-                  <div className="flex justify-between px-4 py-2.5 text-sm font-bold text-[#d4af37]"><span>Total</span><span>LKR {Number(selected.total_amount).toLocaleString()}</span></div>
+                  <div className="flex justify-between px-4 py-2 text-caption text-[#6E6E73]"><span>Delivery</span><span>LKR {Number(selected.delivery_fee).toLocaleString()}</span></div>
+                  <div className="flex justify-between px-4 py-3 text-body font-bold text-[#8A6D1C]"><span>Total</span><span>LKR {Number(selected.total_amount).toLocaleString()}</span></div>
                 </div>
               </div>
 
               {/* Customer */}
-              <div className="space-y-1.5">
-                <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Customer</span>
-                <div className="flex flex-col gap-2 text-xs text-[#111] border border-[#E8E8E8] px-4 py-3 rounded-xl">
-                  <div className="flex items-center gap-2"><User size={14} className="text-[#6B6B6B]" /> {selected.customer_name}{selected.school_name ? ` — ${selected.school_name}` : ''}</div>
-                  <div className="text-[#6B6B6B] font-mono">WhatsApp: {selected.customer_phone}{selected.delivery_contact ? ` · Delivery: ${selected.delivery_contact}` : ''}</div>
-                  {selected.customer_email && <div className="text-[#6B6B6B]">{selected.customer_email}</div>}
-                  <div className="flex gap-2 text-[#6B6B6B]"><MapPin size={14} className="mt-0.5 shrink-0" /> {selected.customer_address}</div>
+              <div className="space-y-2">
+                <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Customer</span>
+                <div className="flex flex-col gap-2 text-body text-[#1D1D1F] border border-[#E5E5EA] px-4 py-3 rounded-control">
+                  <div className="flex items-center gap-2"><User size={14} className="text-[#6E6E73]" /> {selected.customer_name}{selected.school_name ? ` — ${selected.school_name}` : ''}</div>
+                  <div className="text-[#6E6E73] font-mono">WhatsApp: {selected.customer_phone}{selected.delivery_contact ? ` · Delivery: ${selected.delivery_contact}` : ''}</div>
+                  {selected.customer_email && <div className="text-[#6E6E73]">{selected.customer_email}</div>}
+                  <div className="flex gap-2 text-[#6E6E73]"><MapPin size={14} className="mt-1 shrink-0" /> {selected.customer_address}</div>
                 </div>
               </div>
 
               {/* Receipt */}
-              <div className="space-y-1.5">
-                <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Payment Receipt</span>
+              <div className="space-y-2">
+                <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Payment Receipt</span>
                 {selected.receipt_url ? (
                   isPdf(selected.receipt_url) ? (
-                    <a href={selected.receipt_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-3 border border-[#E8E8E8] rounded-xl text-xs text-[#d4af37] hover:bg-[#FAFAFA]"><FileText size={14} /> Open receipt file <ExternalLink size={12} /></a>
+                    <a href={selected.receipt_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-3 border border-[#E5E5EA] rounded-control text-body text-[#8A6D1C] hover:bg-[#FBFBFD]"><FileText size={14} /> Open receipt file <ExternalLink size={12} /></a>
                   ) : (
                     <a href={selected.receipt_url} target="_blank" rel="noopener noreferrer" className="block">
-                      <img src={selected.receipt_url} alt="Receipt" className="w-full rounded-xl border border-[#E8E8E8]" />
+                      <img src={selected.receipt_url} alt="Receipt" className="w-full rounded-control border border-[#E5E5EA]" />
                     </a>
                   )
-                ) : <p className="text-xs text-[#6B6B6B]">No receipt uploaded.</p>}
+                ) : <p className="text-body text-[#6E6E73]">No receipt uploaded.</p>}
               </div>
 
               {selected.notes && (
-                <div className="space-y-1.5">
-                  <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase flex items-center gap-2"><FileText size={12} /> Notes</span>
-                  <div className="text-xs text-[#111]/80 border border-[#E8E8E8] px-4 py-3 rounded-xl whitespace-pre-wrap">{selected.notes}</div>
+                <div className="space-y-2">
+                  <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase flex items-center gap-2"><FileText size={12} /> Notes</span>
+                  <div className="text-body text-[#1D1D1F]/80 border border-[#E5E5EA] px-4 py-3 rounded-control whitespace-pre-wrap">{selected.notes}</div>
                 </div>
               )}
 
               {/* Actions */}
               <div className="space-y-3 pt-2">
-                <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase">Payment Verification</span>
+                <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase">Payment Verification</span>
                 <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase border ${payBadge(selected.payment_status)}`}>{selected.payment_status}</span>
-                  {selected.ledger_posted && <span className="text-[10px] text-green-600">✓ Added to bank</span>}
+                  <span className={`px-3 py-1 rounded-md text-caption font-bold uppercase border ${payBadge(selected.payment_status)}`}>{selected.payment_status}</span>
+                  {selected.ledger_posted && <span className="text-caption text-green-600">✓ Added to bank</span>}
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => approve(selected)} disabled={updatingId === selected.id || selected.payment_status === 'verified'}
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide bg-green-600 text-white hover:bg-green-700 disabled:opacity-40">
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-control text-body font-bold capitalize bg-green-600 text-white hover:bg-green-700 disabled:opacity-40">
                     <CheckCircle2 size={14} /> {selected.payment_status === 'verified' ? 'Verified' : 'Approve & add to bank'}
                   </button>
                   <button onClick={() => setPayment(selected, 'rejected')} disabled={updatingId === selected.id || selected.payment_status === 'rejected'}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide bg-[#F5F5F5] border border-[#E8E8E8] text-red-600 hover:bg-red-50 disabled:opacity-40">
+                    className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-control text-body font-bold capitalize bg-[#F5F5F7] border border-[#E5E5EA] text-red-600 hover:bg-red-50 disabled:opacity-40">
                     <XCircle size={14} /> Reject
                   </button>
                 </div>
 
-                <span className="block text-[9px] font-bold tracking-widest text-[#6B6B6B] uppercase pt-2">Fulfillment Status</span>
+                <span className="block text-caption font-bold tracking-[0.04em] text-[#6E6E73] uppercase pt-2">Fulfillment Status</span>
                 <select value={selected.order_status} onChange={e => setFulfillment(selected, e.target.value)}
-                  className="w-full px-4 py-2.5 bg-white border border-[#E8E8E8] rounded-xl text-xs text-[#111] focus:outline-none cursor-pointer">
+                  className="w-full px-4 py-3 bg-white border border-[#E5E5EA] rounded-control text-body text-[#1D1D1F] focus:outline-none cursor-pointer">
                   <option value="pending">Pending</option>
                   <option value="processing">Processing</option>
                   <option value="shipped">Shipped</option>

@@ -1,29 +1,93 @@
 @import "tailwindcss";
 
+/* ===== Apple-style design tokens ===== */
 :root {
-  --background: #F5F5F5;
-  --foreground: #111111;
+  --background: #F5F5F7;
+  --foreground: #1D1D1F;
+  --label-secondary: #6E6E73;
+  --separator: #E5E5EA;
+  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --transition-control: background-color 0.2s var(--ease-standard), color 0.2s var(--ease-standard),
+    border-color 0.2s var(--ease-standard), box-shadow 0.2s var(--ease-standard), opacity 0.2s var(--ease-standard);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-geist-sans), "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", var(--font-geist-mono), Menlo, monospace;
+
+  /* Type scale: 11 / 13 / 15 / 20 / 28 */
+  --text-caption: 11px;
+  --text-caption--line-height: 14px;
+  --text-body: 13px;
+  --text-body--line-height: 18px;
+  --text-headline: 15px;
+  --text-headline--line-height: 20px;
+  --text-title: 20px;
+  --text-title--line-height: 25px;
+  --text-title--letter-spacing: -0.01em;
+  --text-large-title: 28px;
+  --text-large-title--line-height: 34px;
+  --text-large-title--letter-spacing: -0.02em;
+
+  /* Concentric radii */
+  --radius-control: 10px;
+  --radius-card: 16px;
+  --radius-sheet: 22px;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.02);
+
+  --default-transition-duration: 200ms;
+  --default-transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-/* Explicitly disable dark mode media query to prevent system preference interference */
+/* Single light appearance (dark mode intentionally off) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #F5F5F5;
-    --foreground: #111111;
+    --background: #F5F5F7;
+    --foreground: #1D1D1F;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-geist-sans), "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, td { font-variant-numeric: tabular-nums; }
+
+/* Visible keyboard focus (inline outline:none no longer hides it) */
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible, select:focus-visible {
+  outline: 2px solid #1D1D1F !important;
+  outline-offset: 2px !important;
+}
+input:not(.rg-input):focus, textarea:focus, select:focus {
+  border-color: #6E6E73 !important;
+  box-shadow: 0 0 0 3px rgba(29, 29, 31, 0.08);
+}
+
+/* Press feedback */
+button:not(:disabled):active { opacity: 0.72; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* iOS Safari zooms into inputs under 16px */
+@media (max-width: 767px) {
+  input, select, textarea { font-size: 16px !important; }
 }
 
 /* ===== ADMIN MOBILE RESPONSIVE ===== */
@@ -32,17 +96,17 @@ body {
   /* Sidebar collapses on tablet/mobile */
   .admin-sidebar {
     position: fixed !important;
-    left: -240px !important;
+    left: -220px !important;
     top: 0 !important;
     height: 100vh !important;
     z-index: 999 !important;
-    transition: left 0.3s ease !important;
-    width: 240px !important;
+    transition: left 0.3s var(--ease-sheet) !important;
+    width: 220px !important;
   }
   
   .admin-sidebar.open {
     left: 0 !important;
-    box-shadow: 4px 0 20px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 0 40px rgba(0,0,0,0.18) !important;
   }
 
   .admin-main-content {
@@ -86,7 +150,7 @@ body {
   
   .admin-filters-row {
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 12px !important;
   }
   
   .admin-filters-row input,
@@ -150,7 +214,7 @@ body {
   .dashboard-stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     justify-items: center !important;
-    gap: 10px !important;
+    gap: 12px !important;
   }
   
   /* Page content padding */
@@ -167,7 +231,7 @@ body {
   /* Finance stats center */
   .finance-stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    gap: 12px !important;
   }
 
   /* Analytics stats center */  
@@ -189,10 +253,10 @@ body {
 
   /* Modal full width on mobile */
   .admin-modal-inner {
-    width: calc(100vw - 20px) !important;
-    margin: 10px !important;
+    width: calc(100vw - 24px) !important;
+    margin: 12px !important;
     max-height: 90vh !important;
     overflow-y: auto !important;
-    border-radius: 12px !important;
+    border-radius: 22px !important;
   }
 }
