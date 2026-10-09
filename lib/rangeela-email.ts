@@ -13,8 +13,13 @@ export const RG = {
   time: '2.00 PM onwards',
   venue: 'Nawinna Grounds, Maharagama',
   whatsappGroup: 'https://chat.whatsapp.com/HklcPlrIl3P6tKJsWDbxu8',
-  helpWhatsapp: '94778132137',
-  helpWhatsappLabel: '077 813 2137',
+  // RANGEELA help line: two organisers on WhatsApp.
+  helpContacts: [
+    { name: 'Thulina', whatsapp: '94760444058', label: '076 044 4058' },
+    { name: 'Chrishikesh', whatsapp: '94760470623', label: '076 047 0623' },
+  ],
+  helpWhatsapp: '94760444058',
+  helpWhatsappLabel: 'Thulina (076 044 4058) or Chrishikesh (076 047 0623)',
   site: 'https://aisca.lk',
 }
 
@@ -46,7 +51,7 @@ function shell(inner: string, preheader: string): string {
   </td></tr>
   ${inner}
   <tr><td style="padding:26px 32px 28px;border-top:1px solid #F4EAF2;" align="center">
-    <p style="margin:0 0 6px;font-size:12px;color:#8A7A86;font-family:${FONT};">Questions? Message AISCA on WhatsApp: <a href="https://wa.me/${RG.helpWhatsapp}" style="color:#7B2FF7;text-decoration:none;font-weight:bold;">${RG.helpWhatsappLabel}</a></p>
+    <p style="margin:0 0 6px;font-size:12px;color:#8A7A86;font-family:${FONT};">Questions? WhatsApp ${RG.helpContacts.map(c => `<a href="https://wa.me/${c.whatsapp}" style="color:#7B2FF7;text-decoration:none;font-weight:bold;">${c.name} ${c.label}</a>`).join(' or ')}</p>
     <p style="margin:0;font-size:11px;color:#B3A5AF;font-family:${FONT};">All Island Schools Commerce Association · <a href="${RG.site}" style="color:#B3A5AF;">aisca.lk</a></p>
   </td></tr>
   <tr><td>${rainbowBar(6)}</td></tr>
