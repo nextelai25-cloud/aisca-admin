@@ -22,7 +22,7 @@ export function svc(): SupabaseClient {
   return _svc
 }
 
-export type RangeelaAction = 'view' | 'approve' | 'cash' | 'scan' | 'revoke' | 'edit' | 'price'
+export type RangeelaAction = 'view' | 'approve' | 'cash' | 'scan' | 'revoke' | 'edit' | 'price' | 'amount'
 
 const ACCESS: Record<RangeelaAction, string[]> = {
   view:    ['chairman', 'cfo', 'rangeela_oc', 'rangeela_cash'],
@@ -32,6 +32,7 @@ const ACCESS: Record<RangeelaAction, string[]> = {
   scan:    ['chairman', 'rangeela_oc', 'rangeela_cash'],
   revoke:  ['chairman'],
   price:   ['chairman'],   // change the ticket price for everyone
+  amount:  ['chairman'],   // change the amount on a ticket already submitted
 }
 
 export function can(role: string, action: RangeelaAction): boolean {

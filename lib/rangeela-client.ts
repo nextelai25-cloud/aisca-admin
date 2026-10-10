@@ -53,7 +53,7 @@ export interface RgMe {
   email: string
   name: string
   role: string
-  can: { view: boolean; approve: boolean; cash: boolean; scan: boolean; revoke: boolean; edit: boolean; price: boolean }
+  can: { view: boolean; approve: boolean; cash: boolean; scan: boolean; revoke: boolean; edit: boolean; price: boolean; amount: boolean }
 }
 
 export const AL_BATCHES = ['2025', '2026', '2027', '2028', 'Other']

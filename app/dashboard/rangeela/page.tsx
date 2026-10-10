@@ -6,7 +6,6 @@ import {
   AlertTriangle, Ticket, Clock, Banknote, Landmark, DoorOpen, User, Phone, School, ChevronRight,
 } from 'lucide-react'
 import RangeelaTabs from './RangeelaTabs'
-import PriceCard from './PriceCard'
 import { rgApi, fmtTime, type RgTicket, type RgMe } from '@/lib/rangeela-client'
 
 interface Scan { id: number; ticket_id: string | null; code: string | null; result: string; scanned_by: string | null; scanned_at: string }
@@ -38,6 +37,8 @@ export default function RangeelaTicketsPage() {
   const [rejectNotify, setRejectNotify] = useState(true)
   const [showReject, setShowReject] = useState(false)
   const [newEmail, setNewEmail] = useState('')
+  const [newAmount, setNewAmount] = useState('')
+  const [amountReason, setAmountReason] = useState('')
   const [shown, setShown] = useState(30)
 
   useEffect(() => { load() }, [])
@@ -72,6 +73,8 @@ export default function RangeelaTicketsPage() {
     setRejectReason('')
     setRejectNotify(true)
     setNewEmail(t.email)
+    setNewAmount(String(Number(t.amount)))
+    setAmountReason('')
   }
 
   function replace(t: RgTicket) {
@@ -99,6 +102,20 @@ export default function RangeelaTicketsPage() {
     replace(r.data.ticket)
     setShowReject(false)
     setNotice({ kind: 'ok', text: rejectNotify ? (r.data.emailed ? 'Rejected and the student was emailed.' : `Rejected, but the email failed: ${r.data.emailError}`) : 'Rejected. No email was sent.' })
+  }
+
+  async function changeAmount(t: RgTicket) {
+    const amt = Number(newAmount)
+    if (!Number.isInteger(amt) || amt < 0 || amt > 100000) { setNotice({ kind: 'err', text: 'Enter a whole number between 0 and 100,000.' }); return }
+    if (amt === Number(t.amount)) { setNotice({ kind: 'err', text: 'That is already the amount on this ticket.' }); return }
+    if (!confirm(`Change ${t.ticket_number} (${t.full_name}) from LKR ${Number(t.amount).toLocaleString()} to LKR ${amt.toLocaleString()}?`)) return
+    setBusy(true); setNotice(null)
+    const r = await rgApi<{ ticket: RgTicket; error?: string }>('amount', { id: t.id, amount: amt, reason: amountReason })
+    setBusy(false)
+    if (!r.ok) { setNotice({ kind: 'err', text: r.data?.error || 'Could not change the amount.' }); return }
+    replace(r.data.ticket)
+    setAmountReason('')
+    setNotice({ kind: 'ok', text: `Amount changed to LKR ${amt.toLocaleString()}.${t.status === 'approved' ? ' Use resend below if the student needs the updated ticket email.' : ''}` })
   }
 
   async function resend(t: RgTicket) {
@@ -194,7 +211,6 @@ export default function RangeelaTicketsPage() {
   return (
     <div className="rg-page space-y-4">
       <RangeelaTabs me={me} subtitle="Ticket requests, payment approvals and entrance check in" />
-      {me && <PriceCard me={me} />}
 
       {loadError && (
         <div className="rg-glass flex gap-2 items-start p-4 text-red-700 text-body"><AlertTriangle size={18} className="shrink-0" /> {loadError}</div>
@@ -385,6 +401,20 @@ export default function RangeelaTicketsPage() {
                     )
                   ) : <p className="text-body text-[#6B5E68]">No receipt.</p>}
                   <p className="text-body text-[#6B5E68] mt-2">Check it shows LKR {Number(selected.amount).toLocaleString()} paid to Sampath Bank 1069 6100 6902 before approving.</p>
+                </div>
+              )}
+
+              {me?.can.amount && (
+                <div className="rounded-2xl bg-white/80 border border-white p-4 space-y-2">
+                  <div className="rg-label">Change ticket amount · chairman only</div>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[13px] font-bold text-[#6B5E68]">LKR</span>
+                    <input value={newAmount} onChange={(e) => setNewAmount(e.target.value.replace(/[^\d]/g, '').slice(0, 6))} inputMode="numeric" className="rg-input" style={{ paddingLeft: 52, fontWeight: 700 }} aria-label="New amount in LKR" />
+                  </div>
+                  <input value={amountReason} onChange={(e) => setAmountReason(e.target.value)} placeholder="Reason (optional), e.g. paid early bird price" className="rg-input" maxLength={200} />
+                  <button onClick={() => changeAmount(selected)} disabled={busy || !newAmount || Number(newAmount) === Number(selected.amount)} className="rg-btn rg-btn-dark w-full">
+                    <Banknote size={15} /> Save new amount
+                  </button>
                 </div>
               )}
 
