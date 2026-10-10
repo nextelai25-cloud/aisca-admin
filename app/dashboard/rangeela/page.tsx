@@ -6,6 +6,7 @@ import {
   AlertTriangle, Ticket, Clock, Banknote, Landmark, DoorOpen, User, Phone, School, ChevronRight,
 } from 'lucide-react'
 import RangeelaTabs from './RangeelaTabs'
+import PriceCard from './PriceCard'
 import { rgApi, fmtTime, type RgTicket, type RgMe } from '@/lib/rangeela-client'
 
 interface Scan { id: number; ticket_id: string | null; code: string | null; result: string; scanned_by: string | null; scanned_at: string }
@@ -193,6 +194,7 @@ export default function RangeelaTicketsPage() {
   return (
     <div className="rg-page space-y-4">
       <RangeelaTabs me={me} subtitle="Ticket requests, payment approvals and entrance check in" />
+      {me && <PriceCard me={me} />}
 
       {loadError && (
         <div className="rg-glass flex gap-2 items-start p-4 text-red-700 text-body"><AlertTriangle size={18} className="shrink-0" /> {loadError}</div>

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { randomInt } from 'crypto'
-import { svc, getCaller, can, newQrToken, normaliseId, looksLikeNic, EMAIL_RE } from '@/lib/rangeela-server'
+import { svc, getCaller, can, newQrToken, normaliseId, looksLikeNic, EMAIL_RE, getRgPrices } from '@/lib/rangeela-server'
 import { sendTicketEmail } from '@/lib/rangeela-email'
 import { sendTicketSms, toLocalMobile } from '@/lib/rangeela-sms'
-import { RG_PRICING, rgOnlinePrice } from '@/lib/rangeela-pricing'
+import { rgOnlinePrice } from '@/lib/rangeela-pricing'
 
 // POST /api/rangeela/cash
 // { full_name, email, whatsapp, school, al_batch, nic, amount?, notes?, admit_now? }
@@ -22,7 +22,8 @@ export async function POST(req: NextRequest) {
   const nic = String(b.nic ?? '').trim().toUpperCase().slice(0, 30)
   const admitNow = b.admit_now === true
   // Gate sales default to the gate price, otherwise the current online price.
-  const amount = Number(b.amount ?? (admitNow ? RG_PRICING.gate : rgOnlinePrice()))
+  const prices = await getRgPrices()
+  const amount = Number(b.amount ?? (admitNow ? prices.gate : rgOnlinePrice(Date.now(), prices)))
 
   if (!full_name) return NextResponse.json({ error: 'Enter the full name.' }, { status: 400 })
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 })

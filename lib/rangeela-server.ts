@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
+import { RG_DEFAULT_PRICES, type RgPrices } from '@/lib/rangeela-pricing'
 
 /**
  * RANGEELA '26 server helpers for admin.aisca.lk.
@@ -21,7 +22,7 @@ export function svc(): SupabaseClient {
   return _svc
 }
 
-export type RangeelaAction = 'view' | 'approve' | 'cash' | 'scan' | 'revoke' | 'edit'
+export type RangeelaAction = 'view' | 'approve' | 'cash' | 'scan' | 'revoke' | 'edit' | 'price'
 
 const ACCESS: Record<RangeelaAction, string[]> = {
   view:    ['chairman', 'cfo', 'rangeela_oc', 'rangeela_cash'],
@@ -30,6 +31,7 @@ const ACCESS: Record<RangeelaAction, string[]> = {
   cash:    ['chairman', 'rangeela_cash'],
   scan:    ['chairman', 'rangeela_oc', 'rangeela_cash'],
   revoke:  ['chairman'],
+  price:   ['chairman'],   // change the ticket price for everyone
 }
 
 export function can(role: string, action: RangeelaAction): boolean {
@@ -59,6 +61,18 @@ export async function getCaller(req: NextRequest): Promise<Caller | null> {
     .maybeSingle()
   if (!row) return null
   return { email, name: row.name || email, role: row.role }
+}
+
+/** Live online and gate prices (table rangeela_settings), or the defaults if the row can't be read. */
+export async function getRgPrices(): Promise<RgPrices> {
+  try {
+    const { data, error } = await svc().from('rangeela_settings').select('online_price, gate_price').eq('id', 1).maybeSingle()
+    if (error || !data) return RG_DEFAULT_PRICES
+    const standard = Number(data.online_price), gate = Number(data.gate_price)
+    return standard > 0 && gate > 0 ? { standard, gate } : RG_DEFAULT_PRICES
+  } catch {
+    return RG_DEFAULT_PRICES
+  }
 }
 
 export function newQrToken(): string {

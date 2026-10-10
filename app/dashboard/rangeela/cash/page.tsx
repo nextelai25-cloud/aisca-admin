@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { Banknote, CheckCircle2, AlertTriangle } from 'lucide-react'
 import RangeelaTabs, { RangeelaGlassStyles } from '../RangeelaTabs'
-import { rgApi, AL_BATCHES, RG_PRICING, rgOnlinePrice, type RgMe, type RgTicket } from '@/lib/rangeela-client'
+import { rgApi, AL_BATCHES, RG_DEFAULT_PRICES, rgOnlinePrice, type RgMe, type RgTicket, type RgPrices } from '@/lib/rangeela-client'
 
 const NIC_RE = /^(\d{9}[VX]|\d{12})$/
 
@@ -29,8 +29,17 @@ export default function CashDeskPage() {
   const [done, setDone] = useState<{ ticket: RgTicket; emailed: boolean; emailError: string | null; sms?: boolean; smsError?: string | null } | null>(null)
   const [today, setToday] = useState<{ count: number; total: number }>({ count: 0, total: 0 })
 
-  // Default cash amount is the online price for today (set in the browser, not at build time).
-  useEffect(() => { setAmount(String(rgOnlinePrice())) }, [])
+  // Live prices set by the chairman. Default cash amount is today's online price.
+  const [prices, setPrices] = useState<RgPrices>(RG_DEFAULT_PRICES)
+  useEffect(() => {
+    setAmount(String(rgOnlinePrice()))
+    rgApi<RgPrices>('price').then((r) => {
+      if (r.ok && r.data.standard > 0) {
+        const p = { standard: r.data.standard, gate: r.data.gate }
+        setPrices(p); setAmount(String(rgOnlinePrice(Date.now(), p)))
+      }
+    })
+  }, [])
 
   useEffect(() => {
     rgApi<{ me: RgMe; error?: string }>('me').then((r) => (r.ok ? setMe(r.data.me) : setMeError(r.data?.error || 'Not allowed')))
@@ -55,7 +64,7 @@ export default function CashDeskPage() {
     setDone(r.data)
     setToday((t) => ({ count: t.count + 1, total: t.total + Number(r.data.ticket.amount) }))
     setF({ ...empty })
-    setAmount(String(rgOnlinePrice()))
+    setAmount(String(rgOnlinePrice(Date.now(), prices)))
     setAdmitNow(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -141,8 +150,8 @@ export default function CashDeskPage() {
           </div>
         </div>
         <label className="flex items-start gap-3 p-4 rounded-2xl bg-white/70 border border-white text-body text-[#1B1320] cursor-pointer">
-          <input type="checkbox" checked={admitNow} onChange={(e) => { setAdmitNow(e.target.checked); setAmount(String(e.target.checked ? RG_PRICING.gate : rgOnlinePrice())) }} className="mt-1 w-5 h-5" />
-          <span><b>Selling at the gate?</b> Tick this to admit them right now. The gate price is LKR {RG_PRICING.gate.toLocaleString()}. Their QR will then show as already used.</span>
+          <input type="checkbox" checked={admitNow} onChange={(e) => { setAdmitNow(e.target.checked); setAmount(String(e.target.checked ? prices.gate : rgOnlinePrice(Date.now(), prices))) }} className="mt-1 w-5 h-5" />
+          <span><b>Selling at the gate?</b> Tick this to admit them right now. The gate price is LKR {prices.gate.toLocaleString()}. Their QR will then show as already used.</span>
         </label>
         <button type="submit" disabled={busy} className="rg-btn rg-btn-dark w-full" style={{ height: 54, fontSize: 15 }}>
           {busy ? 'Saving...' : `Save sale and email ticket · LKR ${Number(amount || 0).toLocaleString()}`}
