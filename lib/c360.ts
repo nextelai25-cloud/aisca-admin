@@ -1,7 +1,9 @@
 // COMMERCE 360 project workspace: shared types, options and helpers.
 // Safe to import in the browser and on the server.
 
-export const C360_ROLES = ['chairman', 'deputy_chairman', 'cfo', 'marketing_manager', 'co_secretary', 'administration_manager'] as const
+export const C360_ROLES = ['chairman', 'deputy_chairman', 'cfo', 'marketing_manager', 'co_secretary', 'administration_manager', 'public_relations'] as const
+/** Full control of the workspace: delete, import, event settings. */
+export const C360_ADMIN_ROLES: readonly string[] = ['chairman', 'public_relations']
 
 export const TASK_STATUSES = ['Not Started', 'In Progress', 'Blocked', 'Done'] as const
 export type TaskStatus = (typeof TASK_STATUSES)[number]

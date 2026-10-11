@@ -9,7 +9,9 @@ const ROLE_LABELS: Record<string, string> = {
   deputy_chairman: 'Deputy Chairman',
   cfo: 'Chief Financial Officer',
   marketing_manager: 'Marketing Manager',
-  co_secretary: 'Co Secretary'
+  co_secretary: 'Co Secretary',
+  administration_manager: 'Administration Manager',
+  public_relations: 'Public Relations'
 }
 
 export default function SettingsPage() {

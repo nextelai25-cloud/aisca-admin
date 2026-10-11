@@ -1,12 +1,12 @@
 import { NextRequest } from 'next/server'
 import { svc, getCaller, type Caller } from '@/lib/rangeela-server'
-import { C360_ROLES, TASK_STATUSES, PRIORITIES, SPONSOR_STATUSES, TIERS, LIKELIHOOD, IMPACT, RISK_STATUSES, type Entity, type C360Me } from '@/lib/c360'
+import { C360_ROLES, C360_ADMIN_ROLES, TASK_STATUSES, PRIORITIES, SPONSOR_STATUSES, TIERS, LIKELIHOOD, IMPACT, RISK_STATUSES, type Entity, type C360Me } from '@/lib/c360'
 
 /**
  * COMMERCE 360 server helpers. Every request is checked against the caller's
  * role in admin_users (service role, server side).
  *   view + edit: every board role
- *   delete, settings, import: chairman only
+ *   delete, settings, import: chairman and public relations (C360_ADMIN_ROLES)
  */
 export { svc }
 
@@ -15,8 +15,8 @@ export async function c360Caller(req: NextRequest): Promise<Caller | null> {
   return c && (C360_ROLES as readonly string[]).includes(c.role) ? c : null
 }
 export function meFor(c: Caller): C360Me {
-  const chair = c.role === 'chairman'
-  return { email: c.email, name: c.name, role: c.role, can: { edit: true, delete: chair, admin: chair } }
+  const full = C360_ADMIN_ROLES.includes(c.role)
+  return { email: c.email, name: c.name, role: c.role, can: { edit: true, delete: full, admin: full } }
 }
 
 type Kind = 'text' | 'long' | 'date' | 'int' | 'num' | 'pct' | 'bool' | { enum: readonly string[] }

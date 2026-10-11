@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}))
 
   if (req.nextUrl.searchParams.get('entity') === 'import') {
-    if (!meFor(c).can.admin) return bad('Only the chairman can import.', 403)
+    if (!meFor(c).can.admin) return bad('Only the chairman or PR can import.', 403)
     const rows: Record<string, unknown>[] = Array.isArray(body.tasks) ? body.tasks.slice(0, 1000) : []
     if (!rows.length) return bad('No tasks found in the file.')
     const { data: existing, error } = await svc().from('c360_tasks').select('*')
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
   const entity = entityOf(req)
   if (!entity) return bad('Unknown list')
-  if (SPECS[entity].adminOnly && !meFor(c).can.admin) return bad('Only the chairman can change this.', 403)
+  if (SPECS[entity].adminOnly && !meFor(c).can.admin) return bad('Only the chairman or PR can change this.', 403)
   let row: Record<string, unknown>
   try { row = clean(entity, body, false) } catch (e) { return bad((e as Error).message) }
   if (entity === 'tasks') {
@@ -124,7 +124,7 @@ export async function PATCH(req: NextRequest) {
   if (!c) return bad('Not allowed', 403)
   const entity = entityOf(req)
   if (!entity) return bad('Unknown list')
-  if (SPECS[entity].adminOnly && !meFor(c).can.admin) return bad('Only the chairman can change this.', 403)
+  if (SPECS[entity].adminOnly && !meFor(c).can.admin) return bad('Only the chairman or PR can change this.', 403)
   const body = await req.json().catch(() => ({}))
   const table = SPECS[entity].table
 
@@ -160,7 +160,7 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const c = await c360Caller(req)
   if (!c) return bad('Not allowed', 403)
-  if (!meFor(c).can.delete) return bad('Only the chairman can delete.', 403)
+  if (!meFor(c).can.delete) return bad('Only the chairman or PR can delete.', 403)
   const entity = entityOf(req)
   const id = req.nextUrl.searchParams.get('id')
   if (!entity || entity === 'settings' || !id) return bad('Unknown row')

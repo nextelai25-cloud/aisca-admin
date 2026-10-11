@@ -1,4 +1,4 @@
-export type AdminRole = 'chairman' | 'deputy_chairman' | 'cfo' | 'marketing_manager' | 'co_secretary' | 'administration_manager' | 'rangeela_oc' | 'rangeela_cash'
+export type AdminRole = 'chairman' | 'deputy_chairman' | 'cfo' | 'marketing_manager' | 'co_secretary' | 'administration_manager' | 'public_relations' | 'rangeela_oc' | 'rangeela_cash'
 
 export const ROLE_PERMISSIONS = {
   chairman: {
@@ -82,6 +82,22 @@ export const ROLE_PERMISSIONS = {
     newsletter: false,
     contact: false,
     ideanet: false,
+    rangeela: false,
+    commerce360: true
+  },
+  // Public Relations (Lehara Rajapakse, pr@aisca.lk): outreach, schools, comms,
+  // and full COMMERCE 360 project access. No finance, orders, members or Rangeela.
+  public_relations: {
+    dashboard: true,
+    associates: true,
+    schools: true,
+    orders: false,
+    finance: false,
+    analytics: true,
+    members: false,
+    newsletter: true,
+    contact: true,
+    ideanet: true,
     rangeela: false,
     commerce360: true
   },

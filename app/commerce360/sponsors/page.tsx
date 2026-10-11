@@ -94,7 +94,7 @@ export default function SponsorsPage() {
 
       <div className="c3-grid c3-stats">
         {[
-          { label: 'Budget target', v: k.target, note: d.me.can.admin ? 'Tap to change' : 'Set by the chairman', onClick: d.me.can.admin ? () => setEditTarget(true) : undefined },
+          { label: 'Budget target', v: k.target, note: d.me.can.admin ? 'Tap to change' : 'Set by the chairman or PR', onClick: d.me.can.admin ? () => setEditTarget(true) : undefined },
           { label: 'Confirmed', v: k.confirmed, note: k.target ? `${Math.round((k.confirmed / k.target) * 100)}% of target` : '' },
           { label: 'Cash received', v: k.received, note: k.confirmed ? `${Math.round((k.received / k.confirmed) * 100)}% of confirmed` : 'Nothing confirmed yet' },
           { label: 'Gap to close', v: Math.max(0, k.target - k.confirmed), note: `${lkrShort(k.asked)} asked in open conversations` },
