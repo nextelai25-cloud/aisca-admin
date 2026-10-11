@@ -12,7 +12,8 @@ export const ROLE_PERMISSIONS = {
     newsletter: true,
     contact: true,
     ideanet: true,
-    rangeela: true
+    rangeela: true,
+    commerce360: true
   },
   deputy_chairman: {
     dashboard: true,
@@ -25,7 +26,8 @@ export const ROLE_PERMISSIONS = {
     newsletter: false,
     contact: true,
     ideanet: true,
-    rangeela: false
+    rangeela: false,
+    commerce360: true
   },
   cfo: {
     dashboard: true,
@@ -38,7 +40,8 @@ export const ROLE_PERMISSIONS = {
     newsletter: false,
     contact: false,
     ideanet: false,
-    rangeela: true
+    rangeela: true,
+    commerce360: true
   },
   marketing_manager: {
     dashboard: true,
@@ -51,7 +54,8 @@ export const ROLE_PERMISSIONS = {
     newsletter: true,
     contact: false,
     ideanet: true,
-    rangeela: false
+    rangeela: false,
+    commerce360: true
   },
   co_secretary: {
     dashboard: true,
@@ -64,7 +68,8 @@ export const ROLE_PERMISSIONS = {
     newsletter: false,
     contact: false,
     ideanet: false,
-    rangeela: false
+    rangeela: false,
+    commerce360: true
   },
   administration_manager: {
     dashboard: true,
@@ -77,19 +82,20 @@ export const ROLE_PERMISSIONS = {
     newsletter: false,
     contact: false,
     ideanet: false,
-    rangeela: false
+    rangeela: false,
+    commerce360: true
   },
   // RANGEELA '26 organising committee: approve receipts + scan at the gate
   rangeela_oc: {
     dashboard: false, associates: false, schools: false, orders: false, finance: false,
     analytics: false, members: false, newsletter: false, contact: false, ideanet: false,
-    rangeela: true
+    rangeela: true, commerce360: false
   },
   // RANGEELA '26 cash desk: cash sales + approvals + scanning
   rangeela_cash: {
     dashboard: false, associates: false, schools: false, orders: false, finance: false,
     analytics: false, members: false, newsletter: false, contact: false, ideanet: false,
-    rangeela: true
+    rangeela: true, commerce360: false
   }
 }
 
