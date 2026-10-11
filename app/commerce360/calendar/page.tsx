@@ -118,7 +118,7 @@ export default function CalendarPage() {
               )
               if (it.taskId) return <button key={it.key} className="c3-row" onClick={() => openTask(it.taskId!)}>{body}</button>
               const href = it.kind === 'gate' ? 'gates' : it.kind === 'sponsor' ? 'sponsors' : it.kind === 'risk' ? 'risks' : ''
-              return <Link key={it.key} href={`/dashboard/commerce360/${href}`} className="c3-row">{body}</Link>
+              return <Link key={it.key} href={`/commerce360/${href}`} className="c3-row">{body}</Link>
             })}
           </div>
         )}

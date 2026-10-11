@@ -11,7 +11,7 @@ import {
   SPONSOR_DONE, SPONSOR_LOST, type Task,
 } from '@/lib/c360'
 
-const BASE = '/dashboard/commerce360'
+const BASE = '/commerce360'
 
 function greeting() {
   const h = Number(new Date().toLocaleString('en-GB', { timeZone: 'Asia/Colombo', hour: 'numeric', hour12: false }))

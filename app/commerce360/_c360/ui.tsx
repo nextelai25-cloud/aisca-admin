@@ -144,16 +144,19 @@ export function C360Styles() {
     <style>{`
       .c3 { color: #1D1D1F; font-size: 14px; }
       .c3 *, .c3 *::before, .c3 *::after { box-sizing: border-box; }
-      .c3-shell { display: grid; grid-template-columns: 252px minmax(0, 1fr); gap: 20px; align-items: start; }
-      .c3-shell.collapsed { grid-template-columns: 64px minmax(0, 1fr); }
-      .c3-main { min-width: 0; display: flex; flex-direction: column; gap: 16px; container-type: inline-size; container-name: c3main; }
+      /* full-screen app shell */
+      .c3-app { min-height: 100vh; background: #F5F5F7; }
+      .c3-main { margin-left: 272px; padding: 28px 36px 64px; min-width: 0; display: flex; flex-direction: column; gap: 16px; container-type: inline-size; container-name: c3main; transition: margin-left .32s cubic-bezier(.32,.72,0,1); }
+      .c3-shell.collapsed .c3-main { margin-left: 76px; }
 
-      /* inner sidebar */
-      .c3-side { position: sticky; top: 16px; background: #F2F2F4; border: 1px solid #E5E5EA; border-radius: 24px; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; max-height: calc(100vh - 100px); overflow-y: auto; }
+      /* sidebar */
+      .c3-side { position: fixed; top: 0; left: 0; bottom: 0; width: 272px; z-index: 60; background: #F2F2F4; border-right: 1px solid #E5E5EA; padding: 18px 14px 14px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; overflow-x: hidden; transition: width .32s cubic-bezier(.32,.72,0,1), transform .32s cubic-bezier(.32,.72,0,1); }
+      .c3-shell.collapsed .c3-side { width: 76px; }
       .c3-side > *, .c3-side .c3-nav { flex-shrink: 0; }
-      .c3-brand { display: flex; align-items: center; gap: 12px; padding: 4px 6px 12px; }
-      .c3-logo { width: 40px; height: 40px; border-radius: 12px; background: #1D1D1F; color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 13px; letter-spacing: -.02em; flex-shrink: 0; }
-      .c3-brand-name { font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.15; }
+      .c3-brand { display: flex; align-items: center; gap: 12px; padding: 2px 6px 14px; }
+      .c3-logo { width: 42px; height: 42px; border-radius: 12px; background: #0A0A0A; color: #FF5B0A; display: grid; place-items: center; font-family: 'Montserrat', -apple-system, sans-serif; font-weight: 900; font-size: 14px; letter-spacing: -.03em; flex-shrink: 0; }
+      .c3-wordmark { font-family: 'Montserrat', -apple-system, sans-serif; font-weight: 900; font-size: 17px; letter-spacing: -.02em; line-height: 1.1; white-space: nowrap; }
+      .c3-wordmark span { color: #FF5B0A; }
       .c3-brand-sub { font-size: 13px; color: #6E6E73; }
       .c3-collapse { margin-left: auto; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: #6E6E73; background: transparent; border: none; cursor: pointer; flex-shrink: 0; }
       .c3-collapse:hover { background: rgba(0,0,0,.05); }
@@ -167,22 +170,36 @@ export function C360Styles() {
       .c3-nav svg { color: #48484A; flex-shrink: 0; }
       .c3-nav .c3-count { margin-left: auto; font-size: 12px; color: #6E6E73; font-weight: 600; }
       .c3-divider { height: 1px; background: #E0E0E5; margin: 10px 6px; }
-      .c3-countdown { margin-top: 8px; background: #1D1D1F; color: #fff; border-radius: 18px; padding: 14px; }
-      .c3-countdown b { font-size: 28px; font-weight: 700; letter-spacing: -.02em; }
+      .c3-side-count { margin-top: auto; padding-top: 12px; }
+      .c3-side-foot { position: sticky; bottom: -14px; margin: 8px -14px -14px; padding: 10px 14px 14px; background: #F2F2F4; border-top: 1px solid #E5E5EA; display: flex; flex-direction: column; gap: 8px; z-index: 2; }
+      .c3-countdown { background: #0A0A0A; color: #fff; border-radius: 18px; padding: 14px; }
+      .c3-countdown b { font-size: 28px; font-weight: 800; letter-spacing: -.02em; font-family: 'Montserrat', -apple-system, sans-serif; }
+      .c3-back { display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 14px; background: #fff; border: 1px solid #E5E5EA; color: #1D1D1F; text-decoration: none; font-size: 14px; font-weight: 600; white-space: nowrap; }
+      .c3-back:hover { background: #FAFAFB; }
+      .c3-me { display: flex; align-items: center; gap: 10px; padding: 6px 6px 0; min-width: 0; }
       .c3-shell.collapsed .c3-side .c3-hide-c { display: none !important; }
-      .c3-shell.collapsed .c3-nav { justify-content: center; padding: 0; }
+      .c3-shell.collapsed .c3-nav, .c3-shell.collapsed .c3-back { justify-content: center; padding: 0; }
       .c3-shell.collapsed .c3-brand { justify-content: center; flex-direction: column; }
       .c3-shell.collapsed .c3-collapse { margin: 0; }
+      .c3-scrim { display: none; }
 
-      /* mobile tabs */
+      /* phone & tablet: sidebar becomes a drawer */
+      .c3-topbar { display: none; }
       .c3-mtabs { display: none; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
       .c3-mtabs::-webkit-scrollbar { display: none; }
       .c3-mtabs a { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 999px; background: #fff; border: 1px solid #E5E5EA; color: #1D1D1F; text-decoration: none; font-size: 13px; font-weight: 600; }
       .c3-mtabs a.on { background: #1D1D1F; color: #fff; border-color: #1D1D1F; }
-      @media (max-width: 1180px) {
-        .c3-shell, .c3-shell.collapsed { grid-template-columns: minmax(0, 1fr); }
-        .c3-side { display: none; }
+      @media (max-width: 1100px) {
+        .c3-side, .c3-shell.collapsed .c3-side { width: 284px; transform: translateX(-100%); box-shadow: none; }
+        .c3-shell.drawer .c3-side { transform: none; box-shadow: 0 0 60px rgba(0,0,0,.25); }
+        .c3-shell.collapsed .c3-side .c3-hide-c { display: revert !important; }
+        .c3-shell.collapsed .c3-nav { justify-content: flex-start; padding: 0 12px; }
+        .c3-shell.collapsed .c3-brand { flex-direction: row; justify-content: flex-start; }
+        .c3-shell.drawer .c3-scrim { display: block; position: fixed; inset: 0; z-index: 55; background: rgba(0,0,0,.3); }
+        .c3-main, .c3-shell.collapsed .c3-main { margin-left: 0; padding: 0 16px 48px; }
+        .c3-topbar { display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 50; margin: 0 -16px; padding: 10px 16px; background: rgba(245,245,247,.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid #E5E5EA; }
         .c3-mtabs { display: flex; }
+        .c3-collapse-btn { display: none !important; }
       }
 
       /* type */

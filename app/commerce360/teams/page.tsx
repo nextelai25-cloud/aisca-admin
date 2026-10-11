@@ -90,7 +90,7 @@ export default function TeamsPage() {
               <Bar pct={pct} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, fontSize: 13 }}>
                 <span className="c3-muted">{next ? <>Next: {fmtDate(next.deadline)} <DaysBadge days={daysLeft(next.deadline)} /></> : 'Nothing due'}</span>
-                <Link href={`/dashboard/commerce360/tasks?team=${encodeURIComponent(t.name)}`} className="c3-link">{open} open tasks</Link>
+                <Link href={`/commerce360/tasks?team=${encodeURIComponent(t.name)}`} className="c3-link">{open} open tasks</Link>
               </div>
             </div>
           </Card>
@@ -112,7 +112,7 @@ export default function TeamsPage() {
                       {[p.role, heads.length ? `Head ${heads.join(', ')}` : '', deputy.length ? `Deputy ${deputy.join(', ')}` : ''].filter(Boolean).join(' · ') || (p.active ? 'Member' : 'Inactive')}
                     </div>
                   </div>
-                  <Link href={`/dashboard/commerce360/tasks?q=${encodeURIComponent(p.name.split(' ')[0])}`} onClick={(e) => e.stopPropagation()} className="c3-link" style={{ fontWeight: 500 }}>
+                  <Link href={`/commerce360/tasks?q=${encodeURIComponent(p.name.split(' ')[0])}`} onClick={(e) => e.stopPropagation()} className="c3-link" style={{ fontWeight: 500 }}>
                     {open} open{late ? <span style={{ color: '#B42318' }}>&nbsp;· {late} late</span> : ''}
                   </Link>
                 </div>
