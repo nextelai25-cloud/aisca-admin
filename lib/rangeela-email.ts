@@ -8,8 +8,8 @@ import { QR_PREFIX } from './rangeela-server'
 // The layout matches the "request received" email sent by aisca.lk.
 
 export const RG = {
-  dateShort: '17th October',
-  dateLabel: 'Saturday, 17th October 2026',
+  dateShort: '31st October',
+  dateLabel: 'Saturday, 31st October 2026',
   time: '2.00 PM onwards',
   venue: 'Nawinna Grounds, Maharagama',
   whatsappGroup: 'https://chat.whatsapp.com/HklcPlrIl3P6tKJsWDbxu8',
@@ -164,7 +164,7 @@ export async function sendTicketEmail(t: TicketEmailInput): Promise<{ ok: boolea
       from: fromAddress(),
       to: t.to,
       subject: `Your RANGEELA '26 ticket is here! (${t.ticketNumber})`,
-      html: shell(inner, `Your QR ticket for 17th October at Nawinna Grounds, Maharagama. Show it at the entrance.`),
+      html: shell(inner, `Your QR ticket for 31st October at Nawinna Grounds, Maharagama. Show it at the entrance.`),
       attachments: [{ filename: `RANGEELA26-${t.ticketNumber}-QR.png`, content: qrPng.toString('base64'), contentType: 'image/png', contentId: 'rangeela-qr' }],
     })
     if (error) return { ok: false, error: error.message || JSON.stringify(error) }
