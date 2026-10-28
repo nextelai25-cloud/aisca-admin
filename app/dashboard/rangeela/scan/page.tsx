@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import jsQR from 'jsqr'
-import { Camera, CameraOff, CheckCircle2, XCircle, AlertTriangle, Keyboard, ScanLine } from 'lucide-react'
+import { Camera, CameraOff, CheckCircle2, XCircle, AlertTriangle, Keyboard, ScanLine, Ticket } from 'lucide-react'
 import RangeelaTabs, { RangeelaGlassStyles } from '../RangeelaTabs'
 import { rgApi, fmtTime, type RgMe } from '@/lib/rangeela-client'
 
@@ -11,7 +11,9 @@ interface ScanTicket {
   ticket_number: string; full_name: string; school: string; al_batch: string; nic: string
   payment_method: string; status: string; checked_in_at: string | null; checked_in_by: string | null
 }
-interface ScanResponse { result: Result; ticket?: ScanTicket; message?: string; error?: string }
+interface PaperTicket { number: string; entered_at: string | null; entered_by: string | null }
+interface ScanResponse { result: Result; ticket?: ScanTicket; paper?: PaperTicket; message?: string; error?: string }
+interface Counts { online: number; paper: number; paperMax: number }
 
 const LOOK: Record<Result, { bg: string; title: string; icon: React.ElementType }> = {
   admitted:     { bg: '#16A34A', title: 'VALID · LET THEM IN', icon: CheckCircle2 },
@@ -29,6 +31,8 @@ export default function ScanPage() {
   const [last, setLast] = useState<ScanResponse | null>(null)
   const [manual, setManual] = useState('')
   const [admittedCount, setAdmittedCount] = useState(0)
+  const [paperNo, setPaperNo] = useState('')
+  const [counts, setCounts] = useState<Counts | null>(null)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -43,6 +47,17 @@ export default function ScanPage() {
     return () => stop()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Live total across every gate, refreshed every 15 seconds and after each check
+  const loadCounts = useCallback(async () => {
+    const r = await rgApi<Counts>('scan')
+    if (r.ok) setCounts(r.data)
+  }, [])
+  useEffect(() => {
+    const first = setTimeout(loadCounts, 0)
+    const id = setInterval(loadCounts, 15000)
+    return () => { clearTimeout(first); clearInterval(id) }
+  }, [loadCounts])
 
   function beep(ok: boolean) {
     try {
@@ -69,6 +84,7 @@ export default function ScanPage() {
       if (dismissTimer.current) clearTimeout(dismissTimer.current)
       dismissTimer.current = setTimeout(() => next(), 3500)
     }
+    loadCounts()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -135,6 +151,14 @@ export default function ScanPage() {
     setRunning(false)
   }
 
+  function submitPaper(e: React.FormEvent) {
+    e.preventDefault()
+    if (!paperNo || checking) return
+    const v = paperNo
+    setPaperNo('')
+    check(v)
+  }
+
   function submitManual(e: React.FormEvent) {
     e.preventDefault()
     const v = manual.trim()
@@ -155,10 +179,37 @@ export default function ScanPage() {
     <div className="rg-page space-y-4 max-w-xl mx-auto">
       <RangeelaTabs me={me} subtitle="Scan each QR at the entrance. A ticket can be admitted only once." />
 
-      <div className="rg-glass flex items-center justify-between px-5 py-3">
-        <span className="text-body font-semibold text-[#6B5E68]">Admitted on this device</span>
-        <span className="text-large-title font-bold text-green-600">{admittedCount}</span>
+      <div className="rg-glass px-5 py-4">
+        <div className="flex items-center justify-between">
+          <span className="text-body font-semibold text-[#6B5E68]">Inside now, all gates</span>
+          <span className="text-large-title font-bold text-green-600">{counts ? counts.online + counts.paper : '–'}</span>
+        </div>
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-2xl bg-white/60 px-2 py-2">
+            <div className="text-headline font-bold text-[#1B1320]">{counts?.online ?? '–'}</div>
+            <div className="text-caption text-[#6B5E68]">Online tickets</div>
+          </div>
+          <div className="rounded-2xl bg-white/60 px-2 py-2">
+            <div className="text-headline font-bold text-[#1B1320]">{counts ? `${counts.paper}/${counts.paperMax}` : '–'}</div>
+            <div className="text-caption text-[#6B5E68]">Paper tickets</div>
+          </div>
+          <div className="rounded-2xl bg-white/60 px-2 py-2">
+            <div className="text-headline font-bold text-[#1B1320]">{admittedCount}</div>
+            <div className="text-caption text-[#6B5E68]">This phone</div>
+          </div>
+        </div>
       </div>
+
+      <form onSubmit={submitPaper} className="rg-glass p-4 space-y-2">
+        <div className="rg-label flex items-center gap-2"><Ticket size={13} /> Paper ticket</div>
+        <p className="text-body text-[#6B5E68]">Type the number printed on the paper ticket (001 to {String(counts?.paperMax ?? 200).padStart(3, '0')}). Each number can enter only once.</p>
+        <div className="flex gap-2">
+          <input value={paperNo} onChange={(e) => setPaperNo(e.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="001"
+            inputMode="numeric" pattern="[0-9]*" autoComplete="off" aria-label="Paper ticket number"
+            className="rg-input flex-1 font-mono text-center text-2xl font-bold tracking-[0.3em]" />
+          <button type="submit" disabled={checking || !paperNo} className="rg-btn rg-btn-dark px-6">Enter</button>
+        </div>
+      </form>
 
       <div className="relative rounded-[28px] overflow-hidden bg-[#140d18] aspect-square" style={{ boxShadow: '0 20px 50px -20px rgba(40,10,60,0.55), inset 0 0 0 1px rgba(255,255,255,0.12)' }}>
         <video ref={videoRef} muted playsInline className="w-full h-full object-cover" />
@@ -197,6 +248,16 @@ export default function ScanPage() {
                 )}
                 {last.result === 'admitted' && <div className="mt-3 text-body opacity-90">Check their NIC matches.</div>}
               </div>
+            ) : last.paper ? (
+              <div className="mt-4 space-y-1">
+                <div className="text-large-title font-bold">Paper ticket No. {last.paper.number}</div>
+                {last.result === 'already_used' && last.paper.entered_at && (
+                  <div className="mt-3 px-4 py-2 rounded-xl bg-black/25 text-body font-semibold">
+                    First entered {fmtTime(last.paper.entered_at)}<br />by {last.paper.entered_by}
+                  </div>
+                )}
+                {last.result === 'admitted' && <div className="mt-3 text-body opacity-90">Tear or mark the paper ticket.</div>}
+              </div>
             ) : (
               <div className="mt-3 text-body opacity-90">{last.message}</div>
             )}
@@ -214,7 +275,7 @@ export default function ScanPage() {
 
       <form onSubmit={submitManual} className="rg-glass p-4 space-y-2">
         <div className="rg-label flex items-center gap-2"><Keyboard size={13} /> Phone died or QR will not scan?</div>
-        <p className="text-body text-[#6B5E68]">Type the ticket number from their email (for example RG26-12345) and check their NIC carefully.</p>
+        <p className="text-body text-[#6B5E68]">Type the online ticket number from their email (for example RG26-12345) and check their NIC carefully.</p>
         <div className="flex gap-2">
           <input value={manual} onChange={(e) => setManual(e.target.value.toUpperCase())} placeholder="RG26-12345" inputMode="text"
             className="rg-input flex-1 font-mono" autoCapitalize="characters" autoCorrect="off" />

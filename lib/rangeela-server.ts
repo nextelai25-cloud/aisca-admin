@@ -82,6 +82,9 @@ export function newQrToken(): string {
 
 export const QR_PREFIX = 'RANGEELA26:'
 
+/** Paper tickets sold at the gate/by hand are numbered 001 to PAPER_MAX. */
+export const PAPER_MAX = 200
+
 export function normaliseId(v: string): string {
   return v.toUpperCase().replace(/[^A-Z0-9]/g, '')
 }
