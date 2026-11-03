@@ -32,10 +32,10 @@ if (!url || !key) { console.error('Missing Supabase URL or service role key in .
 if (password.length < 10) { console.error('Set MEMORA_PASSWORD (at least 10 characters) before running.'); process.exit(1) }
 
 const ACCOUNTS = [
-  { email: 'memoraoc1@aisca.lk', name: 'Memora OC 1', role: 'memora_oc' },
-  { email: 'memoraoc2@aisca.lk', name: 'Memora OC 2', role: 'memora_oc' },
-  { email: 'memoraoc3@aisca.lk', name: 'Memora OC 3', role: 'memora_oc' },
-  { email: 'memoraoc4@aisca.lk', name: 'Memora OC 4', role: 'memora_oc' },
+  { email: 'memorasakith@aisca.lk', old: 'memoraoc1@aisca.lk', name: 'Sakith (Memora OC)', role: 'memora_oc' },
+  { email: 'memoraravinu@aisca.lk', old: 'memoraoc2@aisca.lk', name: 'Ravinu (Memora OC)', role: 'memora_oc' },
+  { email: 'memoradamsas@aisca.lk', old: 'memoraoc3@aisca.lk', name: 'Damsas (Memora OC)', role: 'memora_oc' },
+  { email: 'memoradahamsa@aisca.lk', old: 'memoraoc4@aisca.lk', name: 'Dahamsa (Memora OC)', role: 'memora_oc' },
   { email: 'memoracash@aisca.lk', name: 'Memora Cash Desk', role: 'memora_cash' },
 ]
 
@@ -50,6 +50,18 @@ for (let page = 1; page < 50; page++) {
 }
 
 for (const a of ACCOUNTS) {
+  // 0. Rename an earlier numbered login (memoraoc1 etc.) to the named one, so no old login is left behind.
+  if (a.old) {
+    const oldUser = existing.find((u) => (u.email || '').toLowerCase() === a.old)
+    const newUser = existing.find((u) => (u.email || '').toLowerCase() === a.email)
+    if (oldUser && !newUser) {
+      const r = await supabase.auth.admin.updateUserById(oldUser.id, { email: a.email, email_confirm: true })
+      if (r.error) { console.error(`✗ ${a.old} → ${a.email}: rename failed: ${r.error.message}`); continue }
+      oldUser.email = a.email
+      console.log(`↻ ${a.old} renamed to ${a.email}`)
+    }
+    await supabase.from('admin_users').delete().eq('email', a.old)
+  }
   // 1. admin_users row (this is what the server checks for permissions)
   const { data: row } = await supabase.from('admin_users').select('id').eq('email', a.email).maybeSingle()
   const dbRes = row

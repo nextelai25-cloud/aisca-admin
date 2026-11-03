@@ -43,6 +43,18 @@ function fromAddress(): string {
   return `MEMORA '26 by AISCA <${addr}>`
 }
 
+function whatsappBlock(): string {
+  return `<tr><td style="padding:10px 32px 8px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0E2A1C;border:1px solid #1F6B43;border-radius:14px;">
+    <tr><td style="padding:18px 22px;">
+      <p style="margin:0 0 6px;font-size:15px;font-weight:bold;color:#BBF7D0;font-family:${SANS};">Join the MEMORA '26 WhatsApp group</p>
+      <p style="margin:0 0 14px;font-size:13px;line-height:1.6;color:#A7C7B4;font-family:${SANS};">Event day updates, reminders and last minute details are shared here first. If you have not joined yet, please do.</p>
+      <a href="${MM.whatsappGroup}" style="display:inline-block;background:#25D366;color:#FFFFFF;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:bold;text-decoration:none;font-family:${SANS};">Join the WhatsApp group</a>
+    </td></tr>
+  </table>
+</td></tr>`
+}
+
 const cell = (label: string, value: string) =>
   `<td width="33%" style="padding:11px 4px;text-align:center;background:#121A40;border-radius:12px;border:1px solid #26305E;"><p style="margin:0;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8790B8;font-family:${SANS};">${label}</p><p style="margin:4px 0 0;font-size:14px;font-weight:bold;color:${GOLD};font-family:${SANS};">${value}</p></td>`
 
@@ -114,6 +126,7 @@ export async function sendMemoraTicketEmail(t: MmTicketEmailInput): Promise<{ ok
       ].map((t) => `<tr><td width="18" valign="top" style="padding:6px 0;"><div style="width:8px;height:8px;border-radius:50%;background:${GOLD};margin-top:6px;"></div></td><td style="padding:6px 0;font-size:13.5px;line-height:1.6;color:#C3C9E4;font-family:${SANS};">${t}</td></tr>`).join('')}
     </table>
   </td></tr>
+  ${whatsappBlock()}
   <tr><td style="padding:14px 32px 8px;">
     <p style="margin:0;font-size:13.5px;line-height:1.7;color:#C3C9E4;font-family:${SANS};">See you on ${MM.dateLabel}, ${MM.time}, at ${MM.venue}.<br/><strong style="color:#FFFFFF;">Team AISCA</strong></p>
   </td></tr>`

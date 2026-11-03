@@ -20,6 +20,7 @@ export const MM = {
     { name: 'Dahamsa', whatsapp: '94769753858', label: '076 975 3858' },
   ],
   bank: 'Sampath Bank 1019 5518 9611 (A S Thewmika, Piliyandala)',
+  whatsappGroup: 'https://chat.whatsapp.com/EFbOmZ1zX9wJdhlNFOoO6F',
   site: 'https://aisca.lk',
 } as const
 
