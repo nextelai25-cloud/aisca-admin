@@ -1,4 +1,4 @@
-export type AdminRole = 'chairman' | 'deputy_chairman' | 'cfo' | 'marketing_manager' | 'co_secretary' | 'administration_manager' | 'public_relations' | 'rangeela_oc' | 'rangeela_cash'
+export type AdminRole = 'chairman' | 'deputy_chairman' | 'cfo' | 'marketing_manager' | 'co_secretary' | 'administration_manager' | 'public_relations' | 'rangeela_oc' | 'rangeela_cash' | 'memora_oc' | 'memora_cash'
 
 export const ROLE_PERMISSIONS = {
   chairman: {
@@ -13,6 +13,7 @@ export const ROLE_PERMISSIONS = {
     contact: true,
     ideanet: true,
     rangeela: true,
+    memora: true,
     commerce360: true
   },
   deputy_chairman: {
@@ -27,6 +28,7 @@ export const ROLE_PERMISSIONS = {
     contact: true,
     ideanet: true,
     rangeela: false,
+    memora: false,
     commerce360: true
   },
   cfo: {
@@ -41,6 +43,7 @@ export const ROLE_PERMISSIONS = {
     contact: false,
     ideanet: false,
     rangeela: true,
+    memora: true,
     commerce360: true
   },
   marketing_manager: {
@@ -55,6 +58,7 @@ export const ROLE_PERMISSIONS = {
     contact: false,
     ideanet: true,
     rangeela: false,
+    memora: false,
     commerce360: true
   },
   co_secretary: {
@@ -69,6 +73,7 @@ export const ROLE_PERMISSIONS = {
     contact: false,
     ideanet: false,
     rangeela: false,
+    memora: false,
     commerce360: true
   },
   administration_manager: {
@@ -83,6 +88,7 @@ export const ROLE_PERMISSIONS = {
     contact: false,
     ideanet: false,
     rangeela: false,
+    memora: false,
     commerce360: true
   },
   // Public Relations (Lehara Rajapakse, pr@aisca.lk): outreach, schools, comms,
@@ -99,19 +105,32 @@ export const ROLE_PERMISSIONS = {
     contact: true,
     ideanet: true,
     rangeela: false,
+    memora: false,
     commerce360: true
   },
   // RANGEELA '26 organising committee: approve receipts + scan at the gate
   rangeela_oc: {
     dashboard: false, associates: false, schools: false, orders: false, finance: false,
     analytics: false, members: false, newsletter: false, contact: false, ideanet: false,
-    rangeela: true, commerce360: false
+    rangeela: true, memora: false, commerce360: false
   },
   // RANGEELA '26 cash desk: cash sales + approvals + scanning
   rangeela_cash: {
     dashboard: false, associates: false, schools: false, orders: false, finance: false,
     analytics: false, members: false, newsletter: false, contact: false, ideanet: false,
-    rangeela: true, commerce360: false
+    rangeela: true, memora: false, commerce360: false
+  },
+  // MEMORA '26 organising committee: approve receipts + scan at the entrance
+  memora_oc: {
+    dashboard: false, associates: false, schools: false, orders: false, finance: false,
+    analytics: false, members: false, newsletter: false, contact: false, ideanet: false,
+    rangeela: false, memora: true, commerce360: false
+  },
+  // MEMORA '26 cash desk: cash sales + approvals + scanning
+  memora_cash: {
+    dashboard: false, associates: false, schools: false, orders: false, finance: false,
+    analytics: false, members: false, newsletter: false, contact: false, ideanet: false,
+    rangeela: false, memora: true, commerce360: false
   }
 }
 

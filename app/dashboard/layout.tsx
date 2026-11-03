@@ -22,6 +22,7 @@ import {
   Lightbulb,
   Rocket,
   Palette,
+  Moon,
   Target
 } from 'lucide-react'
 import { canAccess, AdminRole } from '@/lib/roles'
@@ -46,6 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, section: 'dashboard' },
     { name: 'COMMERCE 360', path: '/commerce360', icon: Target, section: 'commerce360' },
+    { name: "Memora '26", path: '/dashboard/memora', icon: Moon, section: 'memora' },
     { name: "Rangeela '26", path: '/dashboard/rangeela', icon: Palette, section: 'rangeela' },
     { name: 'Members', path: '/dashboard/members', icon: Users, section: 'dashboard' },
     { name: 'Associates', path: '/dashboard/associates', icon: UserCheck, section: 'associates' },
