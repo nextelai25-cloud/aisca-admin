@@ -3,14 +3,13 @@ import React, { useMemo, useState } from 'react'
 import { Plus, Printer, Check, X as XIcon, Trash2, Star } from 'lucide-react'
 import {
   FIN_EVENTS, FIN_DEPARTMENTS, FIN_EXPENSE_CATEGORIES, lkr, fmtDate, fmtDateTime, needsSecond, STATUS_LABEL,
-  type FinRequisition,
-} from '@/lib/fin'
+  type FinRequisition, FIN_DEFAULT_EVENT } from '@/lib/fin'
 import { printRequisition, printComparison } from '@/lib/fin-print'
 import type { DeskProps } from './FinanceDesk'
-import { C, card, th, td, tdNum, Btn, Badge, Modal, Field, Grid, Input, Textarea, Select, FileField, Empty, FormError } from './ui'
+import { C, card, th, td, tdNum, Btn, Badge, Modal, Field, Grid, Input, Textarea, Select, FileField, Empty, FormError, EventSelect } from './ui'
 
 const blank = {
-  event: 'General', department: FIN_DEPARTMENTS[0], category: FIN_EXPENSE_CATEGORIES[0], title: '', details: '', quantity: '',
+  event: FIN_DEFAULT_EVENT, department: FIN_DEPARTMENTS[0], category: FIN_EXPENSE_CATEGORIES[0], title: '', details: '', quantity: '',
   budgeted_amount: '', estimated_amount: '', needed_by: '', requested_by: '', head_name: '', head_signed_on: '', form_url: '',
 }
 
@@ -78,7 +77,7 @@ export default function Requisitions({ d, act, focus }: DeskProps) {
         <Modal title="New expense requisition" onClose={() => setForm(null)} wide>
           <p style={{ fontSize: 12.5, color: C.sub, marginTop: 0 }}>Enter the department&apos;s requisition form. It goes to the CFO only after the Department Head has signed it.</p>
           <Grid>
-            <Field label="Event / project"><Input list="fin-events" value={form.event} onChange={(e) => setForm({ ...form, event: e.target.value })} /></Field>
+            <Field label="Event / project *"><EventSelect value={form.event} onChange={(v) => setForm({ ...form, event: v })} options={events} /></Field>
             <Field label="Department"><Select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} options={FIN_DEPARTMENTS} /></Field>
             <Field label="Budget head (category)"><Select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} options={FIN_EXPENSE_CATEGORIES} /></Field>
             <Field label="Requirement *" span2><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Event photography and videography" /></Field>
@@ -92,7 +91,6 @@ export default function Requisitions({ d, act, focus }: DeskProps) {
             <Field label="Head signed on"><Input type="date" value={form.head_signed_on} onChange={(e) => setForm({ ...form, head_signed_on: e.target.value })} /></Field>
             <FileField label="Signed form scan" value={form.form_url} onChange={(u) => setForm({ ...form, form_url: u })} hint="Photo or PDF of the signed paper form" />
           </Grid>
-          <datalist id="fin-events">{events.map((e) => <option key={e} value={e} />)}</datalist>
           <FormError text={err} />
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
             <Btn onClick={() => setForm(null)}>Cancel</Btn>

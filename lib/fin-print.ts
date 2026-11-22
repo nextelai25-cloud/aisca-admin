@@ -306,14 +306,14 @@ export function printPettyVoucher(p: FinPetty, float: number) {
   if (p.entry_type !== 'spend') return
   const col = pettyColumn(p.category)
   const body = `
-  <table class="kv" style="width:66%">
+  <table class="kv">
     ${row('Date', esc(fmtDate(p.entry_date)))}
     ${row('Paid a sum of', `<b>${amountInWords(p.amount)}</b>`)}
     ${row('To', `<b>${esc(p.paid_to || '')}</b>`)}
     ${row('Petty cash account code', `${PETTY_ACCOUNT.code} &nbsp; ${PETTY_ACCOUNT.name} (float LKR ${money(float)})`)}
     ${row('Event / project', esc(p.event))}
   </table>
-  <table class="grid" style="margin-top:34px">
+  <table class="grid" style="margin-top:12px">
     <tr><th>Account code</th><th>Name of the account</th><th>Description of the payment</th><th class="num">Amount (Rs. Cts)</th></tr>
     <tr><td>${PETTY_CODES[col]}</td><td>${esc(col)}</td><td>${esc(p.purpose)}</td><td class="num">${money(p.amount)}</td></tr>
     <tr class="total"><td colspan="3">Total</td><td class="num">Rs ${money(p.amount)}</td></tr>
@@ -326,7 +326,7 @@ export function printPettyVoucher(p: FinPetty, float: number) {
     ${sig('Authorised by (CFO)')}
     ${sig('Received by', p.paid_to, null, '<span>NIC: ..............................</span>')}
   </div>`
-  open(shell('Petty Cash Voucher', p.pc_no, body, { sealed: { date: p.entry_date, name: p.recorded_name } }))
+  open(shell('Petty Cash Voucher', p.pc_no, body))  // no digital seal: the official seal is stamped on the signed original
 }
 
 /** Analytical petty cash book on the imprest system. */

@@ -80,7 +80,9 @@ export interface FinData {
   me: FinMe
 }
 
-export const FIN_EVENTS = ['General', 'COMMERCE 360', "MEMORA '26", "RANGEELA '26", 'AISCA Forum', 'NEXTUP', 'Ask the Expert']
+// Finance is kept event by event. General = organisation-wide costs and income not tied to one event.
+export const FIN_EVENTS = ['COMMERCE 360', 'General']
+export const FIN_DEFAULT_EVENT = 'COMMERCE 360'
 export const FIN_DEPARTMENTS = ['Executive Authority', 'Marketing', 'Finance', 'Administration', 'Human Resources', 'Operations', 'Public Relations', 'Events']
 export const FIN_EXPENSE_CATEGORIES = [
   'Photography & Videography', 'Venue Hire', 'Food & Beverages', 'Transportation', 'Printing & Stationery',

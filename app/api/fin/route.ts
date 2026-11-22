@@ -73,12 +73,13 @@ const HANDLERS: Record<string, H> = {
   async 'req.create'(c, b) {
     const deny = need(c, 'create'); if (deny) return deny
     const row = {
-      event: str(b.event, 80) || 'General', department: str(b.department, 80), category: str(b.category, 80),
+      event: str(b.event, 80) || '', department: str(b.department, 80), category: str(b.category, 80),
       title: str(b.title, 160), details: str(b.details, 2000), quantity: num(b.quantity),
       budgeted_amount: num(b.budgeted_amount), estimated_amount: num(b.estimated_amount), needed_by: day(b.needed_by),
       requested_by: str(b.requested_by, 120), head_name: str(b.head_name, 120), head_signed_on: day(b.head_signed_on),
       form_url: cleanFileUrl(b.form_url), created_by: c.email,
     }
+    if (!row.event) return bad('Choose the event this belongs to (COMMERCE 360, General or a new event).')
     if (!row.department || !row.category || !row.title || !row.requested_by) return bad('Fill in department, category, title and who requested it.')
     if (!row.estimated_amount || row.estimated_amount <= 0) return bad('Enter the estimated amount.')
     if (!row.head_name) return bad('The department head must sign the requisition before it goes to the CFO. Enter their name.')
@@ -278,10 +279,11 @@ const HANDLERS: Record<string, H> = {
   async 'rb.create'(c, b) {
     const deny = need(c, 'create'); if (deny) return deny
     const row = {
-      event: str(b.event, 80) || 'General', department: str(b.department, 80), category: str(b.category, 80) || 'Other Expenses',
+      event: str(b.event, 80) || '', department: str(b.department, 80), category: str(b.category, 80) || 'Other Expenses',
       claimant: str(b.claimant, 120), purpose: str(b.purpose, 1000), bill_no: str(b.bill_no, 80), bill_date: day(b.bill_date),
       bill_amount: num(b.bill_amount), claim_amount: num(b.claim_amount), bill_url: cleanFileUrl(b.bill_url), created_by: c.email,
     }
+    if (!row.event) return bad('Choose the event this belongs to (COMMERCE 360, General or a new event).')
     if (!row.claimant || !row.purpose) return bad('Enter who paid and what it was for.')
     if (!row.bill_no || !row.bill_url) return bad('The original bill is mandatory. Attach it and enter its number.')
     if (!row.bill_amount || !row.claim_amount) return bad('Enter the bill amount and the amount claimed.')
@@ -379,7 +381,7 @@ const HANDLERS: Record<string, H> = {
     const kind = b.kind === 'in_kind' ? 'in_kind' : 'monetary'
     const source_type = str(b.source_type, 60) || 'Other'
     const row = {
-      event: str(b.event, 80) || 'General', source_type, received_from: str(b.received_from, 160), kind,
+      event: str(b.event, 80) || '', source_type, received_from: str(b.received_from, 160), kind,
       amount: kind === 'monetary' ? num(b.amount) : 0,
       in_kind_description: kind === 'in_kind' ? str(b.in_kind_description, 1000) : null,
       in_kind_value: kind === 'in_kind' ? num(b.in_kind_value) : null,
@@ -387,6 +389,7 @@ const HANDLERS: Record<string, H> = {
       reference: str(b.reference, 120), received_on: day(b.received_on) || today(), proof_url: cleanFileUrl(b.proof_url),
       notes: str(b.notes, 1000), recorded_by: c.email, recorded_name: c.name,
     }
+    if (!row.event) return bad('Choose the event this belongs to (COMMERCE 360, General or a new event).')
     if (!row.received_from) return bad('Enter who the income was received from.')
     if (kind === 'monetary' && (!row.amount || row.amount <= 0)) return bad('Enter the amount received.')
     if (kind === 'in_kind' && !row.in_kind_description) return bad('Describe what was given in kind.')
@@ -435,11 +438,12 @@ const HANDLERS: Record<string, H> = {
     const noBill = b.no_bill === true
     const bill_no = noBill ? null : str(b.bill_no, 80)
     const bill_url = noBill ? null : cleanFileUrl(b.bill_url)
+    if (!str(b.event, 80)) return bad('Choose the event this belongs to (COMMERCE 360, General or a new event).')
     if (!amount || amount <= 0 || !purpose || !paid_to) return bad('Enter the amount, what it was for and who received the cash.')
     if (amount > max) return bad(`A petty cash payment can be at most ${lkr(max)}. Use a requisition and payment voucher for larger amounts.`)
     if (amount > bal) return bad(`Petty cash has only ${lkr(bal)}. Restore the float first.`)
     if (!noBill && (!bill_no || !bill_url)) return bad('Attach the bill and enter its number, or tick "No bill" for things like bus fares (the receiver then signs the voucher).')
-    const row = { entry_type: 'spend', amount, purpose, paid_to, event: str(b.event, 80) || 'General', category, bill_no, bill_url, entry_date, recorded_by: c.email, recorded_name: c.name }
+    const row = { entry_type: 'spend', amount, purpose, paid_to, event: str(b.event, 80) || '', category, bill_no, bill_url, entry_date, recorded_by: c.email, recorded_name: c.name }
     const { data, error } = await svc().from('fin_petty_cash').insert(row).select('*').single()
     if (error) return dbError(error)
     if (bill_no) {

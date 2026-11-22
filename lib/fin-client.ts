@@ -24,8 +24,11 @@ export async function finApi<T = any>(body?: Record<string, unknown>): Promise<{
 export async function uploadFinFile(file: File): Promise<{ url?: string; error?: string }> {
   if (file.size > 10 * 1024 * 1024) return { error: 'File is larger than 10 MB.' }
   const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5)
-  const path = `desk/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`
+  const path = `desk/${new Date().toISOString().slice(0, 7)}/${crypto.randomUUID()}.${ext}` // unguessable name
   const { error } = await supabase.storage.from('finance_attachments').upload(path, file, { contentType: file.type || undefined })
-  if (error) return { error: 'Upload failed: ' + error.message }
+  if (error) {
+    if (/bucket not found/i.test(error.message)) return { error: 'File storage is not set up yet. Run supabase/finance-storage.sql in Supabase.' }
+    return { error: 'Upload failed: ' + error.message }
+  }
   return { url: supabase.storage.from('finance_attachments').getPublicUrl(path).data.publicUrl }
 }

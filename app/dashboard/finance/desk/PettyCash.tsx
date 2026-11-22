@@ -1,14 +1,14 @@
 'use client'
 import React, { useState } from 'react'
 import { Printer, ArrowDownLeft, ArrowUpRight } from 'lucide-react'
-import { PETTY_COLUMNS, PETTY_DEFAULT_FLOAT, PETTY_DEFAULT_MAX, pettyColumn, lkr, fmtDate } from '@/lib/fin'
+import { PETTY_COLUMNS, PETTY_DEFAULT_FLOAT, PETTY_DEFAULT_MAX, pettyColumn, lkr, fmtDate, FIN_DEFAULT_EVENT } from '@/lib/fin'
 import { printPettyBook, printPettyVoucher, PETTY_CODES } from '@/lib/fin-print'
 import type { DeskProps } from './FinanceDesk'
 import { eventOptions } from './Requisitions'
-import { C, card, th, td, tdNum, Btn, Modal, Field, Grid, Input, Select, FileField, Empty, FormError, Stat } from './ui'
+import { C, card, th, td, tdNum, Btn, Modal, Field, Grid, Input, Select, FileField, Empty, FormError, Stat, EventSelect } from './ui'
 
 const today = () => new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10)
-const blankSpend = { amount: '', purpose: '', paid_to: '', event: 'General', category: PETTY_COLUMNS[0], bill_no: '', bill_url: '', no_bill: false, entry_date: today() }
+const blankSpend = { amount: '', purpose: '', paid_to: '', event: FIN_DEFAULT_EVENT, category: PETTY_COLUMNS[0], bill_no: '', bill_url: '', no_bill: false, entry_date: today() }
 
 export default function PettyCash({ d, act }: DeskProps) {
   const float = Number(d.settings.petty_float) || PETTY_DEFAULT_FLOAT
@@ -122,7 +122,7 @@ export default function PettyCash({ d, act }: DeskProps) {
             <Field label="Account (analysis column)"><Select value={spend.category} onChange={(e) => setSpend({ ...spend, category: e.target.value })} options={PETTY_COLUMNS.map((c) => [c, `${PETTY_CODES[c]} ${c}`] as [string, string])} /></Field>
             <Field label="Date"><Input type="date" value={spend.entry_date} onChange={(e) => setSpend({ ...spend, entry_date: e.target.value })} /></Field>
             <Field label="Description of the payment *" span2><Input value={spend.purpose} onChange={(e) => setSpend({ ...spend, purpose: e.target.value })} placeholder="e.g. Three wheeler to UCFM site visit and back" /></Field>
-            <Field label="Event / project"><Input list="fin-events-pc" value={spend.event} onChange={(e) => setSpend({ ...spend, event: e.target.value })} /></Field>
+            <Field label="Event / project *"><EventSelect value={spend.event} onChange={(v) => setSpend({ ...spend, event: v })} options={events} /></Field>
             <Field label="Bill">
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
                 <input type="checkbox" checked={spend.no_bill} onChange={(e) => setSpend({ ...spend, no_bill: e.target.checked })} />
@@ -134,7 +134,6 @@ export default function PettyCash({ d, act }: DeskProps) {
               <FileField label="Bill" required value={spend.bill_url} onChange={(u) => setSpend({ ...spend, bill_url: u })} />
             </>}
           </Grid>
-          <datalist id="fin-events-pc">{events.map((e) => <option key={e} value={e} />)}</datalist>
           <FormError text={err} />
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
             <Btn onClick={() => setSpend(null)}>Cancel</Btn>

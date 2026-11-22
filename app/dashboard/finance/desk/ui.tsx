@@ -114,3 +114,20 @@ export function Stat({ label, value, sub }: { label: string; value: string; sub?
 
 export const FormError = ({ text }: { text: string }) =>
   text ? <div style={{ background: '#FFF1F2', color: C.red, fontSize: 13, padding: '9px 12px', borderRadius: 10, marginTop: 12 }}>{text}</div> : null
+
+/** Event picker: finance is kept event by event. "+ New event" lets you type a new one. */
+export function EventSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
+  const [custom, setCustom] = useState(!!value && !options.includes(value))
+  if (custom) {
+    return (
+      <div style={{ display: 'flex', gap: 6 }}>
+        <Input autoFocus value={value} onChange={(e) => onChange(e.target.value)} placeholder="New event name" />
+        <Btn small onClick={() => { setCustom(false); onChange(options[0]) }}>List</Btn>
+      </div>
+    )
+  }
+  return (
+    <Select value={value} onChange={(e) => { if (e.target.value === '__new') { setCustom(true); onChange('') } else onChange(e.target.value) }}
+      options={[...options, ['__new', '+ New event']]} />
+  )
+}

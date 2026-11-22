@@ -1,14 +1,14 @@
 'use client'
 import React, { useState } from 'react'
 import { Plus, Printer, Check, X as XIcon, Banknote } from 'lucide-react'
-import { FIN_DEPARTMENTS, FIN_EXPENSE_CATEGORIES, lkr, fmtDate, needsSecond, STATUS_LABEL, type FinReimbursement } from '@/lib/fin'
+import { FIN_DEPARTMENTS, FIN_EXPENSE_CATEGORIES, lkr, fmtDate, needsSecond, STATUS_LABEL, type FinReimbursement, FIN_DEFAULT_EVENT } from '@/lib/fin'
 import { printReimbursement } from '@/lib/fin-print'
 import type { DeskProps } from './FinanceDesk'
 import { eventOptions } from './Requisitions'
-import { C, card, th, td, tdNum, Btn, Badge, Modal, Field, Grid, Input, Textarea, Select, FileField, Empty, FormError } from './ui'
+import { C, card, th, td, tdNum, Btn, Badge, Modal, Field, Grid, Input, Textarea, Select, FileField, Empty, FormError, EventSelect } from './ui'
 
 const today = () => new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10)
-const blank = { event: 'General', department: FIN_DEPARTMENTS[0], category: FIN_EXPENSE_CATEGORIES[0], claimant: '', purpose: '', bill_no: '', bill_date: '', bill_amount: '', claim_amount: '', bill_url: '' }
+const blank = { event: FIN_DEFAULT_EVENT, department: FIN_DEPARTMENTS[0], category: FIN_EXPENSE_CATEGORIES[0], claimant: '', purpose: '', bill_no: '', bill_date: '', bill_amount: '', claim_amount: '', bill_url: '' }
 
 export default function Reimbursements({ d, act, focus }: DeskProps) {
   const [status, setStatus] = useState('open')
@@ -62,7 +62,7 @@ export default function Reimbursements({ d, act, focus }: DeskProps) {
         <Modal title="New reimbursement claim" onClose={() => setForm(null)} wide>
           <Grid>
             <Field label="Claimant (who paid) *"><Input value={form.claimant} onChange={(e) => setForm({ ...form, claimant: e.target.value })} /></Field>
-            <Field label="Event / project"><Input list="fin-events-rb" value={form.event} onChange={(e) => setForm({ ...form, event: e.target.value })} /></Field>
+            <Field label="Event / project *"><EventSelect value={form.event} onChange={(v) => setForm({ ...form, event: v })} options={events} /></Field>
             <Field label="Department"><Select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} options={FIN_DEPARTMENTS} /></Field>
             <Field label="Budget head"><Select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} options={FIN_EXPENSE_CATEGORIES} /></Field>
             <Field label="Purpose / item *" span2><Textarea value={form.purpose} onChange={(e) => setForm({ ...form, purpose: e.target.value })} /></Field>
@@ -72,7 +72,6 @@ export default function Reimbursements({ d, act, focus }: DeskProps) {
             <Field label="Amount claimed (LKR) *" hint={over ? 'Cannot be more than the bill' : undefined}><Input type="number" value={form.claim_amount} onChange={(e) => setForm({ ...form, claim_amount: e.target.value })} style={over ? { borderColor: C.red } : undefined} /></Field>
             <FileField label="Original bill" required value={form.bill_url} onChange={(u) => setForm({ ...form, bill_url: u })} />
           </Grid>
-          <datalist id="fin-events-rb">{events.map((e) => <option key={e} value={e} />)}</datalist>
           <FormError text={err} />
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
             <Btn onClick={() => setForm(null)}>Cancel</Btn>

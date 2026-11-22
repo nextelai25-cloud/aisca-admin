@@ -1,14 +1,14 @@
 'use client'
 import React, { useState } from 'react'
 import { Plus, Printer } from 'lucide-react'
-import { FIN_INCOME_SOURCES, lkr, fmtDate } from '@/lib/fin'
+import { FIN_INCOME_SOURCES, lkr, fmtDate, FIN_DEFAULT_EVENT } from '@/lib/fin'
 import { printIncome } from '@/lib/fin-print'
 import type { DeskProps } from './FinanceDesk'
 import { eventOptions } from './Requisitions'
-import { C, card, th, td, tdNum, Btn, Modal, Field, Grid, Input, Textarea, Select, FileField, Empty, FormError } from './ui'
+import { C, card, th, td, tdNum, Btn, Modal, Field, Grid, Input, Textarea, Select, FileField, Empty, FormError, EventSelect } from './ui'
 
 const today = () => new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10)
-const blank = { event: 'General', source_type: 'Sponsorship', received_from: '', kind: 'monetary', amount: '', payment_method: 'bank', reference: '', received_on: today(), in_kind_description: '', in_kind_value: '', proof_url: '', notes: '' }
+const blank = { event: FIN_DEFAULT_EVENT, source_type: 'Sponsorship', received_from: '', kind: 'monetary', amount: '', payment_method: 'bank', reference: '', received_on: today(), in_kind_description: '', in_kind_value: '', proof_url: '', notes: '' }
 
 export default function Income({ d, act }: DeskProps) {
   const [event, setEvent] = useState('All')
@@ -33,7 +33,7 @@ export default function Income({ d, act }: DeskProps) {
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', marginBottom: 12 }}>
         <b style={{ fontSize: 15, marginRight: 'auto' }}>Income receipts</b>
         <Select value={event} onChange={(e) => setEvent(e.target.value)} options={['All', ...events]} style={{ width: 170 }} />
-        {d.me.can.pay && <Btn kind="primary" onClick={() => { setErr(''); setForm({ ...blank, event: event === 'All' ? 'General' : event }) }}><Plus size={14} /> New receipt</Btn>}
+        {d.me.can.pay && <Btn kind="primary" onClick={() => { setErr(''); setForm({ ...blank, event: event === 'All' ? FIN_DEFAULT_EVENT : event }) }}><Plus size={14} /> New receipt</Btn>}
       </div>
       <p style={{ fontSize: 12.5, color: C.sub, marginTop: 0 }}>
         Kept per event: record only what was received for that event. Money is posted to the ledger; in-kind support is kept on file at its estimated value.
@@ -61,7 +61,7 @@ export default function Income({ d, act }: DeskProps) {
       {form && (
         <Modal title="New income receipt" onClose={() => setForm(null)} wide>
           <Grid>
-            <Field label="Event / project"><Input list="fin-events-ir" value={form.event} onChange={(e) => setForm({ ...form, event: e.target.value })} /></Field>
+            <Field label="Event / project *"><EventSelect value={form.event} onChange={(v) => setForm({ ...form, event: v })} options={events} /></Field>
             <Field label="Source"><Select value={form.source_type} onChange={(e) => setForm({ ...form, source_type: e.target.value })} options={Object.keys(FIN_INCOME_SOURCES)} /></Field>
             <Field label="Received from *"><Input value={form.received_from} onChange={(e) => setForm({ ...form, received_from: e.target.value })} placeholder="Company or person" /></Field>
             <Field label="Type"><Select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })} options={[['monetary', 'Money'], ['in_kind', 'In kind (goods or services)']]} /></Field>
@@ -77,7 +77,6 @@ export default function Income({ d, act }: DeskProps) {
             <FileField label="Proof (slip, letter, agreement)" value={form.proof_url} onChange={(u) => setForm({ ...form, proof_url: u })} />
             <Field label="Notes" span2><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></Field>
           </Grid>
-          <datalist id="fin-events-ir">{events.map((e) => <option key={e} value={e} />)}</datalist>
           <FormError text={err} />
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
             <Btn onClick={() => setForm(null)}>Cancel</Btn>
