@@ -3,7 +3,7 @@ import {
   svc, finCaller, finCan, finMe, cleanFileUrl, str, num, day, logDoc, getThreshold,
   registerBill, releaseBill, postLedger,
 } from '@/lib/fin-server'
-import { FIN_INCOME_SOURCES, needsSecond, lkr } from '@/lib/fin'
+import { FIN_INCOME_SOURCES, PETTY_COLUMNS, PETTY_DEFAULT_FLOAT, PETTY_DEFAULT_MAX, needsSecond, lkr } from '@/lib/fin'
 import type { Caller } from '@/lib/rangeela-server'
 
 export const dynamic = 'force-dynamic'
@@ -16,6 +16,7 @@ const bad = (error: string, status = 400) => NextResponse.json({ error }, { stat
 const SETUP = 'Finance Desk tables are not set up yet. Run supabase/finance-docs.sql in Supabase first.'
 function dbError(e: { message: string; code?: string }) {
   console.error('[fin]', e.message)
+  if (e.code === '42703' || /petty_float|petty_max_spend|paid_to|column .* does not exist/i.test(e.message)) return bad('Petty cash update not set up yet. Run supabase/petty-imprest.sql in Supabase first.', 500)
   if (e.code === '42P01' || /does not exist|schema cache/i.test(e.message)) return bad(SETUP, 500)
   if (e.code === '23514') return bad('Some values are not allowed. Check the amounts and try again.', 400)
   if (e.code === '23505') return bad('This document already exists.', 409)
@@ -408,34 +409,63 @@ const HANDLERS: Record<string, H> = {
   // ---------------- Petty cash ----------------
   async 'pc.create'(c, b) {
     const deny = need(c, 'pay'); if (deny) return deny
-    const entry_type = b.entry_type === 'top_up' ? 'top_up' : 'spend'
-    const row = {
-      entry_type, amount: num(b.amount), purpose: str(b.purpose, 500), event: str(b.event, 80) || 'General',
-      category: entry_type === 'spend' ? (str(b.category, 80) || 'Other Expenses') : null,
-      bill_no: str(b.bill_no, 80), bill_url: cleanFileUrl(b.bill_url), entry_date: day(b.entry_date) || today(),
-      recorded_by: c.email, recorded_name: c.name,
+    const { float, max } = await pettyLimits()
+    const bal = await pettyBalance()
+    const entry_date = day(b.entry_date) || today()
+
+    // Imprest: money only comes in to restore the box to the fixed float
+    if (b.entry_type === 'top_up') {
+      const amount = Math.round((float - bal) * 100) / 100
+      if (amount <= 0) return bad(`The box already holds the full float of ${lkr(float)}.`)
+      const reference = str(b.reference, 120)
+      if (!reference) return bad('Enter the cheque number or bank withdrawal reference for the cash drawn.')
+      const purpose = bal === 0 && !(await hasPetty()) ? `Opening float (imprest ${lkr(float)})` : `Float restored to ${lkr(float)}`
+      const { data, error } = await svc().from('fin_petty_cash').insert({
+        entry_type: 'top_up', amount, purpose, event: 'General', reference, entry_date, recorded_by: c.email, recorded_name: c.name,
+      }).select('*').single()
+      if (error) return dbError(error)
+      await logDoc(c, 'petty_cash', data.id, data.pc_no, 'float_restored', `${lkr(amount)} ref ${reference}`)
+      return ok({ row: data })
     }
-    if (!row.amount || row.amount <= 0 || !row.purpose) return bad('Enter the amount and what it is for.')
-    if (entry_type === 'spend') {
-      if (!row.bill_no || !row.bill_url) return bad('Attach the bill and enter its number for every petty cash spend.')
-      const bal = await pettyBalance()
-      if (row.amount > bal) return bad(`Petty cash has only ${lkr(bal)}. Record a top up first.`)
-    }
+
+    const amount = num(b.amount)
+    const purpose = str(b.purpose, 500)
+    const paid_to = str(b.paid_to, 120)
+    const category = PETTY_COLUMNS.includes(String(b.category)) ? String(b.category) : 'Sundry Expenses'
+    const noBill = b.no_bill === true
+    const bill_no = noBill ? null : str(b.bill_no, 80)
+    const bill_url = noBill ? null : cleanFileUrl(b.bill_url)
+    if (!amount || amount <= 0 || !purpose || !paid_to) return bad('Enter the amount, what it was for and who received the cash.')
+    if (amount > max) return bad(`A petty cash payment can be at most ${lkr(max)}. Use a requisition and payment voucher for larger amounts.`)
+    if (amount > bal) return bad(`Petty cash has only ${lkr(bal)}. Restore the float first.`)
+    if (!noBill && (!bill_no || !bill_url)) return bad('Attach the bill and enter its number, or tick "No bill" for things like bus fares (the receiver then signs the voucher).')
+    const row = { entry_type: 'spend', amount, purpose, paid_to, event: str(b.event, 80) || 'General', category, bill_no, bill_url, entry_date, recorded_by: c.email, recorded_name: c.name }
     const { data, error } = await svc().from('fin_petty_cash').insert(row).select('*').single()
     if (error) return dbError(error)
-    if (entry_type === 'spend') {
-      const reg = await registerBill(c, row.bill_no!, 'petty_cash', data.id, data.pc_no)
+    if (bill_no) {
+      const reg = await registerBill(c, bill_no, 'petty_cash', data.id, data.pc_no)
       if (!reg.ok) { await svc().from('fin_petty_cash').delete().eq('id', data.id); return bad(reg.error, 409) }
-      const led = await postLedger(c, {
-        type: 'expense', category: row.category!, amount: row.amount, date: row.entry_date,
-        description: `${data.pc_no}: petty cash, ${row.purpose}`, cash_or_bank: 'cash', event: row.event,
-        bill_url: row.bill_url, bill_no: row.bill_no,
-      })
-      if ('error' in led) { await releaseBill(data.id); await svc().from('fin_petty_cash').delete().eq('id', data.id); return bad(led.error, 500) }
-      await svc().from('fin_petty_cash').update({ ledger_id: led.id }).eq('id', data.id)
     }
-    await logDoc(c, 'petty_cash', data.id, data.pc_no, entry_type, `${lkr(row.amount)} ${row.purpose}`)
+    const led = await postLedger(c, {
+      type: 'expense', category, amount, date: entry_date,
+      description: `${data.pc_no}: petty cash to ${paid_to}, ${purpose}`, cash_or_bank: 'cash', event: row.event,
+      bill_url, bill_no,
+    })
+    if ('error' in led) { await releaseBill(data.id); await svc().from('fin_petty_cash').delete().eq('id', data.id); return bad(led.error, 500) }
+    await svc().from('fin_petty_cash').update({ ledger_id: led.id }).eq('id', data.id)
+    await logDoc(c, 'petty_cash', data.id, data.pc_no, 'spend', `${lkr(amount)} to ${paid_to}: ${purpose}`)
     return ok({ row: data })
+  },
+
+  async 'petty.settings'(c, b) {
+    const deny = need(c, 'settings'); if (deny) return deny
+    const float = num(b.petty_float), max = num(b.petty_max_spend)
+    if (!float || float < 500) return bad('Enter a float of at least LKR 500.')
+    if (!max || max <= 0 || max > float) return bad('The most per payment must be more than 0 and not above the float.')
+    const { error } = await svc().from('fin_settings').update({ petty_float: float, petty_max_spend: max, updated_by: c.email, updated_at: new Date().toISOString() }).eq('id', 1)
+    if (error) return dbError(error)
+    await logDoc(c, 'settings', null, null, 'petty_limits_changed', `float ${lkr(float)}, max ${lkr(max)}`)
+    return ok()
   },
 
   // ---------------- Settings ----------------
@@ -453,4 +483,15 @@ const HANDLERS: Record<string, H> = {
 async function pettyBalance(): Promise<number> {
   const { data } = await svc().from('fin_petty_cash').select('entry_type, amount').limit(10000)
   return (data ?? []).reduce((s, e) => s + (e.entry_type === 'top_up' ? 1 : -1) * Number(e.amount), 0)
+}
+
+async function pettyLimits(): Promise<{ float: number; max: number }> {
+  const { data } = await svc().from('fin_settings').select('*').eq('id', 1).maybeSingle()
+  const f = Number(data?.petty_float), m = Number(data?.petty_max_spend)
+  return { float: f > 0 ? f : PETTY_DEFAULT_FLOAT, max: m > 0 ? m : PETTY_DEFAULT_MAX }
+}
+
+async function hasPetty(): Promise<boolean> {
+  const { count } = await svc().from('fin_petty_cash').select('id', { count: 'exact', head: true })
+  return (count || 0) > 0
 }

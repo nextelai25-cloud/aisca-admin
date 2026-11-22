@@ -9,7 +9,10 @@ export type ReqStatus = 'pending_cfo' | 'pending_second' | 'approved' | 'rejecte
 export type RbStatus = 'pending_cfo' | 'pending_second' | 'approved' | 'paid' | 'rejected'
 export type PayMethod = 'bank' | 'cash' | 'petty_cash'
 
-export interface FinSettings { id: number; approval_threshold: number; second_approver: string; updated_by: string | null; updated_at: string | null }
+export interface FinSettings {
+  id: number; approval_threshold: number; second_approver: string; updated_by: string | null; updated_at: string | null
+  petty_float?: number | null; petty_max_spend?: number | null
+}
 
 export interface FinQuotation {
   id: string; requisition_id: string; vendor: string; amount: number; contact: string | null
@@ -56,6 +59,7 @@ export interface FinIncome {
 
 export interface FinPetty {
   id: string; pc_no: string; entry_type: 'top_up' | 'spend'; amount: number; purpose: string; event: string
+  paid_to?: string | null; reference?: string | null
   category: string | null; bill_no: string | null; bill_url: string | null; entry_date: string; ledger_id: string | null
   voucher_id: string | null; recorded_by: string | null; recorded_name: string | null; created_at: string
 }
@@ -83,6 +87,14 @@ export const FIN_EXPENSE_CATEGORIES = [
   'Marketing & Promotions', 'Awards & Trophies', 'Sound, Lighting & Stage', 'Equipment & Supplies',
   'Bank Charges', 'Charity & CSR', 'Other Expenses',
 ]
+// Petty cash analysis columns (imprest book). Each is also the ledger expense category.
+export const PETTY_COLUMNS = ['Transportation', 'Food & Beverages', 'Printing & Stationery', 'Postage & Courier', 'Communication', 'Sundry Expenses']
+/** Which analysis column a petty cash payment falls under. */
+export const pettyColumn = (category: string | null | undefined) =>
+  category && PETTY_COLUMNS.includes(category) ? category : 'Sundry Expenses'
+export const PETTY_DEFAULT_FLOAT = 10000
+export const PETTY_DEFAULT_MAX = 5000
+
 // Income source -> finance_ledger income category
 export const FIN_INCOME_SOURCES: Record<string, string> = {
   'Sponsorship': 'Sponsorship',

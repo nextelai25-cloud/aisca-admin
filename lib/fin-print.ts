@@ -10,6 +10,7 @@
 import {
   lkr, fmtDate, fmtDateTime, needsSecond, STATUS_LABEL,
   type FinRequisition, type FinVoucher, type FinReimbursement, type FinIncome, type FinPetty, type FinQuotation, type FinData,
+  PETTY_COLUMNS, pettyColumn,
 } from '@/lib/fin'
 import { FIN_LOGO } from '@/lib/fin-logo'
 
@@ -45,9 +46,9 @@ export function amountInWords(amount: number): string {
 }
 
 // ---------- building blocks ----------
-function seal(date: string | null, name: string | null) {
+function seal(date: string | null, name: string | null, low = false) {
   const d = esc(fmtDate(date) || '')
-  return `<div class="seal"><svg viewBox="0 0 200 200" width="150" height="150">
+  return `<div class="seal${low ? ' low' : ''}"><svg viewBox="0 0 200 200" width="150" height="150">
     <defs><path id="sc" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
     <circle cx="100" cy="100" r="96" fill="none" stroke="#1B3A8C" stroke-width="3"/>
     <circle cx="100" cy="100" r="66" fill="none" stroke="#1B3A8C" stroke-width="1.5"/>
@@ -65,7 +66,7 @@ const sig = (role: string, name?: string | null, when?: string | null, extra = '
 
 const logoUrl = () => FIN_LOGO
 
-function shell(title: string, docNo: string, body: string, opts: { sealed?: { date: string | null; name: string | null }; copy?: string; landscape?: boolean } = {}) {
+function shell(title: string, docNo: string, body: string, opts: { sealed?: { date: string | null; name: string | null; low?: boolean }; copy?: string; landscape?: boolean } = {}) {
   return page(`${docNo} ${title}`, docBlock(title, docNo, body, logoUrl(), opts), opts.landscape)
 }
 
@@ -102,6 +103,9 @@ function page(titleText: string, inner: string, landscape?: boolean) {
   .ack { display: flex; gap: 16px; align-items: flex-end; margin-top: 16px; border: 1px solid #999; padding: 10px; }
   .ack .txt { flex: 1; line-height: 1.6; }
   .seal { position: absolute; right: 8px; top: 64px; opacity: .9; transform: rotate(-12deg); }
+  .seal.low { top: auto; bottom: 30px; right: 36%; }
+  .sigs, .ack, .cert, table.kv { break-inside: avoid; }
+  td.nw { white-space: nowrap; }
   .badge { display: inline-block; border: 1px solid #111; padding: 1px 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
   .sel { font-weight: 700; }
   footer { margin-top: 18px; border-top: 1px solid #bbb; padding-top: 5px; font-size: 9px; color: #555; display: flex; justify-content: space-between; }
@@ -116,12 +120,12 @@ function page(titleText: string, inner: string, landscape?: boolean) {
   </body></html>`
 }
 
-function docBlock(title: string, docNo: string, body: string, logo: string, opts: { sealed?: { date: string | null; name: string | null }; copy?: string }) {
+function docBlock(title: string, docNo: string, body: string, logo: string, opts: { sealed?: { date: string | null; name: string | null; low?: boolean }; copy?: string }) {
   return `<div class="doc">
     ${opts.copy ? `<div class="copy">${esc(opts.copy)}</div>` : ''}
     <header><div><img src="${logo}" alt="AISCA"><div class="org">${ORG} (AISCA) &middot; aisca.lk</div></div>
     <div class="meta"><h1>${esc(title)}</h1><div class="no">No. ${esc(docNo)}</div></div></header>
-    ${opts.sealed ? seal(opts.sealed.date, opts.sealed.name) : ''}
+    ${opts.sealed ? seal(opts.sealed.date, opts.sealed.name, opts.sealed.low) : ''}
     ${body}
     <footer><span>Generated from AISCA Finance Desk on ${esc(fmtDateTime(new Date().toISOString()))}</span><span>Serial numbers run in sequence. Spoilt or cancelled forms are kept on file, never destroyed.</span></footer>
   </div>`
@@ -290,28 +294,83 @@ export function printIncome(ir: FinIncome) {
   open(page(`${ir.ir_no} Receipt`, `${one('ORIGINAL')}<div class="cut">cut here</div>${one('OFFICE COPY')}`))
 }
 
-export function printPettyBook(rows: FinPetty[], from?: string, to?: string) {
-  let bal = 0
+/** Codes printed on petty cash vouchers and the book (AISCA petty cash chart). */
+export const PETTY_ACCOUNT = { code: '1102', name: 'Petty Cash (imprest)' }
+export const PETTY_CODES: Record<string, string> = {
+  'Transportation': '5210', 'Food & Beverages': '5220', 'Printing & Stationery': '5230',
+  'Postage & Courier': '5240', 'Communication': '5250', 'Sundry Expenses': '5290',
+}
+
+/** Petty cash voucher (one per payment), laid out like a standard Sri Lankan PCV. */
+export function printPettyVoucher(p: FinPetty, float: number) {
+  if (p.entry_type !== 'spend') return
+  const col = pettyColumn(p.category)
+  const body = `
+  <table class="kv" style="width:66%">
+    ${row('Date', esc(fmtDate(p.entry_date)))}
+    ${row('Paid a sum of', `<b>${amountInWords(p.amount)}</b>`)}
+    ${row('To', `<b>${esc(p.paid_to || '')}</b>`)}
+    ${row('Petty cash account code', `${PETTY_ACCOUNT.code} &nbsp; ${PETTY_ACCOUNT.name} (float LKR ${money(float)})`)}
+    ${row('Event / project', esc(p.event))}
+  </table>
+  <table class="grid" style="margin-top:34px">
+    <tr><th>Account code</th><th>Name of the account</th><th>Description of the payment</th><th class="num">Amount (Rs. Cts)</th></tr>
+    <tr><td>${PETTY_CODES[col]}</td><td>${esc(col)}</td><td>${esc(p.purpose)}</td><td class="num">${money(p.amount)}</td></tr>
+    <tr class="total"><td colspan="3">Total</td><td class="num">Rs ${money(p.amount)}</td></tr>
+  </table>
+  <table class="kv" style="margin-top:8px">
+    ${row('Supporting bill', p.bill_no ? `Bill no. ${esc(p.bill_no)} attached` : '<b>No bill.</b> The receiver signs below to confirm the payment.')}
+  </table>
+  <div class="sigs">
+    ${sig('Prepared by', p.recorded_name, p.entry_date)}
+    ${sig('Authorised by (CFO)')}
+    ${sig('Received by', p.paid_to, null, '<span>NIC: ..............................</span>')}
+  </div>`
+  open(shell('Petty Cash Voucher', p.pc_no, body, { sealed: { date: p.entry_date, name: p.recorded_name } }))
+}
+
+/** Analytical petty cash book on the imprest system. */
+export function printPettyBook(rows: FinPetty[], float: number, from?: string, to?: string) {
+  const cols = PETTY_COLUMNS
+  let bal = 0, opening = 0, recd = 0, paid = 0
+  const tot: Record<string, number> = Object.fromEntries(cols.map((c) => [c, 0]))
   const lines: string[] = []
-  let opening = 0
   for (const p of rows) {
     const amt = Number(p.amount) * (p.entry_type === 'top_up' ? 1 : -1)
     if (from && p.entry_date < from) { opening += amt; bal += amt; continue }
     if (to && p.entry_date > to) continue
     bal += amt
-    lines.push(`<tr><td>${esc(fmtDate(p.entry_date))}</td><td>${esc(p.pc_no)}</td><td>${esc(p.purpose)}</td><td>${esc(p.event)}</td><td>${esc(p.bill_no || '')}</td>
-      <td class="num">${p.entry_type === 'top_up' ? money(p.amount) : ''}</td><td class="num">${p.entry_type === 'spend' ? money(p.amount) : ''}</td><td class="num">${money(bal)}</td></tr>`)
+    const col = pettyColumn(p.category)
+    if (p.entry_type === 'top_up') recd += Number(p.amount)
+    else { paid += Number(p.amount); tot[col] += Number(p.amount) }
+    lines.push(`<tr>
+      <td class="num">${p.entry_type === 'top_up' ? money(p.amount) : ''}</td>
+      <td class="nw">${esc(fmtDate(p.entry_date))}</td><td class="nw">${esc(p.pc_no)}</td>
+      <td>${esc(p.entry_type === 'top_up' ? `${p.purpose}${p.reference ? ', ref ' + p.reference : ''}` : `${p.paid_to ? p.paid_to + ': ' : ''}${p.purpose}`)}${p.bill_no ? `<br><small>Bill ${esc(p.bill_no)}</small>` : ''}</td>
+      <td class="num">${p.entry_type === 'spend' ? money(p.amount) : ''}</td>
+      ${cols.map((c) => `<td class="num">${p.entry_type === 'spend' && col === c ? money(p.amount) : ''}</td>`).join('')}
+      <td class="num">${money(bal)}</td></tr>`)
   }
+  const restore = Math.max(0, float - bal)
   const body = `
-  <p>Period: ${esc(from ? fmtDate(from) : 'start')} to ${esc(to ? fmtDate(to) : 'today')}</p>
-  <table class="grid">
-    <tr><th>Date</th><th>Voucher</th><th>Particulars</th><th>Event</th><th>Bill no.</th><th class="num">Received</th><th class="num">Paid</th><th class="num">Balance</th></tr>
-    <tr class="total"><td colspan="7">Opening balance</td><td class="num">${money(opening)}</td></tr>
+  <p>Imprest float: <b>LKR ${money(float)}</b> &nbsp; Account ${PETTY_ACCOUNT.code} &nbsp; Period: ${esc(from ? fmtDate(from) : 'start')} to ${esc(to ? fmtDate(to) : fmtDate(new Date().toISOString()))}</p>
+  <table class="grid" style="font-size:9.5px">
+    <tr><th class="num">Receipts</th><th>Date</th><th>PCV no.</th><th style="width:24%">Particulars</th><th class="num">Total paid</th>
+      ${cols.map((c) => `<th class="num">${esc(c)}<br><small>${PETTY_CODES[c]}</small></th>`).join('')}<th class="num">Balance</th></tr>
+    <tr><td class="num">${money(opening)}</td><td></td><td></td><td><b>Balance b/d</b></td><td></td>${cols.map(() => '<td></td>').join('')}<td class="num">${money(opening)}</td></tr>
     ${lines.join('')}
-    <tr class="total"><td colspan="7">Closing balance (cash in hand should equal this)</td><td class="num">${money(bal)}</td></tr>
+    <tr class="total"><td class="num">${money(opening + recd)}</td><td colspan="3">Totals for the period</td><td class="num">${money(paid)}</td>${cols.map((c) => `<td class="num">${money(tot[c])}</td>`).join('')}<td></td></tr>
+    <tr><td></td><td colspan="3"><b>Balance c/d</b></td><td class="num">${money(bal)}</td>${cols.map(() => '<td></td>').join('')}<td></td></tr>
+    <tr class="total"><td class="num">${money(opening + recd)}</td><td colspan="3"></td><td class="num">${money(paid + bal)}</td>${cols.map(() => '<td></td>').join('')}<td></td></tr>
   </table>
-  <p class="note">Count the cash in the petty cash box at each top up and month end. Any difference is reported to the CFO in writing.</p>
-  <div class="sigs">${sig('Petty cash custodian')}${sig('Cash counted and verified by (CFO)')}${sig('Chairperson')}</div>`
+  <table class="kv" style="margin-top:10px;width:60%">
+    ${row('Cash in hand per book (balance c/d)', `LKR ${money(bal)}`)}
+    ${row('Cash counted in the box', '')}
+    ${row('Difference (explain in writing)', '')}
+    ${row('Amount to restore the float', `<b>LKR ${money(restore)}</b> (equals the total paid since the last restoration)`)}
+  </table>
+  <p class="note">Imprest system: the box starts with a fixed float. Each payment needs a petty cash voucher. At the end of the period the float is restored by drawing exactly the amount spent, and the analysis column totals are posted to their expense accounts.</p>
+  <div class="sigs" style="margin-top:14px">${sig('Petty cash custodian')}${sig('Cash counted and verified by (CFO)')}${sig('Chairperson')}</div>`
   open(shell('Petty Cash Book', 'PCB', body, { landscape: true }))
 }
 
