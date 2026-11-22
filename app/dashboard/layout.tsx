@@ -195,6 +195,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .logout-btn:hover {
           background: #F5F5F7 !important;
         }
+        /* Sidebar fits a laptop screen at 100% zoom (Windows 125-150% scaling leaves ~550-650px of height) */
+        .admin-nav { scrollbar-width: thin; scrollbar-color: #D2D2D7 transparent; }
+        .admin-nav::-webkit-scrollbar { width: 4px; }
+        .admin-nav::-webkit-scrollbar-button { display: none; height: 0; }
+        .admin-nav::-webkit-scrollbar-thumb { background: #D2D2D7; border-radius: 4px; }
+        .nav-link { height: 36px !important; }
+        @media (max-height: 760px) {
+          .admin-logo { padding: 14px 20px 10px !important; }
+          .nav-link { height: 31px !important; font-size: 12.5px !important; }
+          .admin-nav { gap: 1px !important; }
+          .admin-bottom { padding: 6px 12px !important; flex-direction: row !important; }
+          .admin-bottom > * { flex: 1; min-width: 0; gap: 8px !important; padding: 0 8px !important; }
+        }
+        @media (max-height: 600px) {
+          .admin-logo { padding: 10px 20px 8px !important; }
+          .nav-link { height: 29px !important; }
+        }
         @media (max-width: 767px) {
           .admin-search { display: none !important; }
           .admin-page-title { font-size: 15px !important; }
@@ -232,8 +249,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           flexDirection: 'column'
         }}
       >
-        <div style={{ padding: '24px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <img src="/original-logo.png" alt="AISCA" style={{ width: '120px', filter: 'brightness(0)' }} />
+        <div className="admin-logo" style={{ padding: '22px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <img src="/aisca-wordmark.png" alt="AISCA" style={{ width: '104px', height: 'auto', filter: 'brightness(0)', display: 'block' }} />
           <button 
             onClick={() => setSidebarOpen(false)}
             className="mobile-close-btn"
@@ -243,7 +260,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
         </div>
 
-        <nav style={{ flex: 1, padding: '0 12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <nav className="admin-nav" style={{ flex: 1, minHeight: 0, padding: '0 12px 8px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {topNavItems.filter(item => profile && canAccess(profile.role as AdminRole, item.section)).map(item => {
             const isActive = pathname === item.path || (pathname.startsWith(item.path) && item.path !== '/dashboard')
             const Icon = item.icon
@@ -262,14 +279,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   transition: 'var(--transition-control)'
                 }}
               >
-                <Icon size={18} />
-                <span>{item.name}</span>
+                <Icon size={17} style={{ flexShrink: 0 }} />
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
               </Link>
             )
           })}
         </nav>
 
-        <div style={{ padding: '12px', borderTop: '1px solid #E5E5EA', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div className="admin-bottom" style={{ padding: '10px 12px', borderTop: '1px solid #E5E5EA', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {bottomNavItems.filter(item => profile && canAccess(profile.role as AdminRole, item.section)).map(item => {
             const isActive = pathname === item.path
             const Icon = item.icon
@@ -287,22 +304,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   transition: 'var(--transition-control)'
                 }}
               >
-                <Icon size={18} />
-                <span>{item.name}</span>
+                <Icon size={17} style={{ flexShrink: 0 }} />
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
               </Link>
             )
           })}
           <button
             onClick={handleSignOut}
-            className="logout-btn"
+            className="logout-btn nav-link"
             style={{
               width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '0 12px', height: '40px',
               borderRadius: '10px', background: 'transparent', border: 'none', color: '#D70015',
               fontSize: '13px', fontWeight: '500', cursor: 'pointer', textAlign: 'left', transition: 'var(--transition-control)'
             }}
           >
-            <LogOut size={18} />
-            <span>Log out</span>
+            <LogOut size={17} style={{ flexShrink: 0 }} />
+            <span style={{ whiteSpace: 'nowrap' }}>Log out</span>
           </button>
         </div>
       </div>

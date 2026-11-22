@@ -7,8 +7,10 @@ import TransactionsTab from './components/TransactionsTab'
 import ReportsTab from './components/ReportsTab'
 import BudgetTab from './components/BudgetTab'
 import ReconciliationTab from './components/ReconciliationTab'
+import FinanceDesk from './desk/FinanceDesk'
 
 export default function FinancePage() {
+  const [mode, setMode] = useState<'desk' | 'ledger'>('desk')
   const [activeTab, setActiveTab] = useState<'dashboard' | 'transactions' | 'reports' | 'budget' | 'reconciliation'>('dashboard')
 
   const tabs = [
@@ -24,8 +26,24 @@ export default function FinancePage() {
       {/* Header */}
       <div>
         <h1 className="text-large-title font-bold tracking-tight text-[#1D1D1F]">Finance Command Center</h1>
-        <p className="text-body text-[#6E6E73] mt-1">Comprehensive Financial Management & Reporting</p>
+        <p className="text-body text-[#6E6E73] mt-1">Approvals, documents, ledger and reporting</p>
       </div>
+
+      {/* Desk (CFO process and documents) or Ledger (books and statements) */}
+      <div style={{ display: 'inline-flex', background: '#E9E9EE', borderRadius: 12, padding: 4, gap: 4 }}>
+        {([['desk', 'Finance Desk'], ['ledger', 'Ledger & Reports']] as const).map(([id, label]) => (
+          <button key={id} onClick={() => setMode(id)}
+            style={{ padding: '8px 16px', borderRadius: 9, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', minHeight: 0,
+              background: mode === id ? '#FFFFFF' : 'transparent', color: mode === id ? '#1D1D1F' : '#6E6E73',
+              boxShadow: mode === id ? '0 1px 3px rgba(0,0,0,.08)' : 'none' }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {mode === 'desk' && <FinanceDesk />}
+
+      {mode === 'ledger' && <>
 
       {/* Tabs Navigation */}
       <div className="flex flex-wrap gap-2 pb-4 border-b border-[#E5E5EA]">
@@ -61,6 +79,7 @@ export default function FinancePage() {
         {activeTab === 'budget' && <BudgetTab />}
         {activeTab === 'reconciliation' && <ReconciliationTab />}
       </div>
+      </>}
     </div>
   )
 }
